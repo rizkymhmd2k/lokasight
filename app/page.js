@@ -3,7 +3,7 @@ import Hero from "./components/sections/Hero";
 
 export default function Home() {
   return (
-    <main className="mx-auto overflow-x-hidden">
+    <main className="mx-auto overflow-x-hidden w-full">
       <Hero />
     </main>
   );
