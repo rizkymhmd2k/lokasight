@@ -5,6 +5,7 @@
 @theme {
   --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
   --color-reddot: #dc2626;
+  --color-backgroundlight: #F8F7F3
 }
 
 @layer base {

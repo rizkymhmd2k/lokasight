@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@next/font": "^14.2.15",
+    "@studio-freight/lenis": "^1.0.42",
     "gsap": "^3.14.2",
     "next": "16.1.1",
     "postcss": "^8.5.6",
