@@ -19,13 +19,14 @@ export default function WorkShowcase() {
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.08 });
 
-    const raf = (time) => {
-      lenis.raf(time);
+    const raf = (t) => {
+      lenis.raf(t);
       requestAnimationFrame(raf);
     };
     requestAnimationFrame(raf);
 
     const vh = window.innerHeight;
+    const centerY = vh / 2;
 
     const onScroll = ({ scroll }) => {
       const section = sectionRef.current;
@@ -40,7 +41,7 @@ export default function WorkShowcase() {
         return;
       }
 
-      // capture pin start once
+      // capture pin start
       if (startScrollRef.current === null) {
         startScrollRef.current = scroll;
         return;
@@ -49,12 +50,8 @@ export default function WorkShowcase() {
       const delta = scroll - startScrollRef.current;
       const perCard = vh;
 
-      const index = Math.min(
-        ITEMS.length - 1,
-        Math.max(0, Math.floor(delta / perCard))
-      );
-
-      setActiveIndex(index);
+      let closestIndex = 0;
+      let closestDistance = Infinity;
 
       cardsRef.current.forEach((card, i) => {
         if (!card) return;
@@ -62,8 +59,20 @@ export default function WorkShowcase() {
         const local = delta - i * perCard;
         const y = vh - local;
 
+        // move card
         card.style.transform = `translateY(${y}px)`;
+
+        // dominance check (center vs viewport center)
+        const cardCenter = y + card.offsetHeight / 2;
+        const distance = Math.abs(cardCenter - centerY);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
       });
+
+      setActiveIndex(closestIndex);
     };
 
     lenis.on("scroll", onScroll);
@@ -73,8 +82,6 @@ export default function WorkShowcase() {
       lenis.destroy();
     };
   }, []);
-
-  const safeIndex = Math.min(ITEMS.length - 1, Math.max(0, activeIndex));
 
   return (
     <section
@@ -89,10 +96,10 @@ export default function WorkShowcase() {
             Featured Work
           </p>
           <h2 className="mt-4 text-4xl font-semibold">
-            {ITEMS[safeIndex]?.title}
+            {ITEMS[activeIndex].title}
           </h2>
           <p className="mt-2 text-neutral-600 max-w-md">
-            {ITEMS[safeIndex]?.desc}
+            {ITEMS[activeIndex].desc}
           </p>
         </div>
 
