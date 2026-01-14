@@ -59,13 +59,45 @@ export default function WorkShowcase() {
         const local = delta - i * perCard;
         const y = vh - local;
 
-        // move card
+        // move card vertically
         card.style.transform = `translateY(${y}px)`;
 
-        // dominance check (center vs viewport center)
-        const cardCenter = y + card.offsetHeight / 2;
-        const distance = Math.abs(cardCenter - centerY);
+        // Calculate card's vertical position relative to viewport
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.top + cardRect.height / 2;
+        
+        // Calculate distance from viewport center (normalized from 0 to 1)
+        // 0 = at viewport center, 1 = at viewport edge
+        const distanceFromCenter = Math.abs(cardCenter - centerY);
+        const normalizedDistance = Math.min(distanceFromCenter / (vh / 2), 1);
 
+        // Apply scaling and perspective effect based on distance from center
+        // Only apply effect when card is BELOW center (approaching from bottom)
+        // When card is AT or ABOVE center, use final values (no effect)
+        
+        let scale = 1.0;
+        let rotateX = 0;
+        
+        if (cardCenter > centerY) {
+          // Card is below center - apply effect
+          // Scale: from 1.1 (far from center) to 1.0 (at center)
+          scale = 1.0 + (0.1 * normalizedDistance);
+          
+          // Rotation: from 8° (far from center) to 0° (at center)
+          // Creates trapezoid effect when rotated with perspective
+          rotateX = 8 * normalizedDistance;
+        } else {
+          // Card is at or above center - no effect (final state)
+          scale = 1.0;
+          rotateX = 0;
+        }
+
+        // Apply the 3D transform with perspective
+        card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotateX}deg)`;
+        card.style.transformOrigin = 'center center';
+
+        // dominance check for active index
+        const distance = Math.abs(cardCenter - centerY);
         if (distance < closestDistance) {
           closestDistance = distance;
           closestIndex = i;
@@ -103,21 +135,29 @@ export default function WorkShowcase() {
           </p>
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT with perspective container */}
         <div className="relative overflow-hidden">
-          {ITEMS.map((item, i) => (
-            <div
-              key={item.title}
-              ref={(el) => (cardsRef.current[i] = el)}
-              style={{ transform: "translateY(100vh)" }}
-              className="absolute inset-0 m-auto h-[60vh] w-[80%]
-                         rounded-xl bg-neutral-200 flex items-center
-                         justify-center text-2xl font-medium
-                         will-change-transform"
-            >
-              {item.title}
-            </div>
-          ))}
+          <div className="relative h-full" style={{
+            perspective: '1000px',
+            transformStyle: 'preserve-3d'
+          }}>
+            {ITEMS.map((item, i) => (
+              <div
+                key={item.title}
+                ref={(el) => (cardsRef.current[i] = el)}
+                style={{ 
+                  transform: 'translateY(100vh) scale(1.1) rotateX(8deg)',
+                  transformOrigin: 'center center'
+                }}
+                className="absolute inset-0 m-auto h-[60vh] w-[80%]
+                           rounded-xl bg-neutral-200 flex items-center
+                           justify-center text-2xl font-medium
+                           will-change-transform transition-transform duration-75"
+              >
+                {item.title}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
