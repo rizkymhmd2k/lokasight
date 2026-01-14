@@ -7,6 +7,7 @@ const ITEMS = [
   { title: "Project One", desc: "Description for project one" },
   { title: "Project Two", desc: "Description for project two" },
   { title: "Project Three", desc: "Description for project three" },
+  { title: "Project Four", desc: "Description for project four" },
 ];
 
 export default function WorkShowcase() {
@@ -18,8 +19,8 @@ export default function WorkShowcase() {
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.08 });
 
-    const raf = (t) => {
-      lenis.raf(t);
+    const raf = (time) => {
+      lenis.raf(time);
       requestAnimationFrame(raf);
     };
     requestAnimationFrame(raf);
@@ -39,7 +40,7 @@ export default function WorkShowcase() {
         return;
       }
 
-      // capture pin start
+      // capture pin start once
       if (startScrollRef.current === null) {
         startScrollRef.current = scroll;
         return;
@@ -48,13 +49,12 @@ export default function WorkShowcase() {
       const delta = scroll - startScrollRef.current;
       const perCard = vh;
 
-      const rawIndex = Math.floor(delta / perCard);
-      const clampedIndex = Math.min(
+      const index = Math.min(
         ITEMS.length - 1,
-        Math.max(0, rawIndex)
+        Math.max(0, Math.floor(delta / perCard))
       );
 
-      setActiveIndex(clampedIndex);
+      setActiveIndex(index);
 
       cardsRef.current.forEach((card, i) => {
         if (!card) return;
@@ -74,14 +74,14 @@ export default function WorkShowcase() {
     };
   }, []);
 
-  // ✅ render-safe index
-  const safeIndex = Math.min(
-    ITEMS.length - 1,
-    Math.max(0, activeIndex)
-  );
+  const safeIndex = Math.min(ITEMS.length - 1, Math.max(0, activeIndex));
 
   return (
-    <section ref={sectionRef} className="relative h-[400vh]">
+    <section
+      ref={sectionRef}
+      style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
+      className="relative"
+    >
       <div className="sticky top-0 h-screen grid grid-cols-2 gap-12 px-12 overflow-hidden">
         {/* LEFT */}
         <div className="flex flex-col justify-center">
@@ -89,10 +89,10 @@ export default function WorkShowcase() {
             Featured Work
           </p>
           <h2 className="mt-4 text-4xl font-semibold">
-            {ITEMS[safeIndex].title}
+            {ITEMS[safeIndex]?.title}
           </h2>
           <p className="mt-2 text-neutral-600 max-w-md">
-            {ITEMS[safeIndex].desc}
+            {ITEMS[safeIndex]?.desc}
           </p>
         </div>
 
@@ -105,7 +105,8 @@ export default function WorkShowcase() {
               style={{ transform: "translateY(100vh)" }}
               className="absolute inset-0 m-auto h-[60vh] w-[80%]
                          rounded-xl bg-neutral-200 flex items-center
-                         justify-center text-2xl will-change-transform"
+                         justify-center text-2xl font-medium
+                         will-change-transform"
             >
               {item.title}
             </div>
