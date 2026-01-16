@@ -19,90 +19,78 @@ export default function WorkShowcase() {
   const scrollStartRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Animation settings
+  const EFFECT_STOP = 0.9;
+  const MAX_SCALE = 0.6;
+  const MAX_ROTATE = 25;
+
   useEffect(() => {
-    // 1. Setup smooth scrolling
     const lenis = new Lenis({ lerp: 0.08 });
     
-    // 2. Animation frame loop
     const animate = (time) => {
       lenis.raf(time);
       requestAnimationFrame(animate);
     };
     requestAnimationFrame(animate);
 
-    // 3. Handle scroll events
     const handleScroll = ({ scroll }) => {
       const section = sectionRef.current;
       if (!section) return;
 
-      // Get section position
       const sectionRect = section.getBoundingClientRect();
       
-      // If section is above viewport (not yet pinned)
       if (sectionRect.top > 0) {
         scrollStartRef.current = 0;
         setActiveIndex(0);
         return;
       }
 
-      // Record start position when section first reaches top
       if (scrollStartRef.current === 0) {
         scrollStartRef.current = scroll;
       }
 
-      // Calculate scroll since pinning started
       const scrollSinceStart = scroll - scrollStartRef.current;
-      const viewportHeight = window.innerHeight;
+      const vh = window.innerHeight;
 
-      let closestIndex = 0;
-      let smallestDistance = Infinity;
+      let closest = 0, minDist = Infinity;
 
-      // Update each card
-      cardsRef.current.forEach((card, index) => {
+      cardsRef.current.forEach((card, i) => {
         if (!card) return;
 
-        // Calculate progress: 0 = entering bottom, 1 = exiting top
-        const progress = (scrollSinceStart - index * viewportHeight) / viewportHeight;
-        
-        // Calculate vertical position
-        const yPosition = (1 - progress) * viewportHeight;
+        const progress = (scrollSinceStart - i * vh) / vh;
+        const y = (1 - progress) * vh;
 
-        // Calculate scale and rotation
-        let scale = 1;
-        let rotate = 0;
+        let scale = 1, rotate = 0;
         
-        // Only apply effects when card is below center
-        if (progress < 0.5) {
-          const effectStrength = 1 - (progress * 2); // Goes from 1 to 0
-          scale = 1 + 0.6 * effectStrength;  // 1.6 → 1.0
-          rotate = 25 * effectStrength;      // 25° → 0°
+        if (progress < EFFECT_STOP) {
+          const norm = 1 - (progress / EFFECT_STOP);
+          scale = 1 + MAX_SCALE * norm;
+          rotate = MAX_ROTATE * norm;
         }
 
-        // Apply transform to card
-        card.style.transform = `translateY(${yPosition}px) scale(${scale}) rotateX(${rotate}deg)`;
-
-        // Find which card is closest to center
-        const distanceFromCenter = Math.abs(progress - 0.5);
-        if (distanceFromCenter < smallestDistance) {
-          smallestDistance = distanceFromCenter;
-          closestIndex = index;
+        card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
+        
+        const dist = Math.abs(progress - 0.5);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
         }
       });
 
-      // Update active project display
-      setActiveIndex(closestIndex);
+      setActiveIndex(closest);
     };
 
     lenis.on("scroll", handleScroll);
-
-    // Cleanup
     return () => lenis.destroy();
   }, []);
 
   return (
     <section ref={sectionRef} style={{ height: `${(ITEMS.length + 1) * 100}vh` }}>
-      <div className="sticky top-0 h-screen grid grid-cols-2 gap-12 px-12 overflow-hidden">
-        <div className="flex flex-col justify-center">
+      {/* Changed from grid to flex with 40/60 split */}
+      <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
+        
+        {/* Left column: 40% width for text */}
+        <div className="w-2/5 flex flex-col justify-center pr-12">
           <p className="text-sm uppercase tracking-wide text-neutral-500">
             Featured Work
           </p>
@@ -114,13 +102,16 @@ export default function WorkShowcase() {
           </p>
         </div>
 
-        <div className="relative overflow-hidden">
+        {/* Right column: 60% width for cards */}
+        <div className="w-3/5 relative overflow-hidden">
           <div className="relative h-full" style={{ perspective: 500 }}>
             {ITEMS.map((item, i) => (
               <div
                 key={i}
                 ref={el => cardsRef.current[i] = el}
-                style={{ transform: "translateY(100vh) scale(1.3) rotateX(25deg)" }}
+                style={{ 
+                  transform: `translateY(100vh) scale(${1 + MAX_SCALE}) rotateX(${MAX_ROTATE}deg)` 
+                }}
                 className="absolute inset-0 m-auto h-[60vh] w-4/5 rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
                 {item.title}
@@ -128,6 +119,7 @@ export default function WorkShowcase() {
             ))}
           </div>
         </div>
+        
       </div>
     </section>
   );
