@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
-
-
 @theme {
   --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
   --color-reddot: #dc2626;
-  --color-backgroundlight: #F8F7F3
+  --color-backgroundlight: #F8F7F3;
 }
 
+/* ---------------------------------------------
+   Base + keyframes
+---------------------------------------------- */
 @layer base {
   body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
-  :focus-visible {
-    outline: 2px solid #dc2626;
-    outline-offset: 2px;
+  @keyframes lineRevealUp {
+    from {
+      transform: translateY(120%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0%);
+      opacity: 1;
+    }
   }
 
-  img {
-    max-width: 100%;
-    height: auto;
+  @keyframes lineRevealDown {
+    from {
+      transform: translateY(-120%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0%);
+      opacity: 1;
+    }
+  }
+}
+
+/* ---------------------------------------------
+   Direction-aware animation
+---------------------------------------------- */
+@layer utilities {
+  [data-direction="down"] .animate-line {
+    animation: lineRevealUp 0.85s cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
+
+  [data-direction="up"] .animate-line {
+    animation: lineRevealDown 0.85s cubic-bezier(0.25, 1, 0.5, 1) both;
   }
 }

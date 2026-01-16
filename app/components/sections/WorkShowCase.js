@@ -145,7 +145,7 @@ export default function WorkShowcase() {
               <div
                 key={i}
                 ref={(el) => (cardsRef.current[i] = el)}
-                className="absolute inset-0 m-auto h-[60vh] w-4/5 rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
+                className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
                 style={{
                   transform: `
                     translateY(100vh)
