@@ -11,68 +11,116 @@ const ITEMS = [
 ];
 
 export default function WorkShowcase() {
-  const section = useRef(null);
-  const cards = useRef([]);
-  const start = useRef(0);
-  const [active, setActive] = useState(0);
+  // DOM references
+  const sectionRef = useRef(null);
+  const cardsRef = useRef([]);
+  
+  // Animation state
+  const scrollStartRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
+    // 1. Setup smooth scrolling
     const lenis = new Lenis({ lerp: 0.08 });
-    const raf = (t) => { lenis.raf(t); requestAnimationFrame(raf); };
-    requestAnimationFrame(raf);
+    
+    // 2. Animation frame loop
+    const animate = (time) => {
+      lenis.raf(time);
+      requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
 
-    lenis.on("scroll", ({ scroll }) => {
-      if (!section.current) return;
-      const rect = section.current.getBoundingClientRect();
-      if (rect.top > 0) { start.current = 0; setActive(0); return; }
+    // 3. Handle scroll events
+    const handleScroll = ({ scroll }) => {
+      const section = sectionRef.current;
+      if (!section) return;
 
-      if (start.current === 0) start.current = scroll;
-      const delta = scroll - start.current;
-      const vh = window.innerHeight;
+      // Get section position
+      const sectionRect = section.getBoundingClientRect();
+      
+      // If section is above viewport (not yet pinned)
+      if (sectionRect.top > 0) {
+        scrollStartRef.current = 0;
+        setActiveIndex(0);
+        return;
+      }
 
-      let closest = 0, minDist = Infinity;
+      // Record start position when section first reaches top
+      if (scrollStartRef.current === 0) {
+        scrollStartRef.current = scroll;
+      }
 
-      cards.current.forEach((card, i) => {
+      // Calculate scroll since pinning started
+      const scrollSinceStart = scroll - scrollStartRef.current;
+      const viewportHeight = window.innerHeight;
+
+      let closestIndex = 0;
+      let smallestDistance = Infinity;
+
+      // Update each card
+      cardsRef.current.forEach((card, index) => {
         if (!card) return;
 
-        const progress = (delta - i * vh) / vh; // 0 to 1 scalar
-        const y = (1 - progress) * vh;
+        // Calculate progress: 0 = entering bottom, 1 = exiting top
+        const progress = (scrollSinceStart - index * viewportHeight) / viewportHeight;
+        
+        // Calculate vertical position
+        const yPosition = (1 - progress) * viewportHeight;
 
-        let scale = 1, rotate = 0;
-        if (progress < 0.5) { // Below center
-          const norm = 1 - (progress * 2); // 1 → 0
-          scale = 1 + 0.2 * norm;
-          rotate = 15 * norm;
+        // Calculate scale and rotation
+        let scale = 1;
+        let rotate = 0;
+        
+        // Only apply effects when card is below center
+        if (progress < 0.5) {
+          const effectStrength = 1 - (progress * 2); // Goes from 1 to 0
+          scale = 1 + 0.6 * effectStrength;  // 1.6 → 1.0
+          rotate = 25 * effectStrength;      // 25° → 0°
         }
 
-        card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
-        
-        const dist = Math.abs(progress - 0.5);
-        if (dist < minDist) { minDist = dist; closest = i; }
+        // Apply transform to card
+        card.style.transform = `translateY(${yPosition}px) scale(${scale}) rotateX(${rotate}deg)`;
+
+        // Find which card is closest to center
+        const distanceFromCenter = Math.abs(progress - 0.5);
+        if (distanceFromCenter < smallestDistance) {
+          smallestDistance = distanceFromCenter;
+          closestIndex = index;
+        }
       });
 
-      setActive(closest);
-    });
+      // Update active project display
+      setActiveIndex(closestIndex);
+    };
 
+    lenis.on("scroll", handleScroll);
+
+    // Cleanup
     return () => lenis.destroy();
   }, []);
 
   return (
-    <section ref={section} style={{ height: `${(ITEMS.length + 1) * 100}vh` }}>
+    <section ref={sectionRef} style={{ height: `${(ITEMS.length + 1) * 100}vh` }}>
       <div className="sticky top-0 h-screen grid grid-cols-2 gap-12 px-12 overflow-hidden">
         <div className="flex flex-col justify-center">
-          <p className="text-sm uppercase tracking-wide text-neutral-500">Featured Work</p>
-          <h2 className="mt-4 text-4xl font-semibold">{ITEMS[active].title}</h2>
-          <p className="mt-2 text-neutral-600 max-w-md">{ITEMS[active].desc}</p>
+          <p className="text-sm uppercase tracking-wide text-neutral-500">
+            Featured Work
+          </p>
+          <h2 className="mt-4 text-4xl font-semibold">
+            {ITEMS[activeIndex].title}
+          </h2>
+          <p className="mt-2 text-neutral-600 max-w-md">
+            {ITEMS[activeIndex].desc}
+          </p>
         </div>
 
         <div className="relative overflow-hidden">
-          <div className="relative h-full" style={{ perspective: 800 }}>
+          <div className="relative h-full" style={{ perspective: 500 }}>
             {ITEMS.map((item, i) => (
               <div
                 key={i}
-                ref={el => cards.current[i] = el}
-                style={{ transform: "translateY(100vh) scale(1.1) rotateX(8deg)" }}
+                ref={el => cardsRef.current[i] = el}
+                style={{ transform: "translateY(100vh) scale(1.3) rotateX(25deg)" }}
                 className="absolute inset-0 m-auto h-[60vh] w-4/5 rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
                 {item.title}
