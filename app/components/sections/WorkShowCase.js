@@ -11,7 +11,7 @@ const ITEMS = [
 ];
 
 /* ---------------------------------------------
-   Line Mask + Stagger Component
+   Desktop-only masked lines
 ---------------------------------------------- */
 function MaskedLines({ text, as: Tag = "div", className }) {
   const lines = text.split("\n");
@@ -32,13 +32,9 @@ function MaskedLines({ text, as: Tag = "div", className }) {
   );
 }
 
-/* ---------------------------------------------
-   Main Component
----------------------------------------------- */
 export default function WorkShowcase() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
-
   const scrollStartRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -46,7 +42,12 @@ export default function WorkShowcase() {
   const MAX_SCALE = 0.6;
   const MAX_ROTATE = 25;
 
+  /* ---------------------------------------------
+     Desktop scroll logic (disabled on mobile)
+  ---------------------------------------------- */
   useEffect(() => {
+    if (window.innerWidth < 640) return;
+
     const lenis = new Lenis({ lerp: 0.08 });
 
     const raf = (time) => {
@@ -113,55 +114,79 @@ export default function WorkShowcase() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
-    >
-      <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
-        {/* LEFT — TEXT */}
-        <div
-          key={activeIndex}
-          className="w-2/5 flex flex-col justify-center pr-12"
-        >
-          <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
-            Featured Work
-          </p>
+    <>
+      {/* ---------------------------------------------
+          MOBILE VERSION (sm and below)
+      ---------------------------------------------- */}
+      <section className="md:hidden px-6 py-16 space-y-10">
+        <h2 className="text-3xl font-semibold">Featured Works</h2>
 
-          <MaskedLines
-            as="h2"
-            className="text-4xl font-semibold"
-            text={ITEMS[activeIndex].title}
-          />
+        <div className="space-y-8">
+          {ITEMS.map((item, i) => (
+            <div
+              key={i}
+              className="rounded-xl bg-neutral-200 h-[50vh] flex items-center justify-center text-xl font-medium"
+            >
+              {item.title}
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="mt-3 text-neutral-600 max-w-md">
-            <MaskedLines text={ITEMS[activeIndex].desc} />
+      {/* ---------------------------------------------
+          DESKTOP VERSION (unchanged behavior)
+      ---------------------------------------------- */}
+      <section
+        ref={sectionRef}
+        className="hidden md:block"
+        style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
+      >
+        <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
+          {/* LEFT */}
+          <div
+            key={activeIndex}
+            className="w-2/5 flex flex-col justify-center pr-12"
+          >
+            <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
+              Featured Work
+            </p>
+
+            <MaskedLines
+              as="h2"
+              className="text-4xl font-semibold"
+              text={ITEMS[activeIndex].title}
+            />
+
+            <div className="mt-3 text-neutral-600 max-w-md">
+              <MaskedLines text={ITEMS[activeIndex].desc} />
+            </div>
+          </div>
+
+          {/* RIGHT */}
+          <div className="w-3/5 relative overflow-hidden">
+            <div className="relative h-full" style={{ perspective: 500 }}>
+              {ITEMS.map((item, i) => (
+                <div
+                  key={i}
+                  ref={(el) => (cardsRef.current[i] = el)}
+                  className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
+                  style={{
+                    transform: `
+                      translateY(100vh)
+                      scale(${1 + MAX_SCALE})
+                      rotateX(${MAX_ROTATE}deg)
+                    `,
+                  }}
+                >
+                  {item.title}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* RIGHT — CARDS */}
-        <div className="w-3/5 relative overflow-hidden">
-          <div className="relative h-full" style={{ perspective: 500 }}>
-            {ITEMS.map((item, i) => (
-              <div
-                key={i}
-                ref={(el) => (cardsRef.current[i] = el)}
-                className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
-                style={{
-                  transform: `
-                    translateY(100vh)
-                    scale(${1 + MAX_SCALE})
-                    rotateX(${MAX_ROTATE}deg)
-                  `,
-                }}
-              >
-                {item.title}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Inline animation (can be moved to global CSS) */}
+      {/* Desktop animation only */}
       <style jsx global>{`
         @keyframes lineReveal {
           from {
@@ -178,6 +203,6 @@ export default function WorkShowcase() {
           animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
         }
       `}</style>
-    </section>
+    </>
   );
 }
