@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Lenis from "lenis";
+import { useState, useRef, useEffect } from "react";
 
 const ITEMS = [
   { title: "Project One", desc: "Description for project one" },
@@ -10,199 +9,116 @@ const ITEMS = [
   { title: "Project Four", desc: "Description for project four" },
 ];
 
-/* ---------------------------------------------
-   Desktop-only masked lines
----------------------------------------------- */
-function MaskedLines({ text, as: Tag = "div", className }) {
-  const lines = text.split("\n");
-
-  return (
-    <Tag className={className}>
-      {lines.map((line, i) => (
-        <span key={i} className="block overflow-hidden leading-tight">
-          <span
-            className="block animate-line will-change-transform"
-            style={{ animationDelay: `${i * 70}ms` }}
-          >
-            {line}
-          </span>
-        </span>
-      ))}
-    </Tag>
-  );
-}
-
 export default function WorkShowcase() {
-  const sectionRef = useRef(null);
-  const cardsRef = useRef([]);
-  const scrollStartRef = useRef(0);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [intersections, setIntersections] = useState([]);
+  const cardRefs = useRef([]);
 
-  const EFFECT_STOP = 0.9;
-  const MAX_SCALE = 0.6;
-  const MAX_ROTATE = 25;
-
-  /* ---------------------------------------------
-     Desktop scroll logic (disabled on mobile)
-  ---------------------------------------------- */
   useEffect(() => {
-    if (window.innerWidth < 640) return;
+    const observers = [];
+    
+    cardRefs.current.forEach((card, index) => {
+      if (!card) return;
 
-    const lenis = new Lenis({ lerp: 0.08 });
-
-    const raf = (time) => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    };
-    requestAnimationFrame(raf);
-
-    const handleScroll = ({ scroll }) => {
-      const section = sectionRef.current;
-      if (!section) return;
-
-      const rect = section.getBoundingClientRect();
-
-      if (rect.top > 0) {
-        scrollStartRef.current = 0;
-        setActiveIndex(0);
-        return;
-      }
-
-      if (!scrollStartRef.current) {
-        scrollStartRef.current = scroll;
-      }
-
-      const scrollSinceStart = scroll - scrollStartRef.current;
-      const vh = window.innerHeight;
-
-      let closest = 0;
-      let minDist = Infinity;
-
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-
-        const progress = (scrollSinceStart - i * vh) / vh;
-        const y = (1 - progress) * vh;
-
-        let scale = 1;
-        let rotate = 0;
-
-        if (progress < EFFECT_STOP) {
-          const norm = 1 - progress / EFFECT_STOP;
-          scale = 1 + MAX_SCALE * norm;
-          rotate = MAX_ROTATE * norm;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              console.log(`🎯 Card ${index} top EXACTLY at bottom!`);
+              setIntersections(prev => [...new Set([...prev, index])]);
+            } else {
+              setIntersections(prev => prev.filter(i => i !== index));
+            }
+          });
+        },
+        {
+          // KEY: Create a 1px tall intersection zone at the very bottom
+          // -1px means "shrink by 1px from the bottom"
+          // This creates a 1px tall line at the bottom edge
+          rootMargin: "0px 0px -1px 0px",
+          threshold: [0]
+          // This triggers when ANY part of the element (even 1px) 
+          // enters that 1px tall zone at the bottom
         }
+      );
 
-        card.style.transform = `
-          translateY(${y}px)
-          scale(${scale})
-          rotateX(${rotate}deg)
-        `;
+      observer.observe(card);
+      observers.push(observer);
+    });
 
-        const dist = Math.abs(progress - 0.5);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = i;
-        }
-      });
-
-      setActiveIndex(closest);
-    };
-
-    lenis.on("scroll", handleScroll);
-    return () => lenis.destroy();
+    return () => observers.forEach(observer => observer.disconnect());
   }, []);
 
   return (
-    <>
-      {/* ---------------------------------------------
-          MOBILE VERSION (sm and below)
-      ---------------------------------------------- */}
-      <section className="md:hidden px-6 py-16 space-y-10">
-        <h2 className="text-3xl font-semibold">Featured Works</h2>
+    <section className="px-6 py-16 space-y-10">
+      <div className="sticky top-4 z-10 bg-purple-600 text-white p-3 rounded-lg shadow-lg">
+        <div className="text-center font-bold">
+          🎯 EXACT PIXEL PRECISION
+        </div>
+        <div className="text-center text-sm mt-1">
+          Using rootMargin: "0px 0px -1px 0px" (1px tall zone)
+        </div>
+        <div className="text-center text-sm">
+          Cards at bottom: {intersections.join(", ") || "None"}
+        </div>
+      </div>
 
-        <div className="space-y-8">
-          {ITEMS.map((item, i) => (
+      <h2 className="text-3xl font-semibold">Featured Works</h2>
+
+      <div className="space-y-8">
+        {ITEMS.map((item, i) => {
+          const isAtBottom = intersections.includes(i);
+          
+          return (
             <div
               key={i}
-              className="rounded-xl bg-neutral-200 h-[50vh] flex items-center justify-center text-xl font-medium"
+              ref={el => cardRefs.current[i] = el}
+              className={`
+                rounded-xl h-[50vh] flex flex-col items-center justify-center p-6 
+                relative border-4 transition-all
+                ${isAtBottom 
+                  ? 'border-purple-500 bg-purple-50 shadow-2xl scale-[1.02]' 
+                  : 'border-gray-300 bg-gray-100'
+                }
+              `}
             >
-              {item.title}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ---------------------------------------------
-          DESKTOP VERSION (unchanged behavior)
-      ---------------------------------------------- */}
-      <section
-        ref={sectionRef}
-        className="hidden md:block"
-        style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
-      >
-        <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
-          {/* LEFT */}
-          <div
-            key={activeIndex}
-            className="w-2/5 flex flex-col justify-center pr-12"
-          >
-            <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
-              Featured Work
-            </p>
-
-            <MaskedLines
-              as="h2"
-              className="text-4xl font-semibold"
-              text={ITEMS[activeIndex].title}
-            />
-
-            <div className="mt-3 text-neutral-600 max-w-md">
-              <MaskedLines text={ITEMS[activeIndex].desc} />
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="w-3/5 relative overflow-hidden">
-            <div className="relative h-full" style={{ perspective: 500 }}>
-              {ITEMS.map((item, i) => (
-                <div
-                  key={i}
-                  ref={(el) => (cardsRef.current[i] = el)}
-                  className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
-                  style={{
-                    transform: `
-                      translateY(100vh)
-                      scale(${1 + MAX_SCALE})
-                      rotateX(${MAX_ROTATE}deg)
-                    `,
-                  }}
-                >
-                  {item.title}
+              {/* Card top indicator */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-red-500">
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                  CARD TOP
                 </div>
-              ))}
+              </div>
+              
+              {/* Status indicator */}
+              {isAtBottom && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 animate-pulse">
+                  <div className="bg-purple-600 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                    🎯 EXACT MATCH!
+                  </div>
+                </div>
+              )}
+
+              <h3 className="text-2xl font-bold">{item.title}</h3>
+              <p className="text-gray-600 mt-2">{item.desc}</p>
+              
+              <div className="absolute bottom-4 left-4 text-sm font-mono">
+                Card #{i}
+              </div>
+              
+              <div className="absolute bottom-4 right-4 text-sm text-gray-500">
+                {isAtBottom ? "✅ At bottom" : "⬇ Scroll down"}
+              </div>
             </div>
-          </div>
+          );
+        })}
+      </div>
+
+      {/* Bottom edge - single pixel line */}
+      <div className="fixed bottom-0 left-0 right-0">
+        <div className="h-[2px] bg-green-600 shadow-[0_0_10px_2px_rgba(34,197,94,0.8)] animate-pulse"></div>
+        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+          1px TRIGGER ZONE
         </div>
-      </section>
-
-      {/* Desktop animation only */}
-      <style jsx global>{`
-        @keyframes lineReveal {
-          from {
-            transform: translateY(120%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0%);
-            opacity: 1;
-          }
-        }
-
-        .animate-line {
-          animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
-        }
-      `}</style>
-    </>
+      </div>
+    </section>
   );
 }
