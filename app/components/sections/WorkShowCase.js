@@ -43,7 +43,7 @@ export default function WorkShowcase() {
     <section className="px-6 py-16 space-y-10">
       <h2 className="text-3xl font-semibold">Featured Works</h2>
 
-      <div className="space-y-8">
+      <div className="space-y-8 w-full flex items-center justify-center flex-col">
         {ITEMS.map((item, i) => {
           const isAtBottom = cardsAtBottom.includes(i);
           
@@ -53,7 +53,7 @@ export default function WorkShowcase() {
               ref={el => cardRefs.current[i] = el}
               className={`
                 rounded-xl h-[50vh] flex items-center justify-center p-6 
-                transition-all duration-300
+                transition-all duration-300 w-[60%]
                 ${isAtBottom ? 'bg-red-500 text-white' : 'bg-gray-200'}
               `}
             >
