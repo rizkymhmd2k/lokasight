@@ -16,46 +16,69 @@ export default function WorkShowcase() {
   useEffect(() => {
     const observers = ITEMS.map((_, i) => {
       if (!refs.current[i]) return null;
-      
+
       const observer = new IntersectionObserver(
         ([entry]) => {
-          setBottomCards(prev => 
-            entry.isIntersecting 
-              ? [...prev, i] 
-              : prev.filter(idx => idx !== i)
+          setBottomCards((prev) =>
+            entry.isIntersecting
+              ? [...prev, i]
+              : prev.filter((idx) => idx !== i)
           );
         },
         { rootMargin: "0px 0px -1px 0px", threshold: 0 }
       );
-      
+
       observer.observe(refs.current[i]);
       return observer;
     });
 
-    return () => observers.forEach(obs => obs?.disconnect());
+    return () => observers.forEach((obs) => obs?.disconnect());
   }, []);
 
   return (
     <section className="px-6 py-16 space-y-10">
       <h2 className="text-3xl font-semibold">Featured Works</h2>
-      
-      <div className="space-y-8 w-full flex flex-col items-center">
-        {ITEMS.map((item, i) => (
-          <div
-            key={i}
-            ref={el => refs.current[i] = el}
-            className={`
-              rounded-xl h-[50vh] w-[60%] flex items-center justify-center p-6
-              transition-all duration-300
-              ${bottomCards.includes(i) ? 'bg-red-500 text-white' : 'bg-gray-200'}
-            `}
-          >
-            <div className="text-center">
-              <h3 className="text-xl font-medium">{item.title}</h3>
-              <p className="mt-2">{item.desc}</p>
+
+      {/* OUTER GRID CONTAINER */}
+      <div className="grid grid-cols-1 gap-y-18 place-items-center w-full">
+        {ITEMS.map((item, i) => {
+          const isActive = bottomCards.includes(i);
+
+          return (
+            <div
+              key={i}
+              className="w-full flex justify-center p-4 border border-blue-600"
+            >
+              {/* CARD (3D TILTED) */}
+              <div
+                ref={(el) => (refs.current[i] = el)}
+                className={`
+                  rounded-xl h-[50vh] w-[60%]
+                  flex items-center justify-center p-6
+                  transition-transform duration-500
+                  ${
+                    isActive
+                      ? "bg-red-500 text-white"
+                      : "bg-yellow-500 border border-blue-600"
+                  }
+                `}
+                style={{
+                  transform: `
+                    perspective(900px)
+                    rotateX(18deg)
+                    scaleY(0.95)
+                  `,
+                  transformOrigin: "center top",
+                }}
+              >
+                <div className="text-center">
+                  <h3 className="text-xl font-medium">{item.title}</h3>
+                  <p className="mt-2">{item.desc}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
