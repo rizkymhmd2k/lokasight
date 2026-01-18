@@ -10,60 +10,52 @@ const ITEMS = [
 ];
 
 export default function WorkShowcase() {
-  const [cardsAtBottom, setCardsAtBottom] = useState([]);
-  const cardRefs = useRef([]);
+  const [bottomCards, setBottomCards] = useState([]);
+  const refs = useRef([]);
 
   useEffect(() => {
-    const observers = [];
-
-    cardRefs.current.forEach((card, index) => {
-      if (!card) return;
-
+    const observers = ITEMS.map((_, i) => {
+      if (!refs.current[i]) return null;
+      
       const observer = new IntersectionObserver(
         ([entry]) => {
-          setCardsAtBottom(prev => {
-            if (entry.isIntersecting) {
-              return [...new Set([...prev, index])];
-            } else {
-              return prev.filter(i => i !== index);
-            }
-          });
+          setBottomCards(prev => 
+            entry.isIntersecting 
+              ? [...prev, i] 
+              : prev.filter(idx => idx !== i)
+          );
         },
-        { rootMargin: "0px 0px -1px 0px", threshold: [0] }
+        { rootMargin: "0px 0px -1px 0px", threshold: 0 }
       );
-
-      observer.observe(card);
-      observers.push(observer);
+      
+      observer.observe(refs.current[i]);
+      return observer;
     });
 
-    return () => observers.forEach(obs => obs.disconnect());
+    return () => observers.forEach(obs => obs?.disconnect());
   }, []);
 
   return (
     <section className="px-6 py-16 space-y-10">
       <h2 className="text-3xl font-semibold">Featured Works</h2>
-
-      <div className="space-y-8 w-full flex items-center justify-center flex-col">
-        {ITEMS.map((item, i) => {
-          const isAtBottom = cardsAtBottom.includes(i);
-          
-          return (
-            <div
-              key={i}
-              ref={el => cardRefs.current[i] = el}
-              className={`
-                rounded-xl h-[50vh] flex items-center justify-center p-6 
-                transition-all duration-300 w-[60%]
-                ${isAtBottom ? 'bg-red-500 text-white' : 'bg-gray-200'}
-              `}
-            >
-              <div className="text-center">
-                <h3 className="text-xl font-medium">{item.title}</h3>
-                <p className="mt-2">{item.desc}</p>
-              </div>
+      
+      <div className="space-y-8 w-full flex flex-col items-center">
+        {ITEMS.map((item, i) => (
+          <div
+            key={i}
+            ref={el => refs.current[i] = el}
+            className={`
+              rounded-xl h-[50vh] w-[60%] flex items-center justify-center p-6
+              transition-all duration-300
+              ${bottomCards.includes(i) ? 'bg-red-500 text-white' : 'bg-gray-200'}
+            `}
+          >
+            <div className="text-center">
+              <h3 className="text-xl font-medium">{item.title}</h3>
+              <p className="mt-2">{item.desc}</p>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </section>
   );
