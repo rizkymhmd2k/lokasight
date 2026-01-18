@@ -59,13 +59,13 @@ export default function WorkShowcase() {
         const m = metrics.current[i];
         if (!el || !m) return;
 
-        // Tilt stops earlier (around 70%)
+        // --- UNTILT (stops early ~70%)
         const tiltProgress = Math.min(
           1,
           Math.max(0, (y - m.start) / (m.tiltEnd - m.start))
         );
 
-        // Scale continues until card leaves viewport
+        // --- SCALE (continues until card leaves viewport)
         const scaleProgress = Math.min(
           1,
           Math.max(0, (y - m.start) / (m.scaleEnd - m.start))
@@ -94,53 +94,46 @@ export default function WorkShowcase() {
       <h2 className="text-3xl font-semibold">Featured Works</h2>
 
       <div className="grid grid-cols-1 gap-y-40 place-items-center w-full">
-        {ITEMS.map((item, i) => {
-          const isMobile =
-            typeof window !== "undefined" && window.innerWidth < 640;
-
-          return (
-            /* 3D STAGE */
+        {ITEMS.map((item, i) => (
+          /* 3D STAGE */
+          <div
+            key={i}
+            className="
+              w-full flex justify-center p-6
+              border-4 border-red-500
+              perspective-[900px]
+              sm:perspective-[1800px]
+              transform-3d
+            "
+          >
+            {/* CARD */}
             <div
-              key={i}
-              className="w-full flex justify-center p-6 border-4 border-red-500"
+              ref={(el) => (cardRefs.current[i] = el)}
+              className="
+                rounded-xl h-[50vh] w-[60%]
+                flex items-center justify-center p-6
+                bg-yellow-500
+                border-4 border-green-500
+                will-change-transform
+                [transform-style:preserve-3d]
+              "
               style={{
-                perspective: isMobile ? "900px" : "1800px",
-                WebkitPerspective: isMobile ? "900px" : "1800px",
-                transformStyle: "preserve-3d",
-                WebkitTransformStyle: "preserve-3d",
+                transform: `
+                  translateZ(120px)
+                  rotateX(52deg)
+                  scale(1.4)
+                `,
+                transformOrigin: "center top",
+                backfaceVisibility: "hidden",
               }}
             >
-              {/* CARD */}
-              <div
-                ref={(el) => (cardRefs.current[i] = el)}
-                className="
-                  rounded-xl h-[50vh] w-[60%]
-                  flex items-center justify-center p-6
-                  bg-yellow-500
-                  border-4 border-green-500
-                  will-change-transform
-                "
-                style={{
-                  transform: `
-                    translateZ(120px)
-                    rotateX(52deg)
-                    scale(1.4)
-                  `,
-                  transformOrigin: "center top",
-                  transformStyle: "preserve-3d",
-                  WebkitTransformStyle: "preserve-3d",
-                  backfaceVisibility: "hidden",
-                  WebkitBackfaceVisibility: "hidden",
-                }}
-              >
-                <div className="text-center border border-black p-4 bg-white/30">
-                  <h3 className="text-xl font-medium">{item.title}</h3>
-                  <p className="mt-2">{item.desc}</p>
-                </div>
+              <div className="text-center border border-black p-4 bg-white/30">
+                <h3 className="text-xl font-medium">{item.title}</h3>
+                <p className="mt-2">{item.desc}</p>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </section>
   );
