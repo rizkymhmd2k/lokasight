@@ -32,11 +32,16 @@ export default function WorkShowcase() {
             const scrollY = window.scrollY;
             const vh = window.innerHeight;
 
-            metrics.current[i] = {
+            const data = {
               start: scrollY + rect.top - vh,
               tiltEnd: scrollY + rect.top + rect.height * 0.7 - vh * 0.5,
               scaleEnd: scrollY + rect.bottom,
             };
+
+            metrics.current[i] = data;
+
+            // 🔍 DEBUG: activation + metrics
+            console.log(`[WorkShowcase] activate card ${i}`, data);
           }
         },
         { threshold: 0 }
@@ -49,6 +54,19 @@ export default function WorkShowcase() {
     return () => observers.forEach((o) => o?.disconnect());
   }, []);
 
+  /* ---------------- Resize Invalidation ---------------- */
+  useEffect(() => {
+    const onResize = () => {
+      console.warn("[WorkShowcase] resize → reset metrics");
+
+      activated.current.clear();
+      metrics.current = {};
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   /* ---------------- Scroll Animation ---------------- */
   useEffect(() => {
     const onScroll = () => {
@@ -59,13 +77,11 @@ export default function WorkShowcase() {
         const m = metrics.current[i];
         if (!el || !m) return;
 
-        // --- UNTILT (stops early ~70%)
         const tiltProgress = Math.min(
           1,
           Math.max(0, (y - m.start) / (m.tiltEnd - m.start))
         );
 
-        // --- SCALE (continues until card leaves viewport)
         const scaleProgress = Math.min(
           1,
           Math.max(0, (y - m.start) / (m.scaleEnd - m.start))
@@ -79,6 +95,10 @@ export default function WorkShowcase() {
           rotateX(${rotateX}deg)
           scale(${scale})
         `;
+
+        // 🔍 DEBUG: live progress
+        el.dataset.tilt = tiltProgress.toFixed(2);
+        el.dataset.scale = scaleProgress.toFixed(2);
       });
     };
 
@@ -103,13 +123,15 @@ export default function WorkShowcase() {
               border-4 border-red-500
               perspective-[900px]
               sm:perspective-[1800px]
-              transform-3d
+              [transform-style:preserve-3d]
             "
           >
             {/* CARD */}
             <div
               ref={(el) => (cardRefs.current[i] = el)}
+              data-card-index={i} // 🔍 DEBUG SIGNIFIER
               className="
+                relative
                 rounded-xl h-[50vh] w-[60%]
                 flex items-center justify-center p-6
                 bg-yellow-500
@@ -127,6 +149,11 @@ export default function WorkShowcase() {
                 backfaceVisibility: "hidden",
               }}
             >
+              {/* 🔍 DEBUG OVERLAY */}
+              <div className="absolute top-2 left-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
+                #{i}
+              </div>
+
               <div className="text-center border border-black p-4 bg-white/30">
                 <h3 className="text-xl font-medium">{item.title}</h3>
                 <p className="mt-2">{item.desc}</p>
