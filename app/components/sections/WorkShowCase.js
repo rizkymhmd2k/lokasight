@@ -19,13 +19,16 @@ export default function WorkShowcase() {
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          setBottomCards((prev) =>
-            entry.isIntersecting
-              ? [...prev, i]
-              : prev.filter((idx) => idx !== i)
-          );
+          // bottom of card hits bottom of viewport
+          if (entry.boundingClientRect.bottom <= window.innerHeight) {
+            setBottomCards((prev) =>
+              prev.includes(i) ? prev : [...prev, i]
+            );
+          }
         },
-        { rootMargin: "0px 0px -1px 0px", threshold: 0 }
+        {
+          threshold: 1, // full card must be in view
+        }
       );
 
       observer.observe(refs.current[i]);
@@ -39,25 +42,24 @@ export default function WorkShowcase() {
     <section className="px-6 py-16 space-y-10">
       <h2 className="text-3xl font-semibold">Featured Works</h2>
 
-      {/* OUTER GRID CONTAINER */}
       <div className="grid grid-cols-1 gap-y-18 place-items-center w-full">
         {ITEMS.map((item, i) => {
-          const isActive = bottomCards.includes(i);
+          const isActivated = bottomCards.includes(i);
 
           return (
             <div
               key={i}
               className="w-full flex justify-center p-4 border border-blue-600"
             >
-              {/* CARD (3D TILTED) */}
+              {/* INNER CARD */}
               <div
                 ref={(el) => (refs.current[i] = el)}
                 className={`
                   rounded-xl h-[50vh] w-[60%]
                   flex items-center justify-center p-6
-                  transition-transform duration-500
+                  transition-colors duration-300
                   ${
-                    isActive
+                    isActivated
                       ? "bg-red-500 text-white"
                       : "bg-yellow-500 border border-blue-600"
                   }
