@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import Lenis from "lenis";
 
 const ITEMS = [
   { title: "Project One", desc: "Description for project one" },
@@ -9,159 +10,184 @@ const ITEMS = [
   { title: "Project Four", desc: "Description for project four" },
 ];
 
+/* ---------------------------------------------
+   Line Mask
+---------------------------------------------- */
+function MaskedLines({ text, as: Tag = "div", className }) {
+  return (
+    <Tag className={className}>
+      {text.split("\n").map((line, i) => (
+        <span key={i} className="block overflow-hidden leading-tight">
+          <span
+            className="block animate-line will-change-transform"
+            style={{ animationDelay: `${i * 70}ms` }}
+          >
+            {line}
+          </span>
+        </span>
+      ))}
+    </Tag>
+  );
+}
+
+/* ---------------------------------------------
+   Main Component
+---------------------------------------------- */
 export default function WorkShowcase() {
-  const cardRefs = useRef([]);
-  const activated = useRef(new Set());
-  const metrics = useRef({});
+  const sectionRef = useRef(null);
+  const cardsRef = useRef([]);
 
-  /* ---------------- Activation ---------------- */
+  const isActiveRef = useRef(false);
+  const scrollStartRef = useRef(0);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const EFFECT_STOP = 0.9;
+  const MAX_SCALE = 0.6;
+  const MAX_ROTATE = 25;
+
+  /* ---------------- Lenis ---------------- */
   useEffect(() => {
-    const observers = ITEMS.map((_, i) => {
-      const el = cardRefs.current[i];
-      if (!el) return null;
+    const lenis = new Lenis({ lerp: 0.08 });
 
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (
-            !activated.current.has(i) &&
-            entry.boundingClientRect.top <= window.innerHeight
-          ) {
-            activated.current.add(i);
-
-            const rect = el.getBoundingClientRect();
-            const scrollY = window.scrollY;
-            const vh = window.innerHeight;
-
-            const data = {
-              start: scrollY + rect.top - vh,
-              tiltEnd: scrollY + rect.top + rect.height * 0.7 - vh * 0.5,
-              scaleEnd: scrollY + rect.bottom,
-            };
-
-            metrics.current[i] = data;
-
-            // 🔍 DEBUG: activation + metrics
-            console.log(`[WorkShowcase] activate card ${i}`, data);
-          }
-        },
-        { threshold: 0 }
-      );
-
-      observer.observe(el);
-      return observer;
-    });
-
-    return () => observers.forEach((o) => o?.disconnect());
-  }, []);
-
-  /* ---------------- Resize Invalidation ---------------- */
-  useEffect(() => {
-    const onResize = () => {
-      console.warn("[WorkShowcase] resize → reset metrics");
-
-      activated.current.clear();
-      metrics.current = {};
+    const raf = (t) => {
+      lenis.raf(t);
+      requestAnimationFrame(raf);
     };
+    requestAnimationFrame(raf);
 
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+    const onScroll = ({ scroll }) => {
+      if (!isActiveRef.current) return;
 
-  /* ---------------- Scroll Animation ---------------- */
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
+      const vh = window.innerHeight;
+      const scrollSinceStart = scroll - scrollStartRef.current;
 
-      activated.current.forEach((i) => {
-        const el = cardRefs.current[i];
-        const m = metrics.current[i];
-        if (!el || !m) return;
+      let closest = 0;
+      let minDist = Infinity;
 
-        const tiltProgress = Math.min(
-          1,
-          Math.max(0, (y - m.start) / (m.tiltEnd - m.start))
-        );
+      cardsRef.current.forEach((card, i) => {
+        if (!card) return;
 
-        const scaleProgress = Math.min(
-          1,
-          Math.max(0, (y - m.start) / (m.scaleEnd - m.start))
-        );
+        const progress = (scrollSinceStart - i * vh) / vh;
+        const y = (1 - progress) * vh;
 
-        const rotateX = 52 * (1 - tiltProgress);
-        const scale = 1.4 - scaleProgress * 0.5;
+        let scale = 1;
+        let rotate = 0;
 
-        el.style.transform = `
-          translateZ(120px)
-          rotateX(${rotateX}deg)
+        if (progress < EFFECT_STOP) {
+          const norm = 1 - progress / EFFECT_STOP;
+          scale = 1 + MAX_SCALE * norm;
+          rotate = MAX_ROTATE * norm;
+        }
+
+        card.style.transform = `
+          translateY(${y}px)
           scale(${scale})
+          rotateX(${rotate}deg)
         `;
 
-        // 🔍 DEBUG: live progress
-        el.dataset.tilt = tiltProgress.toFixed(2);
-        el.dataset.scale = scaleProgress.toFixed(2);
+        const d = Math.abs(progress - 0.5);
+        if (d < minDist) {
+          minDist = d;
+          closest = i;
+        }
       });
+
+      setActiveIndex(closest);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    lenis.on("scroll", onScroll);
+    return () => lenis.destroy();
+  }, []);
 
-    return () => window.removeEventListener("scroll", onScroll);
+  /* ---------------- Intersection Activation ONLY ---------------- */
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          isActiveRef.current = false;
+          return;
+        }
+
+        // 🔑 this replaces all previous scrollStart guessing
+        isActiveRef.current = true;
+        scrollStartRef.current = window.scrollY;
+      },
+      {
+        threshold: 0,
+        rootMargin: "0px 0px -40% 0px",
+      }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
   }, []);
 
   /* ---------------- Render ---------------- */
   return (
-    <section className="px-6 py-16 space-y-10">
-      <h2 className="text-3xl font-semibold">Featured Works</h2>
+    <section
+      ref={sectionRef}
+      style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
+    >
+      <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
+        {/* LEFT */}
+        <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
+          <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
+            Featured Work
+          </p>
 
-      <div className="grid grid-cols-1 gap-y-40 place-items-center w-full">
-        {ITEMS.map((item, i) => (
-          /* 3D STAGE */
-          <div
-            key={i}
-            className="
-              w-full flex justify-center p-6
-              border-4 border-red-500
-              perspective-[900px]
-              sm:perspective-[1800px]
-              [transform-style:preserve-3d]
-            "
-          >
-            {/* CARD */}
-            <div
-              ref={(el) => (cardRefs.current[i] = el)}
-              data-card-index={i} // 🔍 DEBUG SIGNIFIER
-              className="
-                relative
-                rounded-xl h-[50vh] w-[60%]
-                flex items-center justify-center p-6
-                bg-yellow-500
-                border-4 border-green-500
-                will-change-transform
-                [transform-style:preserve-3d]
-              "
-              style={{
-                transform: `
-                  translateZ(120px)
-                  rotateX(52deg)
-                  scale(1.4)
-                `,
-                transformOrigin: "center top",
-                backfaceVisibility: "hidden",
-              }}
-            >
-              {/* 🔍 DEBUG OVERLAY */}
-              <div className="absolute top-2 left-2 text-xs bg-black/60 text-white px-2 py-1 rounded">
-                #{i}
-              </div>
+          <MaskedLines
+            as="h2"
+            className="text-4xl font-semibold"
+            text={ITEMS[activeIndex].title}
+          />
 
-              <div className="text-center border border-black p-4 bg-white/30">
-                <h3 className="text-xl font-medium">{item.title}</h3>
-                <p className="mt-2">{item.desc}</p>
-              </div>
-            </div>
+          <div className="mt-3 text-neutral-600 max-w-md">
+            <MaskedLines text={ITEMS[activeIndex].desc} />
           </div>
-        ))}
+        </div>
+
+        {/* RIGHT — ORIGINAL 3D BEHAVIOR */}
+        <div className="w-3/5 relative overflow-hidden">
+          <div className="relative h-full" style={{ perspective: 500 }}>
+            {ITEMS.map((item, i) => (
+              <div
+                key={i}
+                ref={(el) => (cardsRef.current[i] = el)}
+                className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
+                style={{
+                  transform: `
+                    translateY(100vh)
+                    scale(${1 + MAX_SCALE})
+                    rotateX(${MAX_ROTATE}deg)
+                  `,
+                }}
+              >
+                {item.title}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes lineReveal {
+          from {
+            transform: translateY(120%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0%);
+            opacity: 1;
+          }
+        }
+        .animate-line {
+          animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+        }
+      `}</style>
     </section>
   );
 }
