@@ -11,22 +11,69 @@ const ITEMS = [
 ];
 
 /* ---------------------------------------------
-   Line Mask Component
+   Scroll-triggered Text Swapper
 ---------------------------------------------- */
-function MaskedLines({ text, as: Tag = "div", className }) {
+function TextSwapper({ activeIndex, className }) {
+  const containerRef = useRef(null);
+  const [localActiveIndex, setLocalActiveIndex] = useState(activeIndex);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (activeIndex === localActiveIndex || isAnimating) return;
+
+    const animateSwap = async () => {
+      setIsAnimating(true);
+      
+      // Trigger exit animation
+      const container = containerRef.current;
+      if (container) {
+        container.classList.remove('text-swap-enter');
+        container.classList.add('text-swap-exit');
+        
+        // Wait for exit animation to complete
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Update content
+        setLocalActiveIndex(activeIndex);
+        
+        // Trigger enter animation
+        container.classList.remove('text-swap-exit');
+        container.classList.add('text-swap-enter');
+        
+        // Reset animation state
+        await new Promise(resolve => setTimeout(resolve, 300));
+        container.classList.remove('text-swap-enter');
+        setIsAnimating(false);
+      }
+    };
+
+    animateSwap();
+  }, [activeIndex, localActiveIndex, isAnimating]);
+
   return (
-    <Tag className={className}>
-      {text.split("\n").map((line, i) => (
-        <span key={i} className="block overflow-hidden leading-tight">
-          <span
-            className="block animate-line will-change-transform"
-            style={{ animationDelay: `${i * 70}ms` }}
-          >
-            {line}
-          </span>
-        </span>
-      ))}
-    </Tag>
+    <div ref={containerRef} className={`overflow-hidden ${className}`}>
+      <div className="text-swap-container">
+        <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
+          Featured Work
+        </p>
+
+        <div className="relative">
+          {/* Title */}
+          <div className="relative overflow-hidden">
+            <div className="text-swap-title">
+              {ITEMS[localActiveIndex]?.title}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mt-3 text-neutral-600 max-w-md relative overflow-hidden">
+            <div className="text-swap-desc">
+              {ITEMS[localActiveIndex]?.desc}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -84,21 +131,18 @@ export default function WorkShowcase() {
 function DesktopVersion() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
-
   const isActiveRef = useRef(false);
   const scrollStartRef = useRef(0);
   const isInitializedRef = useRef(false);
-
   const [activeIndex, setActiveIndex] = useState(0);
 
   const EFFECT_STOP = 0.9;
   const MAX_SCALE = 0.6;
-  const MAX_ROTATE = 25;
+  const MAX_ROTATE = 45;
 
   /* ---------------- Update Card Positions ---------------- */
   const updateCardPositions = useCallback((scrollSinceStart) => {
     const vh = window.innerHeight;
-    
     let closest = 0;
     let minDist = Infinity;
 
@@ -133,12 +177,11 @@ function DesktopVersion() {
     setActiveIndex(closest);
   }, []);
 
-  /* ---------------- Initialize Cards to Correct State ---------------- */
+  /* ---------------- Initialize Cards ---------------- */
   const initializeCardsForPosition = useCallback((scrollSinceStart) => {
     if (!isInitializedRef.current) {
       const vh = window.innerHeight;
       const totalAnimationScroll = ITEMS.length * vh;
-      
       const clampedScroll = Math.max(-vh * 0.5, Math.min(scrollSinceStart, totalAnimationScroll + vh * 0.5));
       
       updateCardPositions(clampedScroll);
@@ -166,7 +209,6 @@ function DesktopVersion() {
 
     const onScroll = ({ scroll }) => {
       if (!isActiveRef.current) return;
-
       const scrollSinceStart = scroll - scrollStartRef.current;
       updateCardPositions(scrollSinceStart);
     };
@@ -197,18 +239,15 @@ function DesktopVersion() {
       const sectionTopInViewport = sectionRect.top;
       const sectionBottomInViewport = sectionRect.bottom;
       
-      // Deactivation: when section is completely out of view
       const shouldDeactivate = 
         sectionBottomInViewport < -vh * 0.8 || 
         sectionTopInViewport > vh * 1.8;
       
-      // Activation: when section is entering viewport
       const shouldActivate = 
         (sectionTopInViewport <= vh * 0.6 && sectionTopInViewport >= -vh) ||
         (scrollY > bounds.top && scrollY < bounds.bottom);
       
       if (!isActiveRef.current && shouldActivate) {
-        // Consistent scroll start calculation
         const sectionTopAbsolute = bounds.top;
         const scrollStartAbsolute = sectionTopAbsolute - (vh * 0.4);
         
@@ -226,12 +265,10 @@ function DesktopVersion() {
       }
     };
 
-    // Check initial state
     setTimeout(() => {
       handleScroll();
     }, 100);
 
-    // Add scroll listener
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleScroll);
     
@@ -268,24 +305,9 @@ function DesktopVersion() {
       style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
     >
       <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
-        {/* LEFT */}
-        <div
-          key={activeIndex}
-          className="w-2/5 flex flex-col justify-center pr-12"
-        >
-          <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
-            Featured Work
-          </p>
-
-          <MaskedLines
-            as="h2"
-            className="text-4xl font-semibold"
-            text={ITEMS[activeIndex].title}
-          />
-
-          <div className="mt-3 text-neutral-600 max-w-md">
-            <MaskedLines text={ITEMS[activeIndex].desc} />
-          </div>
+        {/* LEFT - Text Swapper */}
+        <div className="w-2/5 flex flex-col justify-center pr-12">
+          <TextSwapper activeIndex={activeIndex} />
         </div>
 
         {/* RIGHT — 3D CARDS */}
@@ -312,6 +334,52 @@ function DesktopVersion() {
       </div>
 
       <style jsx global>{`
+        /* Text swap animations */
+        .text-swap-exit .text-swap-title,
+        .text-swap-exit .text-swap-desc {
+          animation: textSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        .text-swap-enter .text-swap-title,
+        .text-swap-enter .text-swap-desc {
+          animation: textSlideIn 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
+        }
+
+        .text-swap-title {
+          font-size: 2.25rem;
+          line-height: 2.5rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          min-height: 3.5rem;
+        }
+
+        .text-swap-desc {
+          min-height: 4rem;
+        }
+
+        @keyframes textSlideOut {
+          from {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+        }
+
+        @keyframes textSlideIn {
+          from {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        /* Original line reveal animation */
         @keyframes lineReveal {
           from {
             transform: translateY(120%);
@@ -331,7 +399,7 @@ function DesktopVersion() {
 }
 
 /* ---------------------------------------------
-   Mobile Version
+   Mobile Version (unchanged)
 ---------------------------------------------- */
 function MobileVersion() {
   const cardRefs = useRef([]);
