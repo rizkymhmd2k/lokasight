@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Lenis from "lenis";
 
 const ITEMS = [
@@ -11,7 +11,7 @@ const ITEMS = [
 ];
 
 /* ---------------------------------------------
-   Line Mask
+   Line Mask Component
 ---------------------------------------------- */
 function MaskedLines({ text, as: Tag = "div", className }) {
   return (
@@ -31,9 +31,57 @@ function MaskedLines({ text, as: Tag = "div", className }) {
 }
 
 /* ---------------------------------------------
-   Main Component
+   Responsive Work Showcase
 ---------------------------------------------- */
 export default function WorkShowcase() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // Viewport detection
+  useEffect(() => {
+    setHasMounted(true);
+    
+    const checkViewport = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkViewport();
+    
+    let resizeTimer;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const newIsMobile = window.innerWidth < 768;
+        if (newIsMobile !== isMobile) {
+          // Force re-initialization by reloading the page
+          window.location.reload();
+        }
+      }, 250);
+    };
+    
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, [isMobile]);
+
+  // Show loading during SSR/hydration
+  if (!hasMounted) {
+    return (
+      <div className="h-screen bg-backgroundlight flex items-center justify-center">
+        <div className="text-neutral-500">Loading showcase...</div>
+      </div>
+    );
+  }
+
+  return isMobile ? <MobileVersion /> : <DesktopVersion />;
+}
+
+/* ---------------------------------------------
+   Desktop Version
+---------------------------------------------- */
+function DesktopVersion() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
 
@@ -48,7 +96,7 @@ export default function WorkShowcase() {
   const MAX_ROTATE = 25;
 
   /* ---------------- Update Card Positions ---------------- */
-  const updateCardPositions = (scrollSinceStart) => {
+  const updateCardPositions = useCallback((scrollSinceStart) => {
     const vh = window.innerHeight;
     
     let closest = 0;
@@ -83,10 +131,10 @@ export default function WorkShowcase() {
     });
 
     setActiveIndex(closest);
-  };
+  }, []);
 
   /* ---------------- Initialize Cards to Correct State ---------------- */
-  const initializeCardsForPosition = (scrollSinceStart) => {
+  const initializeCardsForPosition = useCallback((scrollSinceStart) => {
     if (!isInitializedRef.current) {
       const vh = window.innerHeight;
       const totalAnimationScroll = ITEMS.length * vh;
@@ -104,7 +152,7 @@ export default function WorkShowcase() {
       
       isInitializedRef.current = true;
     }
-  };
+  }, [updateCardPositions]);
 
   /* ---------------- Lenis ---------------- */
   useEffect(() => {
@@ -125,7 +173,7 @@ export default function WorkShowcase() {
 
     lenis.on("scroll", onScroll);
     return () => lenis.destroy();
-  }, []);
+  }, [updateCardPositions]);
 
   /* ---------------- Intersection Activation ---------------- */
   useEffect(() => {
@@ -191,7 +239,7 @@ export default function WorkShowcase() {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [initializeCardsForPosition]);
 
   /* ---------------- Initialize Cards to Default ---------------- */
   useEffect(() => {
@@ -278,6 +326,150 @@ export default function WorkShowcase() {
           animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
         }
       `}</style>
+    </section>
+  );
+}
+
+/* ---------------------------------------------
+   Mobile Version
+---------------------------------------------- */
+function MobileVersion() {
+  const cardRefs = useRef([]);
+  const activated = useRef(new Set());
+  const metrics = useRef({});
+
+  /* ---------------- Activation ---------------- */
+  useEffect(() => {
+    const observers = ITEMS.map((_, i) => {
+      const el = cardRefs.current[i];
+      if (!el) return null;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (
+            !activated.current.has(i) &&
+            entry.boundingClientRect.top <= window.innerHeight
+          ) {
+            activated.current.add(i);
+
+            const rect = el.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            const vh = window.innerHeight;
+
+            const data = {
+              start: scrollY + rect.top - vh,
+              tiltEnd: scrollY + rect.top + rect.height * 0.7 - vh * 0.5,
+              scaleEnd: scrollY + rect.bottom,
+            };
+
+            metrics.current[i] = data;
+          }
+        },
+        { threshold: 0 }
+      );
+
+      observer.observe(el);
+      return observer;
+    });
+
+    return () => observers.forEach((o) => o?.disconnect());
+  }, []);
+
+  /* ---------------- Resize Invalidation ---------------- */
+  useEffect(() => {
+    const onResize = () => {
+      activated.current.clear();
+      metrics.current = {};
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  /* ---------------- Scroll Animation ---------------- */
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+
+      activated.current.forEach((i) => {
+        const el = cardRefs.current[i];
+        const m = metrics.current[i];
+        if (!el || !m) return;
+
+        const tiltProgress = Math.min(
+          1,
+          Math.max(0, (y - m.start) / (m.tiltEnd - m.start))
+        );
+
+        const scaleProgress = Math.min(
+          1,
+          Math.max(0, (y - m.start) / (m.scaleEnd - m.start))
+        );
+
+        const rotateX = 52 * (1 - tiltProgress);
+        const scale = 1.4 - scaleProgress * 0.5;
+
+        el.style.transform = `
+          translateZ(120px)
+          rotateX(${rotateX}deg)
+          scale(${scale})
+        `;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* ---------------- Render ---------------- */
+  return (
+    <section className="px-6 py-16 space-y-10">
+      <h2 className="text-3xl font-semibold">Featured Works</h2>
+
+      <div className="grid grid-cols-1 gap-y-40 place-items-center w-full">
+        {ITEMS.map((item, i) => (
+          /* 3D STAGE */
+          <div
+            key={i}
+            className="
+              w-full flex justify-center p-6
+              perspective-[900px]
+              sm:perspective-[1800px]
+              [transform-style:preserve-3d]
+            "
+          >
+            {/* CARD */}
+            <div
+              ref={(el) => (cardRefs.current[i] = el)}
+              data-card-index={i}
+              className="
+                relative
+                rounded-xl h-[50vh] w-[60%]
+                flex items-center justify-center p-6
+                bg-neutral-200
+                will-change-transform
+                [transform-style:preserve-3d]
+              "
+              style={{
+                transform: `
+                  translateZ(120px)
+                  rotateX(52deg)
+                  scale(1.4)
+                `,
+                transformOrigin: "center top",
+                backfaceVisibility: "hidden",
+              }}
+            >
+              <div className="text-center p-4 bg-white/30">
+                <h3 className="text-xl font-medium">{item.title}</h3>
+                <p className="mt-2">{item.desc}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
