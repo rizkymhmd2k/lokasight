@@ -15,7 +15,7 @@ const ITEMS = [
 ---------------------------------------------- */
 function MaskedLines({ text, as: Tag = "div", className }) {
   return (
-    <Tag className={`flex flex-col justify-center ${className}`}>
+    <Tag className={`flex flex-col ${className}`}>
       {text.split("\n").map((line, i) => (
         <span key={i} className="block overflow-hidden leading-tight">
           <span
@@ -31,7 +31,7 @@ function MaskedLines({ text, as: Tag = "div", className }) {
 }
 
 /* ---------------------------------------------
-   Desktop Work Showcase
+   Work Showcase
 ---------------------------------------------- */
 export default function WorkShowcase() {
   const sectionRef = useRef(null);
@@ -39,7 +39,6 @@ export default function WorkShowcase() {
 
   const isActiveRef = useRef(false);
   const scrollStartRef = useRef(0);
-  const isInitializedRef = useRef(false);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -47,7 +46,7 @@ export default function WorkShowcase() {
   const MAX_SCALE = 0.6;
   const MAX_ROTATE = 25;
 
-  /* ---------------- Update Card Positions ---------------- */
+  /* ---------------- Core Scroll Math ---------------- */
   const updateCardPositions = useCallback((scrollSinceStart) => {
     const vh = window.innerHeight;
 
@@ -85,33 +84,6 @@ export default function WorkShowcase() {
     setActiveIndex(closest);
   }, []);
 
-  /* ---------------- Initialize Cards to Correct State ---------------- */
-  const initializeCardsForPosition = useCallback(
-    (scrollSinceStart) => {
-      if (!isInitializedRef.current) {
-        const vh = window.innerHeight;
-        const totalAnimationScroll = ITEMS.length * vh;
-
-        const clampedScroll = Math.max(
-          -vh * 0.5,
-          Math.min(scrollSinceStart, totalAnimationScroll + vh * 0.5)
-        );
-
-        updateCardPositions(clampedScroll);
-
-        const progress = clampedScroll / vh;
-        const initialIndex = Math.min(
-          ITEMS.length - 1,
-          Math.max(0, Math.floor(progress + 0.5))
-        );
-        setActiveIndex(initialIndex);
-
-        isInitializedRef.current = true;
-      }
-    },
-    [updateCardPositions]
-  );
-
   /* ---------------- Lenis ---------------- */
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.08 });
@@ -124,92 +96,52 @@ export default function WorkShowcase() {
 
     const onScroll = ({ scroll }) => {
       if (!isActiveRef.current) return;
-
-      const scrollSinceStart = scroll - scrollStartRef.current;
-      updateCardPositions(scrollSinceStart);
+      updateCardPositions(scroll - scrollStartRef.current);
     };
 
     lenis.on("scroll", onScroll);
     return () => lenis.destroy();
   }, [updateCardPositions]);
 
-  /* ---------------- Intersection Activation ---------------- */
+  /* ---------------- Sticky Activation ---------------- */
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
-    const updateSectionBounds = () => {
-      const rect = section.getBoundingClientRect();
-      return {
-        top: rect.top + window.scrollY,
-        bottom: rect.bottom + window.scrollY,
-      };
-    };
-
-    const handleScroll = () => {
+    const onScroll = () => {
       const vh = window.innerHeight;
       const scrollY = window.scrollY;
-      const sectionRect = section.getBoundingClientRect();
-      const bounds = updateSectionBounds();
+      const rect = section.getBoundingClientRect();
 
-      const sectionTopInViewport = sectionRect.top;
-      const sectionBottomInViewport = sectionRect.bottom;
-
-      const shouldDeactivate =
-        sectionBottomInViewport < -vh * 0.8 || sectionTopInViewport > vh * 1.8;
+      const sectionTop = rect.top + scrollY;
+      const sectionBottom = rect.bottom + scrollY;
 
       const shouldActivate =
-        (sectionTopInViewport <= vh * 0.6 && sectionTopInViewport >= -vh) ||
-        (scrollY > bounds.top && scrollY < bounds.bottom);
+        rect.top <= vh * 0.6 && rect.bottom >= vh * 0.4;
+
+      const shouldDeactivate =
+        rect.bottom < -vh || rect.top > vh * 2;
 
       if (!isActiveRef.current && shouldActivate) {
-        const sectionTopAbsolute = bounds.top;
-        const scrollStartAbsolute = sectionTopAbsolute - vh * 0.4;
-
-        scrollStartRef.current = scrollStartAbsolute;
-
-        const initialScrollSinceStart = scrollY - scrollStartAbsolute;
-        initializeCardsForPosition(initialScrollSinceStart);
-
+        scrollStartRef.current = sectionTop - vh * 0.4;
         isActiveRef.current = true;
-        isInitializedRef.current = true;
-      } else if (isActiveRef.current && shouldDeactivate) {
+        updateCardPositions(scrollY - scrollStartRef.current);
+      }
+
+      if (isActiveRef.current && shouldDeactivate) {
         isActiveRef.current = false;
-        isInitializedRef.current = false;
       }
     };
 
-    setTimeout(() => {
-      handleScroll();
-    }, 100);
-
-    window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleScroll);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
-  }, [initializeCardsForPosition]);
-
-  /* ---------------- Initialize Cards to Default ---------------- */
-  useEffect(() => {
-    const initCardsToDefault = () => {
-      cardsRef.current.forEach((card, i) => {
-        if (!card) return;
-        card.style.transform = `
-          translateY(100vh)
-          scale(${1 + MAX_SCALE})
-          rotateX(${MAX_ROTATE}deg)
-        `;
-      });
-    };
-
-    setTimeout(initCardsToDefault, 50);
-
-    window.addEventListener("resize", initCardsToDefault);
-    return () => window.removeEventListener("resize", initCardsToDefault);
-  }, []);
+  }, [updateCardPositions]);
 
   /* ---------------- Render ---------------- */
   return (
@@ -220,12 +152,9 @@ export default function WorkShowcase() {
     >
       <div className="sticky top-0 h-screen flex px-4 overflow-hidden">
         {/* LEFT */}
-        <div
-          key={activeIndex}
-          className="w-2/5 flex flex-col justify-center pr-12"
-        >
-          <span className="absolute bottom-5 text-sm font-medium mr-50 flex gap-1">
-            <span>[WORK / </span>
+        <div className="w-2/5 flex flex-col justify-center pr-12">
+          <span className="absolute bottom-5 text-sm font-medium flex gap-1">
+            <span>[WORK /</span>
             <MaskedLines
               as="span"
               className="text-sm"
@@ -233,24 +162,28 @@ export default function WorkShowcase() {
             />
             <span>]</span>
           </span>
+
           <MaskedLines
             as="h2"
             className="text-8xl font-bold tracking-[-0.04em]"
             text={ITEMS[activeIndex].title}
           />
+
           <div className="mt-3 max-w-md">
             <MaskedLines text={ITEMS[activeIndex].desc} className="text-2xl" />
           </div>
         </div>
 
-        {/* RIGHT — 3D CARDS */}
+        {/* RIGHT — CARDS */}
         <div className="w-3/5 relative overflow-hidden">
           <span className="absolute top-5 right-0 font-semibold">
             [2026 SHOWCASE]
           </span>
+
           <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
             [SEE MORE]
           </span>
+
           <div className="relative h-full" style={{ perspective: 500 }}>
             {ITEMS.map((item, i) => (
               <div
@@ -258,11 +191,7 @@ export default function WorkShowcase() {
                 ref={(el) => (cardsRef.current[i] = el)}
                 className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
                 style={{
-                  transform: `
-                    translateY(100vh)
-                    scale(${1 + MAX_SCALE})
-                    rotateX(${MAX_ROTATE}deg)
-                  `,
+                  transform: "translateY(100vh)",
                 }}
               >
                 {item.title}
