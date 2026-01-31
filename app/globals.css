@@ -50,3 +50,19 @@
     animation: lineRevealDown 0.85s cubic-bezier(0.25, 1, 0.5, 1) both;
   }
 }
+
+@keyframes lineReveal {
+  from {
+    transform: translateY(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+.animate-line {
+  animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+

@@ -137,7 +137,7 @@ export default function Hero() {
   }, [isMenuOpen, toggleMenu]);
 
   return (
-    <section className="px-4 py-4 flex flex-col justify-between h-screen bg-[linear-gradient(180deg,rgba(206,216,54,0.5)_0%,#F8F7F3_40%)] border-b border-black/1">
+    <section className="px-4 py-4 flex flex-col justify-between h-screen bg-[linear-gradient(180deg,rgba(206,216,54,0.5)_0%,#F8F7F3_40%)] border-b border-black/100">
       <div className="w-full relative">
         {/* Desktop Nav */}
         <div className="hidden sm:grid grid-cols-4">
