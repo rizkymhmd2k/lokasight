@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Lenis from "lenis";
 
 const ITEMS = [
@@ -13,10 +13,12 @@ const ITEMS = [
 /* ---------------------------------------------
    Line Mask Component
 ---------------------------------------------- */
-function MaskedLines({ text, as: Tag = "div", className }) {
+function MaskedLines({ text, as: Tag = "div", className = "" }) {
+  const lines = useMemo(() => String(text).split("\n"), [text]);
+
   return (
-    <Tag className={`flex flex-col ${className}`}>
-      {text.split("\n").map((line, i) => (
+    <Tag className={`flex flex-col justify-center ${className}`}>
+      {lines.map((line, i) => (
         <span key={i} className="block overflow-hidden leading-tight">
           <span
             className="block animate-line will-change-transform"
@@ -31,14 +33,12 @@ function MaskedLines({ text, as: Tag = "div", className }) {
 }
 
 /* ---------------------------------------------
-   Work Showcase
+   Desktop Work Showcase
 ---------------------------------------------- */
 export default function WorkShowcase() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
-
-  const isActiveRef = useRef(false);
-  const scrollStartRef = useRef(0);
+  const stickyStartRef = useRef(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -46,8 +46,8 @@ export default function WorkShowcase() {
   const MAX_SCALE = 0.6;
   const MAX_ROTATE = 25;
 
-  /* ---------------- Core Scroll Math ---------------- */
-  const updateCardPositions = useCallback((scrollSinceStart) => {
+  /* ---------------- Main Animation ---------------- */
+  const apply = useCallback((scrollSinceStart) => {
     const vh = window.innerHeight;
 
     let closest = 0;
@@ -68,11 +68,7 @@ export default function WorkShowcase() {
         rotate = MAX_ROTATE * norm;
       }
 
-      card.style.transform = `
-        translateY(${y}px)
-        scale(${scale})
-        rotateX(${rotate}deg)
-      `;
+      card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
 
       const d = Math.abs(progress - 0.5);
       if (d < minDist) {
@@ -81,67 +77,81 @@ export default function WorkShowcase() {
       }
     });
 
-    setActiveIndex(closest);
+    setActiveIndex((prev) => (prev === closest ? prev : closest));
+  }, []);
+
+  /* ---------------- Pre-sticky State (Card 0 centered) ---------------- */
+  const setPreStickyState = useCallback(() => {
+    const vh = window.innerHeight;
+
+    cardsRef.current.forEach((card, i) => {
+      if (!card) return;
+
+      // Match EXACTLY what apply(vh) would produce
+      const y = i === 0 ? 0 : vh;
+      const scale = i === 0 ? 1 : 1 + MAX_SCALE;
+      const rotate = i === 0 ? 0 : MAX_ROTATE;
+
+      card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
+    });
+
+    setActiveIndex(0);
   }, []);
 
   /* ---------------- Lenis ---------------- */
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.08 });
 
+    let rafId;
     const raf = (t) => {
       lenis.raf(t);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     };
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
-    const onScroll = ({ scroll }) => {
-      if (!isActiveRef.current) return;
-      updateCardPositions(scroll - scrollStartRef.current);
-    };
+    const update = () => {
+      const section = sectionRef.current;
+      if (!section) return;
 
-    lenis.on("scroll", onScroll);
-    return () => lenis.destroy();
-  }, [updateCardPositions]);
-
-  /* ---------------- Sticky Activation ---------------- */
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const onScroll = () => {
-      const vh = window.innerHeight;
-      const scrollY = window.scrollY;
       const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight;
 
-      const sectionTop = rect.top + scrollY;
-      const sectionBottom = rect.bottom + scrollY;
+      // perf: ignore when far away
+      const near = rect.top < vh * 1.2 && rect.bottom > -vh * 0.2;
+      if (!near) return;
 
-      const shouldActivate =
-        rect.top <= vh * 0.6 && rect.bottom >= vh * 0.4;
-
-      const shouldDeactivate =
-        rect.bottom < -vh || rect.top > vh * 2;
-
-      if (!isActiveRef.current && shouldActivate) {
-        scrollStartRef.current = sectionTop - vh * 0.4;
-        isActiveRef.current = true;
-        updateCardPositions(scrollY - scrollStartRef.current);
+      // BEFORE sticky: keep first card centered, and reset sticky start
+      if (rect.top > 0) {
+        stickyStartRef.current = null;
+        setPreStickyState();
+        return;
       }
 
-      if (isActiveRef.current && shouldDeactivate) {
-        isActiveRef.current = false;
+      // STICKY active:
+      // lock the scroll position when we FIRST enter sticky
+      if (stickyStartRef.current == null) {
+        stickyStartRef.current = window.scrollY;
       }
+
+      // IMPORTANT:
+      // At sticky start, we want card 0 to be centered.
+      // With your formula, that happens when scrollSinceStart === vh.
+      const sinceStart = window.scrollY - stickyStartRef.current + vh;
+
+      apply(sinceStart);
     };
 
-    onScroll();
-    window.addEventListener("scroll", onScroll);
-    window.addEventListener("resize", onScroll);
+    lenis.on("scroll", update);
+    window.addEventListener("resize", update);
+    update();
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      lenis.off("scroll", update);
+      window.removeEventListener("resize", update);
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
     };
-  }, [updateCardPositions]);
+  }, [apply, setPreStickyState]);
 
   /* ---------------- Render ---------------- */
   return (
@@ -152,9 +162,9 @@ export default function WorkShowcase() {
     >
       <div className="sticky top-0 h-screen flex px-4 overflow-hidden">
         {/* LEFT */}
-        <div className="w-2/5 flex flex-col justify-center pr-12">
-          <span className="absolute bottom-5 text-sm font-medium flex gap-1">
-            <span>[WORK /</span>
+        <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
+          <span className="absolute bottom-5 text-sm font-medium mr-50 flex gap-1">
+            <span>[WORK / </span>
             <MaskedLines
               as="span"
               className="text-sm"
@@ -168,18 +178,14 @@ export default function WorkShowcase() {
             className="text-8xl font-bold tracking-[-0.04em]"
             text={ITEMS[activeIndex].title}
           />
-
           <div className="mt-3 max-w-md">
             <MaskedLines text={ITEMS[activeIndex].desc} className="text-2xl" />
           </div>
         </div>
 
-        {/* RIGHT — CARDS */}
+        {/* RIGHT — 3D CARDS */}
         <div className="w-3/5 relative overflow-hidden">
-          <span className="absolute top-5 right-0 font-semibold">
-            [2026 SHOWCASE]
-          </span>
-
+          <span className="absolute top-5 right-0 font-semibold">[2026 SHOWCASE]</span>
           <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
             [SEE MORE]
           </span>
@@ -188,11 +194,10 @@ export default function WorkShowcase() {
             {ITEMS.map((item, i) => (
               <div
                 key={i}
-                ref={(el) => (cardsRef.current[i] = el)}
-                className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
-                style={{
-                  transform: "translateY(100vh)",
+                ref={(el) => {
+                  if (el) cardsRef.current[i] = el;
                 }}
+                className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
                 {item.title}
               </div>
