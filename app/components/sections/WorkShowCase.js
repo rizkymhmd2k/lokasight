@@ -207,17 +207,17 @@ function DesktopWorkShowcase() {
       className="bg-backgroundlight hidden lg:block"
       style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
     >
-      <h1 className="pt-20 sm:pt-20 text-8xl lg:text-[250px] font-medium mr-50 tracking-[-0.04em] border border-blue-700">
-        FEATURED
-      </h1>
 
       <div
         ref={stickyRef} // ✅ this is the red border whose top must hit viewport top
-        className="sticky top-0 h-screen flex px-4 overflow-hidden border border-red-800"
+        className="sticky top-0 h-screen flex px-4 overflow-hidden "
       >
         {/* LEFT */}
-        <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
-          <span className="absolute top-5 left-5 font-semibold">XFEATUREDX</span>
+        <div
+          key={activeIndex}
+          className="w-2/5 flex flex-col justify-center pr-12"
+        >
+
 
           <span className="absolute bottom-5 text-sm font-medium mr-50 flex gap-1">
             <span>[WORK / </span>
@@ -241,7 +241,9 @@ function DesktopWorkShowcase() {
 
         {/* RIGHT — 3D CARDS */}
         <div className="w-3/5 relative overflow-hidden">
-          <span className="absolute top-5 right-0 font-semibold">2026 SHOWCASE</span>
+          <span className="absolute top-5 right-0 font-semibold">
+            2026 SHOWCASE
+          </span>
           <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
             [SEE MORE]
           </span>
