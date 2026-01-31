@@ -4,76 +4,29 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Lenis from "lenis";
 
 const ITEMS = [
-  { title: "Project One", desc: "Description for project one" },
-  { title: "Project Two", desc: "Description for project two" },
+  { title: "GARIS KARSA", desc: "Description for project one" },
+  { title: "BLACK ROCK INC", desc: "Description for project two" },
   { title: "Project Three", desc: "Description for project three" },
   { title: "Project Four", desc: "Description for project four" },
 ];
 
 /* ---------------------------------------------
-   Scroll-triggered Text Swapper
+   Line Mask Component
 ---------------------------------------------- */
-function TextSwapper({ activeIndex, className }) {
-  const containerRef = useRef(null);
-  const [localActiveIndex, setLocalActiveIndex] = useState(activeIndex);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  useEffect(() => {
-    if (activeIndex === localActiveIndex || isAnimating) return;
-
-    const animateSwap = async () => {
-      setIsAnimating(true);
-      
-      // Trigger exit animation
-      const container = containerRef.current;
-      if (container) {
-        container.classList.remove('text-swap-enter');
-        container.classList.add('text-swap-exit');
-        
-        // Wait for exit animation to complete
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Update content
-        setLocalActiveIndex(activeIndex);
-        
-        // Trigger enter animation
-        container.classList.remove('text-swap-exit');
-        container.classList.add('text-swap-enter');
-        
-        // Reset animation state
-        await new Promise(resolve => setTimeout(resolve, 300));
-        container.classList.remove('text-swap-enter');
-        setIsAnimating(false);
-      }
-    };
-
-    animateSwap();
-  }, [activeIndex, localActiveIndex, isAnimating]);
-
+function MaskedLines({ text, as: Tag = "div", className }) {
   return (
-    <div ref={containerRef} className={`overflow-hidden ${className}`}>
-      <div className="text-swap-container">
-        <p className="text-sm uppercase tracking-wide text-neutral-500 mb-4">
-          Featured Work
-        </p>
-
-        <div className="relative">
-          {/* Title */}
-          <div className="relative overflow-hidden">
-            <div className="text-swap-title">
-              {ITEMS[localActiveIndex]?.title}
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="mt-3 text-neutral-600 max-w-md relative overflow-hidden">
-            <div className="text-swap-desc">
-              {ITEMS[localActiveIndex]?.desc}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Tag className={`flex flex-col justify-center  ${className}`}>
+      {text.split("\n").map((line, i) => (
+        <span key={i} className="block overflow-hidden leading-tight">
+          <span
+            className="block animate-line will-change-transform "
+            style={{ animationDelay: `${i * 70}ms` }}
+          >
+            {line}
+          </span>
+        </span>
+      ))}
+    </Tag>
   );
 }
 
@@ -87,13 +40,13 @@ export default function WorkShowcase() {
   // Viewport detection
   useEffect(() => {
     setHasMounted(true);
-    
+
     const checkViewport = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkViewport();
-    
+
     let resizeTimer;
     const handleResize = () => {
       clearTimeout(resizeTimer);
@@ -105,7 +58,7 @@ export default function WorkShowcase() {
         }
       }, 250);
     };
-    
+
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -131,18 +84,21 @@ export default function WorkShowcase() {
 function DesktopVersion() {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
+
   const isActiveRef = useRef(false);
   const scrollStartRef = useRef(0);
   const isInitializedRef = useRef(false);
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   const EFFECT_STOP = 0.9;
   const MAX_SCALE = 0.6;
-  const MAX_ROTATE = 45;
+  const MAX_ROTATE = 25;
 
   /* ---------------- Update Card Positions ---------------- */
   const updateCardPositions = useCallback((scrollSinceStart) => {
     const vh = window.innerHeight;
+
     let closest = 0;
     let minDist = Infinity;
 
@@ -177,25 +133,32 @@ function DesktopVersion() {
     setActiveIndex(closest);
   }, []);
 
-  /* ---------------- Initialize Cards ---------------- */
-  const initializeCardsForPosition = useCallback((scrollSinceStart) => {
-    if (!isInitializedRef.current) {
-      const vh = window.innerHeight;
-      const totalAnimationScroll = ITEMS.length * vh;
-      const clampedScroll = Math.max(-vh * 0.5, Math.min(scrollSinceStart, totalAnimationScroll + vh * 0.5));
-      
-      updateCardPositions(clampedScroll);
-      
-      const progress = clampedScroll / vh;
-      const initialIndex = Math.min(
-        ITEMS.length - 1, 
-        Math.max(0, Math.floor(progress + 0.5))
-      );
-      setActiveIndex(initialIndex);
-      
-      isInitializedRef.current = true;
-    }
-  }, [updateCardPositions]);
+  /* ---------------- Initialize Cards to Correct State ---------------- */
+  const initializeCardsForPosition = useCallback(
+    (scrollSinceStart) => {
+      if (!isInitializedRef.current) {
+        const vh = window.innerHeight;
+        const totalAnimationScroll = ITEMS.length * vh;
+
+        const clampedScroll = Math.max(
+          -vh * 0.5,
+          Math.min(scrollSinceStart, totalAnimationScroll + vh * 0.5),
+        );
+
+        updateCardPositions(clampedScroll);
+
+        const progress = clampedScroll / vh;
+        const initialIndex = Math.min(
+          ITEMS.length - 1,
+          Math.max(0, Math.floor(progress + 0.5)),
+        );
+        setActiveIndex(initialIndex);
+
+        isInitializedRef.current = true;
+      }
+    },
+    [updateCardPositions],
+  );
 
   /* ---------------- Lenis ---------------- */
   useEffect(() => {
@@ -209,6 +172,7 @@ function DesktopVersion() {
 
     const onScroll = ({ scroll }) => {
       if (!isActiveRef.current) return;
+
       const scrollSinceStart = scroll - scrollStartRef.current;
       updateCardPositions(scrollSinceStart);
     };
@@ -235,46 +199,49 @@ function DesktopVersion() {
       const scrollY = window.scrollY;
       const sectionRect = section.getBoundingClientRect();
       const bounds = updateSectionBounds();
-      
+
       const sectionTopInViewport = sectionRect.top;
       const sectionBottomInViewport = sectionRect.bottom;
-      
-      const shouldDeactivate = 
-        sectionBottomInViewport < -vh * 0.8 || 
-        sectionTopInViewport > vh * 1.8;
-      
-      const shouldActivate = 
+
+      // Deactivation: when section is completely out of view
+      const shouldDeactivate =
+        sectionBottomInViewport < -vh * 0.8 || sectionTopInViewport > vh * 1.8;
+
+      // Activation: when section is entering viewport
+      const shouldActivate =
         (sectionTopInViewport <= vh * 0.6 && sectionTopInViewport >= -vh) ||
         (scrollY > bounds.top && scrollY < bounds.bottom);
-      
+
       if (!isActiveRef.current && shouldActivate) {
+        // Consistent scroll start calculation
         const sectionTopAbsolute = bounds.top;
-        const scrollStartAbsolute = sectionTopAbsolute - (vh * 0.4);
-        
+        const scrollStartAbsolute = sectionTopAbsolute - vh * 0.4;
+
         scrollStartRef.current = scrollStartAbsolute;
-        
+
         const initialScrollSinceStart = scrollY - scrollStartAbsolute;
         initializeCardsForPosition(initialScrollSinceStart);
-        
+
         isActiveRef.current = true;
         isInitializedRef.current = true;
-      } 
-      else if (isActiveRef.current && shouldDeactivate) {
+      } else if (isActiveRef.current && shouldDeactivate) {
         isActiveRef.current = false;
         isInitializedRef.current = false;
       }
     };
 
+    // Check initial state
     setTimeout(() => {
       handleScroll();
     }, 100);
 
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleScroll);
-    
+    // Add scroll listener
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
   }, [initializeCardsForPosition]);
 
@@ -292,9 +259,9 @@ function DesktopVersion() {
     };
 
     setTimeout(initCardsToDefault, 50);
-    
-    window.addEventListener('resize', initCardsToDefault);
-    return () => window.removeEventListener('resize', initCardsToDefault);
+
+    window.addEventListener("resize", initCardsToDefault);
+    return () => window.removeEventListener("resize", initCardsToDefault);
   }, []);
 
   /* ---------------- Render ---------------- */
@@ -304,15 +271,46 @@ function DesktopVersion() {
       className="bg-backgroundlight"
       style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
     >
-      <div className="sticky top-0 h-screen flex px-12 overflow-hidden">
-        {/* LEFT - Text Swapper */}
-        <div className="w-2/5 flex flex-col justify-center pr-12">
-          <TextSwapper activeIndex={activeIndex} />
+     
+      <div className="sticky top-0 h-screen flex px-4 overflow-hidden">
+        {/* LEFT */}
+        <div
+          key={activeIndex}
+          className="w-2/5 flex flex-col justify-center pr-12 "
+        >
+          {/* <span className="absolute top-5 font-bold">
+            [SELECTED]
+          </span> */}
+          <span className="absolute bottom-5 text-sm font-medium mr-50 flex gap-1 ">
+            <span>[WORK / </span>
+
+            <MaskedLines
+              as="span"
+              className=" text-sm "
+              text={String(activeIndex + 1).padStart(2, "0")}
+            />
+
+            <span>]</span>
+          </span>
+          <MaskedLines
+            as="h2"
+            className="text-8xl font-bold tracking-[-0.04em]"
+            text={ITEMS[activeIndex].title}
+          />
+          <div className="mt-3  max-w-md">
+            <MaskedLines text={ITEMS[activeIndex].desc} className="text-2xl" />
+          </div>
         </div>
 
         {/* RIGHT — 3D CARDS */}
-        <div className="w-3/5 relative overflow-hidden">
-          <div className="relative h-full" style={{ perspective: 500 }}>
+        <div className="w-3/5 relative overflow-hidden ">
+          <span className="absolute top-5 right-0 font-semibold">
+            [2026 SHOWCASE]
+          </span>
+            <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
+            [SEE MORE]
+          </span>
+          <div className="relative h-full " style={{ perspective: 500 }}>
             {ITEMS.map((item, i) => (
               <div
                 key={i}
@@ -334,52 +332,6 @@ function DesktopVersion() {
       </div>
 
       <style jsx global>{`
-        /* Text swap animations */
-        .text-swap-exit .text-swap-title,
-        .text-swap-exit .text-swap-desc {
-          animation: textSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
-        }
-
-        .text-swap-enter .text-swap-title,
-        .text-swap-enter .text-swap-desc {
-          animation: textSlideIn 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
-        }
-
-        .text-swap-title {
-          font-size: 2.25rem;
-          line-height: 2.5rem;
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-          min-height: 3.5rem;
-        }
-
-        .text-swap-desc {
-          min-height: 4rem;
-        }
-
-        @keyframes textSlideOut {
-          from {
-            transform: translateY(0);
-            opacity: 1;
-          }
-          to {
-            transform: translateY(-100%);
-            opacity: 0;
-          }
-        }
-
-        @keyframes textSlideIn {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-
-        /* Original line reveal animation */
         @keyframes lineReveal {
           from {
             transform: translateY(120%);
@@ -399,7 +351,7 @@ function DesktopVersion() {
 }
 
 /* ---------------------------------------------
-   Mobile Version (unchanged)
+   Mobile Version
 ---------------------------------------------- */
 function MobileVersion() {
   const cardRefs = useRef([]);
@@ -433,7 +385,7 @@ function MobileVersion() {
             metrics.current[i] = data;
           }
         },
-        { threshold: 0 }
+        { threshold: 0 },
       );
 
       observer.observe(el);
@@ -466,12 +418,12 @@ function MobileVersion() {
 
         const tiltProgress = Math.min(
           1,
-          Math.max(0, (y - m.start) / (m.tiltEnd - m.start))
+          Math.max(0, (y - m.start) / (m.tiltEnd - m.start)),
         );
 
         const scaleProgress = Math.min(
           1,
-          Math.max(0, (y - m.start) / (m.scaleEnd - m.start))
+          Math.max(0, (y - m.start) / (m.scaleEnd - m.start)),
         );
 
         const rotateX = 52 * (1 - tiltProgress);
@@ -496,7 +448,7 @@ function MobileVersion() {
     <section className="px-6 py-16 space-y-10">
       <h2 className="text-3xl font-semibold">Featured Works</h2>
 
-      <div className="grid grid-cols-1 gap-y-40 place-items-center w-full">
+      <div className="grid grid-cols-1 gap-y-30 place-items-center w-full">
         {ITEMS.map((item, i) => (
           /* 3D STAGE */
           <div
@@ -514,7 +466,7 @@ function MobileVersion() {
               data-card-index={i}
               className="
                 relative
-                rounded-xl h-[50vh] w-[60%]
+                rounded-xl h-[2vh] w-[60%]
                 flex items-center justify-center p-6
                 bg-neutral-200
                 will-change-transform
@@ -523,7 +475,7 @@ function MobileVersion() {
               style={{
                 transform: `
                   translateZ(120px)
-                  rotateX(52deg)
+                  rotateX(102deg)
                   scale(1.4)
                 `,
                 transformOrigin: "center top",
