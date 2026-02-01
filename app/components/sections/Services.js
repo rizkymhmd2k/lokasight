@@ -39,12 +39,11 @@ const Services = () => {
       {/* container becomes column on mobile, row on desktop */}
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}
-        <div className="w-full lg:w-4/5 flex flex-col p-6 lg:p-10">
+        <div className="w-full lg:w-2/5 2xl:w-3/5 flex flex-col p-6 lg:p-10">
           <span className="text-sm md:text-xl font-medium text-white">
             [services]
           </span>
 
-          {/* mobile like screenshot: single line title */}
           <h1 className="text-white text-4xl md:text-6xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]">
             WHAT WE DO BEST
           </h1>
@@ -52,7 +51,7 @@ const Services = () => {
 
         {/* RIGHT SERVICES */}
         <div className="w-full p-6 lg:p-10 flex flex-col">
-          {/* mobile divider under heading (like screenshot) */}
+          {/* mobile divider under heading */}
           <div className="border-t border-white/10 mb-6 lg:hidden" />
 
           {services.map((item, idx) => (
@@ -100,38 +99,54 @@ const Services = () => {
                 </div>
               </div>
 
-              {/* ---------------- DESKTOP LAYOUT (unchanged) ---------------- */}
-              <div className="hidden lg:grid grid-cols-[220px_1fr_200px] gap-10 items-start">
-                {/* COL 1: TITLE + TAGS */}
-                <div className="pt-6">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 rounded-full bg-red-500" />
-                    <h3 className="text-white text-3xl font-semibold">
-                      {item.title}
-                    </h3>
+              {/* ---------------- DESKTOP/TABLET LAYOUT ----------------
+                  lg → xl  : 2 columns (left = text block, right = image)
+                  xl+      : 3 columns (title/tags | desc | image)
+              */}
+              <div
+                className="
+                  hidden lg:grid
+                  lg:grid-cols-[1fr_200px]
+                  xl:grid-cols-[220px_1fr_200px]
+                  gap-10 items-start
+                "
+              >
+                {/* LEFT SIDE:
+                    - lg→xl: this is ONE column containing col1+col2 stacked
+                    - xl+: becomes "contents" so col1 and col2 become separate grid columns
+                */}
+                <div className="pt-6 flex flex-col gap-6 xl:contents xl:pt-0 xl:gap-0">
+                  {/* COL 1: TITLE + TAGS */}
+                  <div className="xl:pt-6">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-2 rounded-full bg-red-500" />
+                      <h3 className="text-white text-3xl font-semibold">
+                        {item.title}
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {item.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[11px] px-3 py-1 rounded-full bg-white/10 text-white/60 border border-white/10"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {item.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[11px] px-3 py-1 rounded-full bg-white/10 text-white/60 border border-white/10"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                  {/* COL 2: DESCRIPTION */}
+                  <div className="xl:pt-6">
+                    <p className="text-white/60 text-sm leading-relaxed whitespace-pre-line">
+                      {item.desc}
+                    </p>
                   </div>
                 </div>
 
-                {/* COL 2: DESCRIPTION (MIDDLE) */}
-                <div className="pt-6">
-                  <p className="text-white/60 text-sm leading-relaxed whitespace-pre-line">
-                    {item.desc}
-                  </p>
-                </div>
-
-                {/* COL 3: IMAGE CARD */}
-                <div className="flex justify-end pt-2">
+                {/* RIGHT SIDE IMAGE (always its own column at lg+) */}
+                <div className="flex justify-end pt-2 xl:pt-2">
                   <div className="w-[180px] h-[180px] rounded-2xl bg-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-white via-yellow-200 to-yellow-400 opacity-80" />
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-200/40 to-transparent" />
@@ -146,7 +161,7 @@ const Services = () => {
                 </div>
               </div>
 
-              {/* DIVIDER (both) */}
+              {/* DIVIDER */}
               {idx !== services.length - 1 && (
                 <div className="mt-8 lg:mt-10 border-t border-white/10" />
               )}
