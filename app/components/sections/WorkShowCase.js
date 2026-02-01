@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback, useLayoutEffect } from "react";
 import Lenis from "lenis";
 
 const ITEMS = [
@@ -37,7 +37,7 @@ function MaskedLines({ text, as: Tag = "div", className = "" }) {
 ---------------------------------------------- */
 function MobileWorkShowcase() {
   return (
-    <section className="bg-backgroundlight px-4 py-10 lg:hidden">
+    <section className="bg-backgroundlight px-4 py-10 lg:hidden flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <span className="font-semibold">2026 SHOWCASE</span>
         <span className="text-sm font-medium opacity-70">[WORK]</span>
@@ -64,20 +64,25 @@ function MobileWorkShowcase() {
           </article>
         ))}
       </div>
+      <span className="font-semibold pt-5 text-center">SEE MORE</span>
     </section>
   );
 }
 
 /* ---------------------------------------------
-   Desktop Work Showcase (Fixed start at RED border)
+   Desktop Work Showcase (Approach B: explicit track + geometry progress)
 ---------------------------------------------- */
 function DesktopWorkShowcase() {
   const sectionRef = useRef(null);
-  const stickyRef = useRef(null); // ✅ red border/sticky wrapper ref
+  const stickyRef = useRef(null);
   const cardsRef = useRef([]);
-  const stickyStartRef = useRef(null);
+
+  const sectionTopRef = useRef(0);
+  const trackLenRef = useRef(0);
+  const vhRef = useRef(0);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [sectionHeight, setSectionHeight] = useState("500vh"); // will be measured
 
   const EFFECT_STOP = 0.9;
   const MAX_SCALE = 0.6;
@@ -86,13 +91,15 @@ function DesktopWorkShowcase() {
   const FOCUS = 0.8;
   const SWITCH_MARGIN = 0.16;
 
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
   const getProgress = useCallback((scrollSinceStart, i, vh) => {
     return (scrollSinceStart - i * vh) / vh;
   }, []);
 
   const apply = useCallback(
     (scrollSinceStart) => {
-      const vh = window.innerHeight;
+      const vh = vhRef.current || window.innerHeight;
 
       let bestIndex = 0;
       let bestDist = Infinity;
@@ -136,89 +143,99 @@ function DesktopWorkShowcase() {
     [EFFECT_STOP, MAX_SCALE, MAX_ROTATE, FOCUS, SWITCH_MARGIN, getProgress],
   );
 
-  const setPreStickyState = useCallback(() => {
+  const measure = useCallback(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
     const vh = window.innerHeight;
+    vhRef.current = vh;
 
-    cardsRef.current.forEach((card, i) => {
-      if (!card) return;
+    // Explicit scroll track: long enough to fully play all cards.
+    // Keep your original section height pattern: (ITEMS.length + 1) * vh
+    // Track length = ITEMS.length * vh, sticky viewport = 1 * vh
+    const trackLen = ITEMS.length * vh;
+    trackLenRef.current = trackLen;
 
-      const y = i === 0 ? 0 : vh;
-      const scale = i === 0 ? 1 : 1 + MAX_SCALE;
-      const rotate = i === 0 ? 0 : MAX_ROTATE;
+    setSectionHeight(`${(ITEMS.length + 1) * 100}vh`);
 
-      card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
-    });
+    // Cache absolute document Y of section top
+    const rect = section.getBoundingClientRect();
+    sectionTopRef.current = rect.top + window.scrollY;
+  }, []);
 
-    setActiveIndex(0);
-  }, [MAX_SCALE, MAX_ROTATE]);
+  // Measure as early as possible to handle refresh mid-page reliably
+  useLayoutEffect(() => {
+    measure();
+  }, [measure]);
 
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.08 });
 
-    let rafId;
+    let rafId = 0;
     const raf = (t) => {
       lenis.raf(t);
       rafId = requestAnimationFrame(raf);
     };
     rafId = requestAnimationFrame(raf);
 
-    const update = () => {
-      const section = sectionRef.current;
-      const sticky = stickyRef.current;
-      if (!section || !sticky) return;
+    const updateFromScroll = (scrollY) => {
+      const vh = vhRef.current || window.innerHeight;
+      const sectionTop = sectionTopRef.current;
+      const trackLen = trackLenRef.current;
 
-      const sectionRect = section.getBoundingClientRect();
-      const stickyRect = sticky.getBoundingClientRect();
-      const vh = window.innerHeight;
+      // Geometry-based progress: deterministic even on refresh anywhere
+      const raw = scrollY - sectionTop;
+      const progress = clamp(raw, 0, trackLen);
 
-      const near = sectionRect.top < vh * 1.2 && sectionRect.bottom > -vh * 0.2;
-      if (!near) return;
+      // Keep your original "start at vh" behavior so card 0 is centered at progress 0
+      const sinceStart = progress + vh;
 
-      // ✅ Start condition is now based on the RED border/sticky wrapper
-      if (stickyRect.top > 0) {
-        stickyStartRef.current = null;
-        setPreStickyState();
-        return;
-      }
+      // Optional lightweight bounds check (avoid work far away)
+      // Run transforms slightly outside range for smoother entry
+      if (raw < -vh * 1.5 || raw > trackLen + vh * 1.5) return;
 
-      if (stickyStartRef.current == null) {
-        stickyStartRef.current = window.scrollY;
-      }
-
-      const sinceStart = window.scrollY - stickyStartRef.current + vh;
       apply(sinceStart);
     };
 
-    lenis.on("scroll", update);
-    window.addEventListener("resize", update);
-    update();
+    const onLenisScroll = (e) => {
+      // Use Lenis scroll value as the single value we drive from (more consistent than mixing)
+      updateFromScroll(e.scroll);
+    };
+
+    lenis.on("scroll", onLenisScroll);
+
+    const onResize = () => {
+      measure();
+      // Re-apply immediately with current scroll position
+      updateFromScroll(lenis.scroll);
+    };
+
+    window.addEventListener("resize", onResize);
+
+    // Initial sync (important for refresh at footer)
+    measure();
+    updateFromScroll(lenis.scroll);
 
     return () => {
-      lenis.off("scroll", update);
-      window.removeEventListener("resize", update);
+      lenis.off("scroll", onLenisScroll);
+      window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
-  }, [apply, setPreStickyState]);
+  }, [apply, measure]);
 
   return (
     <section
       ref={sectionRef}
       className="bg-backgroundlight hidden lg:block"
-      style={{ height: `${(ITEMS.length + 1) * 100}vh` }}
+      style={{ height: sectionHeight }}
     >
-
       <div
-        ref={stickyRef} // ✅ this is the red border whose top must hit viewport top
-        className="sticky top-0 h-screen flex px-4 overflow-hidden "
+        ref={stickyRef}
+        className="sticky top-0 h-screen flex px-4 overflow-hidden"
       >
         {/* LEFT */}
-        <div
-          key={activeIndex}
-          className="w-2/5 flex flex-col justify-center pr-12"
-        >
-
-
+        <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
           <span className="absolute bottom-5 text-sm font-medium mr-50 flex gap-1">
             <span>[WORK / </span>
             <MaskedLines
@@ -241,9 +258,7 @@ function DesktopWorkShowcase() {
 
         {/* RIGHT — 3D CARDS */}
         <div className="w-3/5 relative overflow-hidden">
-          <span className="absolute top-5 right-0 font-semibold">
-            2026 SHOWCASE
-          </span>
+          <span className="absolute top-5 right-0 font-semibold">2026 SHOWCASE</span>
           <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
             [SEE MORE]
           </span>
@@ -253,7 +268,7 @@ function DesktopWorkShowcase() {
               <div
                 key={i}
                 ref={(el) => {
-                  if (el) cardsRef.current[i] = el;
+                  cardsRef.current[i] = el;
                 }}
                 className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
