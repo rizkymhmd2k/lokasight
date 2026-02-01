@@ -65,4 +65,12 @@
 .animate-line {
   animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
 }
+/* hero overlay effect */
+.hero-covered {
+  transform: scale(1.04);
+}
+
+.hero-covered .hero-dim {
+  opacity: 0.6;
+}
 

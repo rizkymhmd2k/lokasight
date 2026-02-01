@@ -35,7 +35,7 @@ quam.`,
 
 const Services = () => {
   return (
-    <div className="w-full px-4 pt-50 flex flex-col bg-backgroundlight">
+    <div className="w-full px-4 pt-25 flex flex-col bg-backgroundlight">
       {/* container becomes column on mobile, row on desktop */}
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}

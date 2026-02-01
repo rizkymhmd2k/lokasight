@@ -84,9 +84,14 @@ function DesktopWorkShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [sectionHeight, setSectionHeight] = useState("500vh"); // will be measured
 
-  const EFFECT_STOP = 0.9;
-  const MAX_SCALE = 0.6;
-  const MAX_ROTATE = 25;
+  // --- motion tuning ---
+  const EFFECT_STOP = 0.9;       // where "pre" animation ends (scale hits 1)
+  const MAX_SCALE = 0.6;       // pre-stop scale up amount
+  const MAX_ROTATE = 50;       // pre-stop rotateX amount
+
+  // post-stop: keep shrinking slightly after scale=1
+  const POST_SCALE_RANGE = 0.35; // how long after stop we keep shrinking (progress units)
+  const MIN_SCALE = 0.92;        // smallest scale reached in post zone
 
   const FOCUS = 0.8;
   const SWITCH_MARGIN = 0.16;
@@ -114,9 +119,15 @@ function DesktopWorkShowcase() {
         let rotate = 0;
 
         if (progress < EFFECT_STOP) {
-          const norm = 1 - progress / EFFECT_STOP;
+          // pre-stop: big laid-down + scale up
+          const norm = 1 - progress / EFFECT_STOP; // 1 -> 0
           scale = 1 + MAX_SCALE * norm;
           rotate = MAX_ROTATE * norm;
+        } else {
+          // post-stop: keep shrinking a bit after reaching scale=1
+          const t = clamp((progress - EFFECT_STOP) / POST_SCALE_RANGE, 0, 1); // 0 -> 1
+          scale = 1 - (1 - MIN_SCALE) * t; // 1 -> MIN_SCALE
+          rotate = 0; // keep flat after stop (set to 4-8 if you want a resting tilt)
         }
 
         card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
@@ -140,7 +151,16 @@ function DesktopWorkShowcase() {
         return prev;
       });
     },
-    [EFFECT_STOP, MAX_SCALE, MAX_ROTATE, FOCUS, SWITCH_MARGIN, getProgress],
+    [
+      EFFECT_STOP,
+      MAX_SCALE,
+      MAX_ROTATE,
+      POST_SCALE_RANGE,
+      MIN_SCALE,
+      FOCUS,
+      SWITCH_MARGIN,
+      getProgress,
+    ],
   );
 
   const measure = useCallback(() => {
@@ -150,20 +170,15 @@ function DesktopWorkShowcase() {
     const vh = window.innerHeight;
     vhRef.current = vh;
 
-    // Explicit scroll track: long enough to fully play all cards.
-    // Keep your original section height pattern: (ITEMS.length + 1) * vh
-    // Track length = ITEMS.length * vh, sticky viewport = 1 * vh
     const trackLen = ITEMS.length * vh;
     trackLenRef.current = trackLen;
 
     setSectionHeight(`${(ITEMS.length + 1) * 100}vh`);
 
-    // Cache absolute document Y of section top
     const rect = section.getBoundingClientRect();
     sectionTopRef.current = rect.top + window.scrollY;
   }, []);
 
-  // Measure as early as possible to handle refresh mid-page reliably
   useLayoutEffect(() => {
     measure();
   }, [measure]);
@@ -183,22 +198,17 @@ function DesktopWorkShowcase() {
       const sectionTop = sectionTopRef.current;
       const trackLen = trackLenRef.current;
 
-      // Geometry-based progress: deterministic even on refresh anywhere
       const raw = scrollY - sectionTop;
       const progress = clamp(raw, 0, trackLen);
 
-      // Keep your original "start at vh" behavior so card 0 is centered at progress 0
       const sinceStart = progress + vh;
 
-      // Optional lightweight bounds check (avoid work far away)
-      // Run transforms slightly outside range for smoother entry
       if (raw < -vh * 1.5 || raw > trackLen + vh * 1.5) return;
 
       apply(sinceStart);
     };
 
     const onLenisScroll = (e) => {
-      // Use Lenis scroll value as the single value we drive from (more consistent than mixing)
       updateFromScroll(e.scroll);
     };
 
@@ -206,13 +216,11 @@ function DesktopWorkShowcase() {
 
     const onResize = () => {
       measure();
-      // Re-apply immediately with current scroll position
       updateFromScroll(lenis.scroll);
     };
 
     window.addEventListener("resize", onResize);
 
-    // Initial sync (important for refresh at footer)
     measure();
     updateFromScroll(lenis.scroll);
 
@@ -258,7 +266,7 @@ function DesktopWorkShowcase() {
 
         {/* RIGHT — 3D CARDS */}
         <div className="w-3/5 relative overflow-hidden">
-          <span className="absolute top-5 right-0 font-semibold">2026 SHOWCASE</span>
+          <span className="absolute top-5 right-0 font-semibold">[2026 SHOWCASE]</span>
           <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
             [SEE MORE]
           </span>
@@ -270,7 +278,7 @@ function DesktopWorkShowcase() {
                 ref={(el) => {
                   cardsRef.current[i] = el;
                 }}
-                className="absolute inset-0 m-auto h-[60vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
+                className="absolute inset-0 m-auto h-[50vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
                 {item.title}
               </div>
