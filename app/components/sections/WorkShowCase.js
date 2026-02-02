@@ -218,7 +218,8 @@ function DesktopWorkShowcase() {
 
     setSectionHeight(`${(ITEMS.length + 1) * 100}vh`);
 
-    const rect = section.getBoundingClientRect();
+    const anchor = stickyRef.current || section;
+    const rect = anchor.getBoundingClientRect();
     sectionTopRef.current = rect.top + window.scrollY;
   }, []);
 
@@ -279,8 +280,9 @@ function DesktopWorkShowcase() {
     measure();
     updateFromScroll();
 
-    io.observe(sectionRef.current);
-    if (ro) ro.observe(sectionRef.current);
+    const ioTarget = stickyRef.current || sectionRef.current;
+    io.observe(ioTarget);
+    if (ro) ro.observe(ioTarget);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
@@ -299,12 +301,12 @@ function DesktopWorkShowcase() {
   return (
     <section
       ref={sectionRef}
-      className="bg-backgroundlight hidden lg:block pt-25"
+      className="bg-backgroundlight hidden lg:block pt-25 border border-red-700"
       style={{ height: sectionHeight }}
     >
       <div
         ref={stickyRef}
-        className="sticky top-0 h-screen flex px-4 overflow-hidden"
+        className="sticky top-0 h-screen flex px-4 overflow-hidden border border-blue-700"
       >
         {/* LEFT */}
         <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
