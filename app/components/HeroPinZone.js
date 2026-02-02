@@ -40,8 +40,6 @@ export default function HeroPinZone({ children }) {
 
   const metricsRef = useRef({ top: 0, range: 1 });
   const rafRef = useRef(0);
-  const lastScrollRef = useRef(0);
-  const activeRef = useRef(false);
 
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
@@ -62,7 +60,9 @@ export default function HeroPinZone({ children }) {
     if (!dim) return;
 
     const { top, range } = metricsRef.current;
-    const progress = clamp((lastScrollRef.current - top) / range, 0, 1);
+    const startOffset = range * 0.12;
+    const scrollY = window.scrollY || window.pageYOffset;
+    const progress = clamp((scrollY - top - startOffset) / range, 0, 1);
     dim.style.opacity = String(progress * 0.7);
 
     rafRef.current = 0;
@@ -74,8 +74,6 @@ export default function HeroPinZone({ children }) {
     if (!heroZone || !dim) return;
 
     const onScroll = () => {
-      lastScrollRef.current = window.scrollY || window.pageYOffset;
-      if (!activeRef.current) return;
       if (rafRef.current) return;
       rafRef.current = requestAnimationFrame(apply);
     };
@@ -85,33 +83,13 @@ export default function HeroPinZone({ children }) {
       onScroll();
     };
 
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        activeRef.current = entry.isIntersecting;
-        if (entry.isIntersecting) onScroll();
-      },
-      { rootMargin: "200px 0px 200px 0px", threshold: 0 }
-    );
-
-    const ro =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(() => {
-            measure();
-            onScroll();
-          })
-        : null;
-
     measure();
     onScroll();
 
-    io.observe(heroZone);
-    if (ro) ro.observe(heroZone);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
 
     return () => {
-      io.disconnect();
-      if (ro) ro.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -119,7 +97,7 @@ export default function HeroPinZone({ children }) {
   }, [apply, measure]);
 
   return (
-    <section ref={heroZoneRef} className="relative h-[200vh]">
+    <section ref={heroZoneRef} className="hero-pinzone relative h-[200vh]">
       {process.env.NODE_ENV === "development" && <BreakpointIndicator />}
 
       <div className="sticky top-0 h-screen overflow-hidden">
@@ -128,7 +106,7 @@ export default function HeroPinZone({ children }) {
 
           <div
             ref={heroDimRef}
-            className="pointer-events-none absolute inset-0 bg-black opacity-0 will-change-opacity"
+            className="hero-dim pointer-events-none absolute inset-0 bg-black opacity-0 will-change-opacity"
           />
         </div>
       </div>
