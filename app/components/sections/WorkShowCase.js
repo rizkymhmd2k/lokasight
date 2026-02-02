@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useCallback, useLayoutEffect } from "react";
-import Lenis from "lenis";
 
 const ITEMS = [
   { title: "GARIS KARSA", desc: "Description for project one" },
@@ -80,6 +79,11 @@ function DesktopWorkShowcase() {
   const sectionTopRef = useRef(0);
   const trackLenRef = useRef(0);
   const vhRef = useRef(0);
+  const targetRef = useRef([]);
+  const currentRef = useRef([]);
+  const animRafRef = useRef(0);
+  const scrollRafRef = useRef(0);
+  const inViewRef = useRef(false);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [sectionHeight, setSectionHeight] = useState("500vh"); // will be measured
@@ -88,6 +92,8 @@ function DesktopWorkShowcase() {
   const EFFECT_STOP = 0.9;       // where "pre" animation ends (scale hits 1)
   const MAX_SCALE = 0.6;       // pre-stop scale up amount
   const MAX_ROTATE = 50;       // pre-stop rotateX amount
+  const SMOOTH = 0.16;         // lerp factor for internal smoothing
+  const EPS = 0.001;           // stop threshold
 
   // post-stop: keep shrinking slightly after scale=1
   const POST_SCALE_RANGE = 0.35; // how long after stop we keep shrinking (progress units)
@@ -102,7 +108,7 @@ function DesktopWorkShowcase() {
     return (scrollSinceStart - i * vh) / vh;
   }, []);
 
-  const apply = useCallback(
+  const computeTargets = useCallback(
     (scrollSinceStart) => {
       const vh = vhRef.current || window.innerHeight;
 
@@ -130,7 +136,7 @@ function DesktopWorkShowcase() {
           rotate = 0; // keep flat after stop (set to 4-8 if you want a resting tilt)
         }
 
-        card.style.transform = `translateY(${y}px) scale(${scale}) rotateX(${rotate}deg)`;
+        targetRef.current[i] = { y, scale, rotate };
 
         const dist = Math.abs(progress - FOCUS);
         if (dist < bestDist) {
@@ -163,6 +169,43 @@ function DesktopWorkShowcase() {
     ],
   );
 
+  const animate = useCallback(() => {
+    let keepGoing = false;
+
+    cardsRef.current.forEach((card, i) => {
+      if (!card) return;
+      const target = targetRef.current[i];
+      if (!target) return;
+
+      const current = currentRef.current[i] || {
+        y: target.y,
+        scale: target.scale,
+        rotate: target.rotate,
+      };
+
+      const y = current.y + (target.y - current.y) * SMOOTH;
+      const scale = current.scale + (target.scale - current.scale) * SMOOTH;
+      const rotate = current.rotate + (target.rotate - current.rotate) * SMOOTH;
+
+      currentRef.current[i] = { y, scale, rotate };
+      card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale}) rotateX(${rotate}deg)`;
+
+      if (
+        Math.abs(target.y - y) > EPS ||
+        Math.abs(target.scale - scale) > EPS ||
+        Math.abs(target.rotate - rotate) > EPS
+      ) {
+        keepGoing = true;
+      }
+    });
+
+    if (keepGoing && inViewRef.current) {
+      animRafRef.current = requestAnimationFrame(animate);
+    } else {
+      animRafRef.current = 0;
+    }
+  }, [SMOOTH, EPS]);
+
   const measure = useCallback(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -184,53 +227,74 @@ function DesktopWorkShowcase() {
   }, [measure]);
 
   useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.08 });
-
-    let rafId = 0;
-    const raf = (t) => {
-      lenis.raf(t);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
-
-    const updateFromScroll = (scrollY) => {
+    const updateFromScroll = () => {
       const vh = vhRef.current || window.innerHeight;
       const sectionTop = sectionTopRef.current;
       const trackLen = trackLenRef.current;
 
-      const raw = scrollY - sectionTop;
+      const raw = (window.scrollY || window.pageYOffset) - sectionTop;
       const progress = clamp(raw, 0, trackLen);
-
       const sinceStart = progress + vh;
 
-      if (raw < -vh * 1.5 || raw > trackLen + vh * 1.5) return;
+      if (raw < -vh * 1.5 || raw > trackLen + vh * 1.5) {
+        scrollRafRef.current = 0;
+        return;
+      }
 
-      apply(sinceStart);
+      computeTargets(sinceStart);
+      if (!animRafRef.current && inViewRef.current) {
+        animRafRef.current = requestAnimationFrame(animate);
+      }
+
+      scrollRafRef.current = 0;
     };
 
-    const onLenisScroll = (e) => {
-      updateFromScroll(e.scroll);
+    const onScroll = () => {
+      if (!inViewRef.current) return;
+      if (scrollRafRef.current) return;
+      scrollRafRef.current = requestAnimationFrame(updateFromScroll);
     };
-
-    lenis.on("scroll", onLenisScroll);
 
     const onResize = () => {
       measure();
-      updateFromScroll(lenis.scroll);
+      updateFromScroll();
     };
 
-    window.addEventListener("resize", onResize);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = entry.isIntersecting;
+        if (entry.isIntersecting) onScroll();
+      },
+      { rootMargin: "200px 0px 200px 0px", threshold: 0 }
+    );
+
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            measure();
+            onScroll();
+          })
+        : null;
 
     measure();
-    updateFromScroll(lenis.scroll);
+    updateFromScroll();
+
+    io.observe(sectionRef.current);
+    if (ro) ro.observe(sectionRef.current);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
 
     return () => {
-      lenis.off("scroll", onLenisScroll);
+      io.disconnect();
+      if (ro) ro.disconnect();
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(rafId);
-      lenis.destroy();
+      if (animRafRef.current) cancelAnimationFrame(animRafRef.current);
+      if (scrollRafRef.current) cancelAnimationFrame(scrollRafRef.current);
+      animRafRef.current = 0;
+      scrollRafRef.current = 0;
     };
-  }, [apply, measure]);
+  }, [animate, computeTargets, measure]);
 
   return (
     <section
@@ -287,21 +351,6 @@ function DesktopWorkShowcase() {
         </div>
       </div>
 
-      <style jsx global>{`
-        @keyframes lineReveal {
-          from {
-            transform: translateY(120%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0%);
-            opacity: 1;
-          }
-        }
-        .animate-line {
-          animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
-        }
-      `}</style>
     </section>
   );
 }

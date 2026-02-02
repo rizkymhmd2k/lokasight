@@ -22,7 +22,7 @@ export default function Home() {
         "
       >
         <Work />
-        <WorkShowCase />
+        {/* <WorkShowCase /> */}
         <Services />
         <About />
       </section>
