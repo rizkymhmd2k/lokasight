@@ -5,6 +5,7 @@ import Hero from "./components/sections/Hero";
 import Work from "./components/sections/Work";
 import WorkShowCase from "./components/sections/WorkShowCase";
 import Services from "./components/sections/Services";
+import About from "./components/sections/About";
 
 /* ---------------------------------------------
    Breakpoint Indicator (DEV HELPER)
@@ -102,6 +103,7 @@ export default function ClientHome() {
         <Work />
         <WorkShowCase />
         <Services />
+        <About />
       </section>
     </main>
   );

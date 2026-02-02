@@ -39,7 +39,7 @@ function MobileWorkShowcase() {
   return (
     <section className="bg-backgroundlight px-4 py-10 lg:hidden flex flex-col">
       <div className="flex items-center justify-between mb-6">
-        <span className="font-semibold">2026 SHOWCASE</span>
+        <span className="font-semibold ">2026 SHOWCASE</span>
         <span className="text-sm font-medium opacity-70">[WORK]</span>
       </div>
 
@@ -235,7 +235,7 @@ function DesktopWorkShowcase() {
   return (
     <section
       ref={sectionRef}
-      className="bg-backgroundlight hidden lg:block"
+      className="bg-backgroundlight hidden lg:block pt-25"
       style={{ height: sectionHeight }}
     >
       <div
@@ -244,11 +244,11 @@ function DesktopWorkShowcase() {
       >
         {/* LEFT */}
         <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
-          <span className="absolute bottom-5 text-sm font-medium mr-50 flex gap-1">
+          <span className="absolute bottom-5 text-xl font-medium mr-50 flex gap-1">
             <span>[WORK / </span>
             <MaskedLines
               as="span"
-              className="text-sm"
+              className="text-xl"
               text={String(activeIndex + 1).padStart(2, "0")}
             />
             <span>]</span>
@@ -266,7 +266,7 @@ function DesktopWorkShowcase() {
 
         {/* RIGHT — 3D CARDS */}
         <div className="w-3/5 relative overflow-hidden">
-          <span className="absolute top-5 right-0 font-semibold">[2026 SHOWCASE]</span>
+          <span className="absolute top-5 right-0 text-xl font-semibold">[2026 SHOWCASE]</span>
           <span className="absolute bottom-5 right-0 text-xl font-medium z-50">
             [SEE MORE]
           </span>
