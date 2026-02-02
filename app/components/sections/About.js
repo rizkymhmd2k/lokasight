@@ -91,14 +91,21 @@ const socials = [
 
 const About = () => {
   return (
-    <div className="bg-backgroundlight flex flex-row px-4 pt-25 pb-25">
-      {/* LEFT */}
-      <div className="w-4/5 flex    justify-center">
-        <div className="bg-gray-300 w-4/5 h-[400px] rounded-3xl" />
+    <div
+      className="
+        bg-backgroundlight
+        flex flex-col gap-10 px-4 py-12
+        lg:flex-row lg:gap-0 lg:px-4 lg:pt-25 lg:pb-25
+      "
+    >
+      {/* LEFT (desktop original starts at lg) */}
+      <div className="w-full lg:w-4/5 flex justify-center">
+        {/* keep landscape on mobile, keep original on lg+ */}
+        <div className="bg-gray-300 w-full max-w-[560px] aspect-video lg:max-w-none lg:w-4/5 lg:aspect-auto lg:h-[400px] rounded-3xl" />
       </div>
 
       {/* RIGHT */}
-      <div className="w-full  pl-12 flex flex-col">
+      <div className="w-full pl-0 flex flex-col lg:pl-12">
         <div className="shrink-0">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium leading-tight">
             <span className="text-sm md:text-xl font-medium mr-2 md:mr-5">
@@ -109,8 +116,11 @@ const About = () => {
           </h1>
         </div>
 
-        <div className="grid grid-cols-5 mt-10">
-          <div className="col-start-3 col-span-2">
+        {/* original grid exists on lg+ */}
+        <div className="mt-6 lg:mt-8 lg:grid lg:grid-cols-5">
+          {/* ONLY CHANGE: on lg→xl, start at col 1 and span full.
+              On 2xl+ revert to original (col 3 span 2). */}
+          <div className="lg:col-start-1 lg:col-span-5 2xl:col-start-3 2xl:col-span-2">
             <p className="md:text-lg">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et
               lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu,
@@ -122,7 +132,7 @@ const About = () => {
               lectus rutrum, fringilla lorem et, pulvinar erat. socmed below
             </p>
 
-            <div className="mt-6 flex gap-6">
+            <div className="mt-6 flex flex-wrap gap-4 lg:gap-6">
               {socials.map((s) => (
                 <SocialIcon key={s.label} href={s.href} label={s.label}>
                   {s.svg}
