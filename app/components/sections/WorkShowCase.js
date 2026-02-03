@@ -81,6 +81,9 @@ function DesktopWorkShowcase() {
 
   // rAF lock
   const rafRef = useRef(0);
+  const animRef = useRef(0);
+  const targetRef = useRef([]);
+  const currentRef = useRef([]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [sectionHeight, setSectionHeight] = useState("500vh");
@@ -100,6 +103,8 @@ function DesktopWorkShowcase() {
   const EFFECT_STOP = 0.9;
   const MAX_SCALE = 0.18;
   const MAX_ROTATE = 16;
+  const SMOOTH = 0.08; // smaller = floatier (more lag)
+  const EPS = 0.001;
 
   // delay after sticky engages (in vh units)
   const ANIM_DELAY = 0.12;
@@ -113,6 +118,43 @@ function DesktopWorkShowcase() {
   const SWITCH_MARGIN = 0.16;
 
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  const animate = useCallback(() => {
+    let keepGoing = false;
+
+    for (let i = 0; i < ITEMS.length; i++) {
+      const card = cardsRef.current[i];
+      const target = targetRef.current[i];
+      if (!card || !target) continue;
+
+      const current = currentRef.current[i] || {
+        y: target.y,
+        scale: target.scale,
+        rotate: target.rotate,
+      };
+
+      const y = current.y + (target.y - current.y) * SMOOTH;
+      const scale = current.scale + (target.scale - current.scale) * SMOOTH;
+      const rotate = current.rotate + (target.rotate - current.rotate) * SMOOTH;
+
+      currentRef.current[i] = { y, scale, rotate };
+      card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale}) rotateX(${rotate}deg)`;
+
+      if (
+        Math.abs(target.y - y) > EPS ||
+        Math.abs(target.scale - scale) > EPS ||
+        Math.abs(target.rotate - rotate) > EPS
+      ) {
+        keepGoing = true;
+      }
+    }
+
+    if (keepGoing) {
+      animRef.current = requestAnimationFrame(animate);
+    } else {
+      animRef.current = 0;
+    }
+  }, [SMOOTH, EPS]);
 
   const measure = useCallback(() => {
     const section = sectionRef.current;
@@ -172,9 +214,7 @@ function DesktopWorkShowcase() {
       }
 
       // helpful for rotateX feel
-      card.style.transformOrigin = "center bottom";
-      card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale}) rotateX(${rotate}deg)`;
-      card.style.opacity = "1";
+      targetRef.current[i] = { y, scale, rotate };
 
       // pick active card (same as your original idea)
       const dist = Math.abs(progress - FOCUS);
@@ -196,6 +236,10 @@ function DesktopWorkShowcase() {
       return prev;
     });
 
+    if (!animRef.current) {
+      animRef.current = requestAnimationFrame(animate);
+    }
+
     if (DEBUG) {
       setDebug({
         y: scrollY,
@@ -211,11 +255,14 @@ function DesktopWorkShowcase() {
     EFFECT_STOP,
     MAX_SCALE,
     MAX_ROTATE,
+    SMOOTH,
+    EPS,
     POST_SCALE_RANGE,
     MIN_SCALE,
     FOCUS,
     SWITCH_MARGIN,
     DEBUG,
+    animate,
   ]);
 
   // Measure before paint to avoid jump
@@ -275,6 +322,8 @@ function DesktopWorkShowcase() {
       if (ro) ro.disconnect();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+      animRef.current = 0;
     };
   }, [measure, applyTransforms]);
 
@@ -332,7 +381,10 @@ function DesktopWorkShowcase() {
                 key={i}
                 ref={(el) => {
                   cardsRef.current[i] = el;
-                  if (el) el.style.transformStyle = "preserve-3d";
+                  if (el) {
+                    el.style.transformStyle = "preserve-3d";
+                    el.style.transformOrigin = "center bottom";
+                  }
                 }}
                 className="absolute inset-0 m-auto h-[50vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
