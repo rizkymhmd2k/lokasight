@@ -4,6 +4,7 @@ import Work from "./components/sections/Work";
 import WorkShowCase from "./components/sections/WorkShowCase";
 import Services from "./components/sections/Services";
 import About from "./components/sections/About";
+import Testimony from "./components/sections/Testimony";
 
 export default function Home() {
   return (
@@ -25,7 +26,8 @@ export default function Home() {
         <WorkShowCase />
         <Services />
         <About />
-        <Services />
+        <Testimony />
+        {/* <Testimony /> */}
       </section>
     </main>
   );
