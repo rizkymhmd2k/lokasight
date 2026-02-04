@@ -101,7 +101,7 @@ const About = () => {
       {/* LEFT (desktop original starts at lg) */}
       <div className="w-full lg:w-4/5 flex justify-center">
         {/* keep landscape on mobile, keep original on lg+ */}
-        <div className="bg-gray-300 w-full max-w-[560px] aspect-video lg:max-w-none lg:w-4/5 lg:aspect-auto lg:h-[400px] rounded-3xl" />
+        <div className="bg-gray-300 w-full aspect-video lg:w-4/5 lg:aspect-auto lg:h-[400px] rounded-3xl" />
       </div>
 
       {/* RIGHT */}

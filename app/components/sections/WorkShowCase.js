@@ -69,6 +69,8 @@ function MobileWorkShowcase() {
    - Starts animation exactly when the sticky hits top (sectionTop)
    - Works when refreshing anywhere (re-measures on resize/fonts/RO)
    - Preserves your original 3D curve: tilt -> untilt -> scaledown
+   - Smooth/glide: cards ease toward targets via rAF loop
+   - FIX: admire delay only arms when entering from above (raw crosses <0 -> >=0)
 ---------------------------------------------- */
 function DesktopWorkShowcase() {
   const sectionRef = useRef(null);
@@ -84,6 +86,15 @@ function DesktopWorkShowcase() {
   const animRef = useRef(0);
   const targetRef = useRef([]);
   const currentRef = useRef([]);
+
+  // admire delay lock (vh-based)
+  const admireRef = useRef({
+    frozen: false,
+    baseRaw: 0,
+  });
+
+  // FIX: track previous raw so we only arm admire when entering from above
+  const prevRawRef = useRef(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [sectionHeight, setSectionHeight] = useState("500vh");
@@ -116,6 +127,9 @@ function DesktopWorkShowcase() {
   // active selection
   const FOCUS = 0.8;
   const SWITCH_MARGIN = 0.16;
+
+  // admire distance in vh (scroll-controlled pause)
+  const ADMIRE_VH = 0.25; // 0.12 subtle, 0.18 nice, 0.25 strong
 
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
@@ -181,6 +195,40 @@ function DesktopWorkShowcase() {
     const trackLen = ITEMS.length * vh; // same as your original
     const raw = scrollY - sectionTop; // 0 exactly when sticky hits top
 
+    // -------------------------
+    // FIX: vh-based admire gate
+    // Arm ONLY when entering from above (raw crosses <0 -> >=0).
+    // This prevents "stuck frozen" behavior when entering from below.
+    // -------------------------
+    const prevRaw = prevRawRef.current;
+    prevRawRef.current = raw;
+
+    const justEnteredFromAbove = prevRaw !== null && prevRaw < 0 && raw >= 0;
+
+    if (justEnteredFromAbove) {
+      admireRef.current.frozen = true;
+      admireRef.current.baseRaw = raw; // typically ~0
+    }
+
+    if (raw >= 0 && admireRef.current.frozen) {
+      const admirePx = vh * ADMIRE_VH;
+      const consumed = raw - admireRef.current.baseRaw;
+
+      if (consumed < admirePx) {
+        // keep targets as-is; no new target updates, no animation start
+        return;
+      }
+
+      // once consumed enough, stop freezing
+      admireRef.current.frozen = false;
+    }
+
+    if (raw < 0) {
+      // reset if user scrolls back above the section
+      admireRef.current.frozen = false;
+      admireRef.current.baseRaw = 0;
+    }
+
     // delay (same intention as your original ANIM_DELAY)
     const delayPx = vh * ANIM_DELAY;
     const progressed = clamp(raw - delayPx, 0, trackLen);
@@ -213,7 +261,6 @@ function DesktopWorkShowcase() {
         rotate = 0;
       }
 
-      // helpful for rotateX feel
       targetRef.current[i] = { y, scale, rotate };
 
       // pick active card (same as your original idea)
@@ -263,6 +310,7 @@ function DesktopWorkShowcase() {
     SWITCH_MARGIN,
     DEBUG,
     animate,
+    ADMIRE_VH,
   ]);
 
   // Measure before paint to avoid jump
@@ -290,7 +338,6 @@ function DesktopWorkShowcase() {
     const ro =
       typeof ResizeObserver !== "undefined"
         ? new ResizeObserver(() => {
-            // Re-measure + apply; keep it rAFed to avoid RO storms
             if (rafRef.current) return;
             rafRef.current = requestAnimationFrame(() => {
               rafRef.current = 0;
@@ -320,10 +367,16 @@ function DesktopWorkShowcase() {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("load", onResize);
       if (ro) ro.disconnect();
+
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = 0;
+
       if (animRef.current) cancelAnimationFrame(animRef.current);
       animRef.current = 0;
+
+      admireRef.current.frozen = false;
+      admireRef.current.baseRaw = 0;
+      prevRawRef.current = null;
     };
   }, [measure, applyTransforms]);
 

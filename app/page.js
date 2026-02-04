@@ -25,6 +25,7 @@ export default function Home() {
         <WorkShowCase />
         <Services />
         <About />
+        <Services />
       </section>
     </main>
   );
