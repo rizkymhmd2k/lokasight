@@ -6,6 +6,7 @@ import Services from "./components/sections/Services";
 import About from "./components/sections/About";
 import Testimony from "./components/sections/Testimony";
 
+
 export default function Home() {
   return (
     <main className="w-full">
@@ -26,7 +27,6 @@ export default function Home() {
         <WorkShowCase />
         <Services />
         <About />
-        <Testimony />
         {/* <Testimony /> */}
       </section>
     </main>
