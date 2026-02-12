@@ -1,20 +1,12 @@
 "use client";
 
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 const ITEMS = [
-  { title: "GARIS\nKARSA", desc: "Description for project one" },
-  { title: "BLACK\nROCK", desc: "Description for project two" },
-  { title: "Project\nThree", desc: "Description for project three" },
-  { title: "Project\nFour", desc: "Description for project four" },
+  { title: "GARIS KARSA", desc: "Description for project one" },
+  { title: "BLACK ROCK INC", desc: "Description for project two" },
+  { title: "Project Three", desc: "Description for project three" },
+  { title: "Project Four", desc: "Description for project four" },
 ];
 
 const CFG = {
@@ -33,28 +25,13 @@ const CFG = {
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
-const MaskedLines = memo(function MaskedLines({
-  text,
-  as: Tag = "div",
-  className = "",
-}) {
+const MaskedLines = memo(function MaskedLines({ text, as: Tag = "div", className = "" }) {
   const lines = useMemo(() => String(text).split("\n"), [text]);
-
   return (
-    <Tag
-      className={`flex flex-col justify-center leading-[1.2] ${className}`}
-    >
+    <Tag className={`flex flex-col justify-center ${className}`}>
       {lines.map((line, i) => (
-        <span
-          key={i}
-          className={`block overflow-hidden ${
-            i === 0 ? "" : "-mt-[0.28em]"
-          }`}
-        >
-          <span
-            className="block animate-line will-change-transform"
-            style={{ animationDelay: `${i * 70}ms` }}
-          >
+        <span key={i} className="block overflow-hidden leading-tight">
+          <span className="block animate-line will-change-transform" style={{ animationDelay: `${i * 70}ms` }}>
             {line}
           </span>
         </span>
@@ -66,24 +43,20 @@ const MaskedLines = memo(function MaskedLines({
 function MobileWorkShowcase() {
   return (
     <section className="bg-backgroundlight px-4 py-10 lg:hidden flex flex-col">
+      <div className="flex items-center justify-between mb-6">
+        <span className="font-semibold">2026 SHOWCASE</span>
+        <span className="text-sm font-medium opacity-70">[WORK]</span>
+      </div>
+
       <div className="flex flex-col gap-4">
         {ITEMS.map((item, i) => (
-          <article
-            key={i}
-            className="rounded-xl bg-neutral-200 p-5 flex flex-col gap-3"
-          >
+          <article key={i} className="rounded-xl bg-neutral-200 p-5 flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
-              <h3 className="text-xl font-bold whitespace-pre-line leading-[0.9]">
-                {item.title}
-              </h3>
-              <span className="text-sm font-medium opacity-70">
-                {String(i + 1).padStart(2, "0")}
-              </span>
+              <h3 className="text-xl font-bold leading-tight">{item.title}</h3>
+              <span className="text-sm font-medium opacity-70">{String(i + 1).padStart(2, "0")}</span>
             </div>
             <p className="text-base opacity-80">{item.desc}</p>
-            <button className="mt-2 self-start text-sm font-semibold">
-              [SEE MORE]
-            </button>
+            <button className="mt-2 self-start text-sm font-semibold">[SEE MORE]</button>
           </article>
         ))}
       </div>
@@ -111,8 +84,8 @@ function DesktopWorkShowcase() {
 
   const [sectionHeight, setSectionHeight] = useState("2000px");
 
+  // numeric buffers (faster + shorter)
   const bufRef = useRef(null);
-
   const ensureBuffers = useCallback(() => {
     const n = ITEMS.length;
     const b = bufRef.current;
@@ -162,8 +135,7 @@ function DesktopWorkShowcase() {
       cr[i] += (tr[i] - cr[i]) * CFG.SMOOTH;
 
       el.style.transform = `translate3d(0, ${cy[i]}px, 0) scale(${cs[i]}) rotateX(${cr[i]}deg)`;
-      el.style.zIndex =
-        i === activeIndexRef.current ? 50 : ITEMS.length - i;
+      el.style.zIndex = String(i === activeIndexRef.current ? 50 : ITEMS.length - i);
 
       if (
         Math.abs(ty[i] - cy[i]) > CFG.EPS ||
@@ -174,9 +146,7 @@ function DesktopWorkShowcase() {
       }
     }
 
-    rafAnimRef.current = keep
-      ? requestAnimationFrame(animate)
-      : 0;
+    rafAnimRef.current = keep ? requestAnimationFrame(animate) : 0;
   }, []);
 
   const applyTransforms = useCallback(() => {
@@ -194,17 +164,16 @@ function DesktopWorkShowcase() {
     const prevRaw = prevRawRef.current;
     prevRawRef.current = raw;
 
+    // admire freeze when entering
     if (prevRaw !== null && prevRaw < 0 && raw >= 0) {
       admireRef.current.frozen = true;
       admireRef.current.baseRaw = raw;
     }
-
     if (raw >= 0 && admireRef.current.frozen) {
       const admirePx = vh * CFG.ADMIRE_VH;
       if (raw - admireRef.current.baseRaw < admirePx) return;
       admireRef.current.frozen = false;
     }
-
     if (raw < 0) {
       admireRef.current.frozen = false;
       admireRef.current.baseRaw = 0;
@@ -227,11 +196,7 @@ function DesktopWorkShowcase() {
         ts[i] = 1 + CFG.MAX_SCALE * norm;
         tr[i] = CFG.MAX_ROTATE * norm;
       } else {
-        const t = clamp(
-          (progress - CFG.EFFECT_STOP) / CFG.POST_SCALE_RANGE,
-          0,
-          1
-        );
+        const t = clamp((progress - CFG.EFFECT_STOP) / CFG.POST_SCALE_RANGE, 0, 1);
         ts[i] = 1 - (1 - CFG.MIN_SCALE) * t;
         tr[i] = 0;
       }
@@ -243,13 +208,17 @@ function DesktopWorkShowcase() {
       }
     }
 
-    if (activeIndexRef.current !== bestIndex) {
-      activeIndexRef.current = bestIndex;
-      setActiveIndex(bestIndex);
+    const prevIdx = activeIndexRef.current;
+    if (prevIdx !== bestIndex) {
+      const prevProgress = (sinceStart - prevIdx * vh) / vh;
+      const improvedBy = Math.abs(prevProgress - CFG.FOCUS) - bestDist;
+      if (improvedBy > CFG.SWITCH_MARGIN) {
+        activeIndexRef.current = bestIndex;
+        setActiveIndex(bestIndex);
+      }
     }
 
-    if (!rafAnimRef.current)
-      rafAnimRef.current = requestAnimationFrame(animate);
+    if (!rafAnimRef.current) rafAnimRef.current = requestAnimationFrame(animate);
   }, [ensureBuffers, animate]);
 
   useLayoutEffect(() => {
@@ -258,54 +227,74 @@ function DesktopWorkShowcase() {
   }, [ensureBuffers, measure]);
 
   useEffect(() => {
-    const onScroll = () => applyTransforms();
-    const onResize = () => {
+    const schedule = (fn) => {
+      if (rafScrollRef.current) return;
+      rafScrollRef.current = requestAnimationFrame(() => {
+        rafScrollRef.current = 0;
+        fn();
+      });
+    };
+
+    const recalc = () => {
       measure();
       applyTransforms();
     };
 
-    onResize();
+    const onScroll = () => schedule(applyTransforms);
+    const onResize = () => schedule(recalc);
+
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => schedule(recalc))
+        : null;
+
+    recalc();
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+    window.addEventListener("load", onResize);
+    if (sectionRef.current && ro) ro.observe(sectionRef.current);
+
+    if (document.fonts?.ready) document.fonts.ready.then(onResize).catch(() => {});
 
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("load", onResize);
+      ro?.disconnect();
+
+      if (rafScrollRef.current) cancelAnimationFrame(rafScrollRef.current);
+      if (rafAnimRef.current) cancelAnimationFrame(rafAnimRef.current);
+      rafScrollRef.current = 0;
+      rafAnimRef.current = 0;
+
+      admireRef.current.frozen = false;
+      admireRef.current.baseRaw = 0;
+      prevRawRef.current = null;
     };
   }, [measure, applyTransforms]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-backgroundlight hidden lg:block pt-25"
-      style={{ height: sectionHeight }}
-    >
+    <section ref={sectionRef} className="bg-backgroundlight hidden lg:block pt-25" style={{ height: sectionHeight }}>
       <div className="sticky top-0 h-screen flex px-4 overflow-hidden">
-        <span className="text-sm md:text-xl font-medium absolute top-5 right-5">
-          [2026 SHOWCASE]
-        </span>
+        <div key={activeIndex} className="w-2/5 flex flex-col justify-center pr-12">
+          <span className="absolute bottom-5 text-xl font-medium mr-50 flex gap-1">
+            <span>[WORK / </span>
+            <MaskedLines as="span" className="text-xl" text={String(activeIndex + 1).padStart(2, "0")} />
+            <span>]</span>
+          </span>
 
-        <div key={activeIndex} className="w-1/3 flex flex-col justify-end pb-15">
-          <MaskedLines
-            as="h2"
-            className="text-[140px] font-bold tracking-[-0.04em]"
-            text={ITEMS[activeIndex].title}
-          />
-
-          <div className="mt-3 max-w-md border border-red-700">
-            <MaskedLines
-              text={ITEMS[activeIndex].desc}
-              className="text-2xl"
-            />
+          <MaskedLines as="h2" className="text-8xl font-bold tracking-[-0.04em]" text={ITEMS[activeIndex].title} />
+          <div className="mt-3 max-w-md">
+            <MaskedLines text={ITEMS[activeIndex].desc} className="text-2xl" />
           </div>
         </div>
 
-        <div className="w-2/3 relative overflow-hidden">
-          <div
-            className="relative h-full grid place-items-center border border-red-500"
-            style={{ perspective: 500 }}
-          >
+        <div className="w-3/5 relative overflow-hidden">
+          <span className="absolute top-5 right-0 text-xl font-semibold">[2026 SHOWCASE]</span>
+          <span className="absolute bottom-5 right-0 text-xl font-medium z-50">[SEE MORE]</span>
+
+          <div className="relative h-full grid place-items-center" style={{ perspective: 500 }}>
             {ITEMS.map((item, i) => (
               <div
                 key={i}
@@ -316,9 +305,9 @@ function DesktopWorkShowcase() {
                     el.style.transformOrigin = "center bottom";
                   }
                 }}
-                className="col-start-1 row-start-1 m-auto h-[50vh] w-[80%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
+                className="col-start-1 row-start-1 m-auto h-[50vh] w-[70%] rounded-xl bg-neutral-200 flex items-center justify-center text-2xl font-medium will-change-transform"
               >
-                {item.title.replace("\n", " ")}
+                {item.title}
               </div>
             ))}
           </div>
