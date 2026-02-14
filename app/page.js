@@ -27,7 +27,7 @@ export default function Home() {
         <WorkShowCase />
         <Services />
         <About />
-        {/* <Testimony /> */}
+        <Testimony />
       </section>
     </main>
   );

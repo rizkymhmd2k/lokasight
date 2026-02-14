@@ -1,346 +1,323 @@
-"use client";
+'use client'
+import React, { useEffect, useRef, useState } from "react";
 
-import React, { useLayoutEffect, useMemo, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+const Testimony = () => {
+  const [cards, setCards] = useState([
+    {
+      id: 1,
+      name: "Sarah Chen",
+      role: "Product Designer",
+      quote:
+        "This platform completely transformed how we collaborate. The intuitive interface made adoption instant across our entire team.",
+      color: "#FF006E",
+      textColor: "#FFFFFF",
+    },
+    {
+      id: 2,
+      name: "Marcus Johnson",
+      role: "Tech Lead",
+      quote:
+        "The API documentation is the best I've ever worked with. Integration took hours instead of days. Game changer for our startup.",
+      color: "#FB5607",
+      textColor: "#FFFFFF",
+    },
+    {
+      id: 3,
+      name: "Elena Rodriguez",
+      role: "Marketing Director",
+      quote:
+        "Our campaign performance increased 340% after switching. The analytics dashboard gives us insights we never had before.",
+      color: "#8338EC",
+      textColor: "#FFFFFF",
+    },
+    {
+      id: 4,
+      name: "David Park",
+      role: "Founder & CEO",
+      quote:
+        "I've recommended this to every founder I know. It's rare to find a tool that scales from 10 to 10,000 users seamlessly.",
+      color: "#06FFB4",
+      textColor: "#1A1A2E",
+    },
+  ]);
 
-gsap.registerPlugin(ScrollTrigger);
+  /**
+   * Phases:
+   * idle   -> normal stack
+   * lift   -> top card flies up (front)
+   * swap   -> reorder array; moving card is now last but kept "above + behind"
+   * settle -> moving card transitions down into last stack position
+   */
+  const [phase, setPhase] = useState("idle"); // 'idle' | 'lift' | 'swap' | 'settle'
+  const [movingId, setMovingId] = useState(null);
 
-// deterministic rng (kept)
-function mulberry32(seed) {
-  return function () {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  const timersRef = useRef({ lift: null, settle: null });
+  useEffect(() => {
+    return () => {
+      if (timersRef.current.lift) clearTimeout(timersRef.current.lift);
+      if (timersRef.current.settle) clearTimeout(timersRef.current.settle);
+    };
+  }, []);
+
+  // Tunables
+  const LIFT_MS = 320;
+  const SETTLE_MS = 420;
+
+  const STACK_Y = 12; // px per depth
+  const STACK_SCALE = 0.05; // scale loss per depth
+  const LIFT_Y = -140; // % (relative to card height)
+  const LIFT_SCALE = 0.92;
+  const LIFT_ROT_X = 14; // deg
+  const FRONT_Z = 140; // px (toward viewer)
+  const BACK_Z = -220; // px (away from viewer)
+
+  const isAnimating = phase !== "idle";
+  const topCard = cards[0];
+
+  const stackTransform = (index) => {
+    const y = index * STACK_Y;
+    const s = 1 - index * STACK_SCALE;
+    // Keep opacity ALWAYS 1
+    return `translate3d(0, ${y}px, 0) scale(${s})`;
   };
-}
 
-export default function Testimony() {
-  const sectionRef = useRef(null);
-  const trackRef = useRef(null);
+  const liftTransform = () => {
+    // Fly upward + slightly toward viewer
+    return `translate3d(0, ${LIFT_Y}%, ${FRONT_Z}px) scale(${LIFT_SCALE}) rotateX(${LIFT_ROT_X}deg)`;
+  };
 
-  // Reference copy style: big editorial line, medium weight
-  const text = "So, ready to animate?";
-  const chars = useMemo(() => Array.from(text), [text]);
+  const aboveBehindTransform = () => {
+    // Same "in the air" pose, but pushed behind the stack in 3D space
+    // (This is the key to "goes behind" reliably)
+    return `translate3d(0, ${LIFT_Y}%, ${BACK_Z}px) scale(${LIFT_SCALE}) rotateX(${LIFT_ROT_X}deg)`;
+  };
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track) return;
+  const handleNext = () => {
+    if (isAnimating) return;
 
-    const prefersReduced =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const id = topCard.id;
+    setMovingId(id);
+    setPhase("lift");
 
-    if (prefersReduced) return;
-
-    const TOPBAR_H = 91; // reference topbar height
-
-    const ctx = gsap.context(() => {
-      const els = Array.from(track.querySelectorAll("[data-char]"));
-      if (!els.length) return;
-
-      const measure = () => {
-        // mimic “grid-margin: 25px” + fixed topbar
-        const viewportW = section.clientWidth;
-        const contentW = track.scrollWidth;
-
-        const startX = viewportW; // off-screen right
-        const endX = -contentW; // off-screen left
-        const dist = Math.abs(endX - startX);
-
-        // distance-aware pin length (snappy but not too long)
-        const scrollLen = Math.max(1100, dist * 0.72);
-
-        return { startX, endX, scrollLen };
-      };
-
-      gsap.set(track, { x: measure().startX, willChange: "transform" });
-      gsap.set(els, {
-        y: 0,
-        rotate: 0,
-        scale: 1,
-        transformOrigin: "50% 85%",
-        willChange: "transform",
-        force3D: true,
+    timersRef.current.lift = setTimeout(() => {
+      // Reorder at the peak
+      setCards((prev) => {
+        const [first, ...rest] = prev;
+        return [...rest, first];
       });
 
-      // per-letter params (deterministic)
-      const rnd = mulberry32(text.length * 99173);
-      const params = els.map((el) => {
-        const isSpace = el.getAttribute("data-space") === "1";
-        const damp = isSpace ? 0.1 : 1;
+      // After reorder: keep the moving card "above + behind" for one paint
+      setPhase("swap");
 
-        return {
-          isSpace,
-          // slightly tighter/cleaner to match the reference’s “designed” feel
-          yAmp: (10 + rnd() * 16) * damp,
-          rAmp: (0.5 + rnd() * 1.4) * damp,
-          sAmp: (0.008 + rnd() * 0.018) * damp,
-          f1: 0.9 + rnd() * 1.1,
-          f2: 1.8 + rnd() * 1.7,
-          p1: rnd() * Math.PI * 2,
-          p2: rnd() * Math.PI * 2,
-          accent: !isSpace && rnd() > 0.9 ? 1.22 : 1,
-        };
+      // Next frame: let it transition down into the last position
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setPhase("settle");
+
+          timersRef.current.settle = setTimeout(() => {
+            setPhase("idle");
+            setMovingId(null);
+          }, SETTLE_MS);
+        });
       });
-
-      const setY = els.map((el) => gsap.quickSetter(el, "y", "px"));
-      const setR = els.map((el) => gsap.quickSetter(el, "rotate", "deg"));
-      const setS = els.map((el) => gsap.quickSetter(el, "scale"));
-
-      const applyLetters = (progress, velocity) => {
-        const cycles = 10.5; // “wiggles” across pin
-        const baseT = progress * cycles * Math.PI * 2;
-
-        // reference easing vibe: punchy but controlled
-        const v = Math.abs(velocity || 0);
-        const boost = 1 + Math.min(1, v / 2400) * 0.85;
-
-        for (let i = 0; i < els.length; i++) {
-          const p = params[i];
-          if (p.isSpace) continue;
-
-          const n =
-            Math.sin(baseT * p.f1 + p.p1) * 0.64 +
-            Math.sin(baseT * p.f2 + p.p2) * 0.36;
-
-          const y = n * p.yAmp * boost * p.accent;
-          const r =
-            Math.sin(baseT * (p.f1 * 0.92) + p.p1 + Math.PI / 3) *
-            p.rAmp *
-            boost *
-            p.accent;
-          const s =
-            1 +
-            Math.sin(baseT * (p.f2 * 0.86) + p.p2 + Math.PI / 2) *
-              p.sAmp *
-              boost;
-
-          setY[i](y);
-          setR[i](r);
-          setS[i](s);
-        }
-      };
-
-      // update letters only when scroll changes
-      let lastScroll = ScrollTrigger.scroll();
-
-      const tween = gsap.to(track, {
-        x: () => measure().endX,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          // account for fixed 91px topbar like the reference
-          start: () => `top top+=${TOPBAR_H}`,
-          end: () => `+=${measure().scrollLen}`,
-          pin: true,
-          pinSpacing: true,
-          scrub: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-
-          onUpdate: (self) => {
-            const s = self.scroll();
-            if (s === lastScroll) return;
-            lastScroll = s;
-            applyLetters(self.progress, self.getVelocity());
-          },
-
-          onLeave: () => applyLetters(1, 0),
-          onLeaveBack: () => applyLetters(0, 0),
-        },
-      });
-
-      const onRefreshInit = () => {
-        const { startX } = measure();
-        gsap.set(track, { x: startX });
-        gsap.set(els, { y: 0, rotate: 0, scale: 1 });
-        lastScroll = ScrollTrigger.scroll();
-      };
-
-      ScrollTrigger.addEventListener("refreshInit", onRefreshInit);
-
-      // ensure correct on resize / font load
-      const onResize = () => ScrollTrigger.refresh();
-      window.addEventListener("resize", onResize);
-
-      return () => {
-        window.removeEventListener("resize", onResize);
-        ScrollTrigger.removeEventListener("refreshInit", onRefreshInit);
-        tween.kill();
-      };
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, [text]);
-
-  // Reference tokens
-  const TOKENS = {
-    yellow: "#C9FE6E",
-    black: "#121212",
-    white: "#F1F1F1",
-    darkGrey: "#232323",
+    }, LIFT_MS);
   };
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative min-h-screen overflow-hidden"
-      style={{
-        background: TOKENS.yellow, // bg-primary
-        color: TOKENS.black, // text-muted
-        fontFamily:
-          'LayGrotesk, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
-      }}
-    >
-      {/* Topbar (fixed, 91px, z≈7) */}
-      <header
-        className="fixed inset-x-0 top-0 z-[7] border-b"
-        style={{
-          height: 91,
-          borderColor: "rgba(18,18,18,0.18)",
-          background: TOKENS.yellow,
-        }}
-      >
-        <div
-          className="h-full"
-          style={{ paddingLeft: 25, paddingRight: 25 }}
-        >
-          <div className="h-full flex items-center justify-between gap-6">
-            {/* Branding */}
-            <div className="flex items-center gap-3">
-              <div
-                className="h-[28px] w-[28px] rounded-[2px]"
-                style={{ background: TOKENS.black }}
-                aria-hidden="true"
-              />
-              <span className="text-[13px] font-medium tracking-tight">
-                Made With Motion
-              </span>
+    <div style={styles.container}>
+      <div style={styles.stackContainer}>
+        {cards.map((card, index) => {
+          const isTop = index === 0;
+          const isMoving = card.id === movingId;
+
+          // zIndex: front card highest. After reorder, the moved card becomes last and naturally drops behind.
+          // During lift, force it highest.
+          const baseZ = 100 - index;
+          const zIndex = isMoving && phase === "lift" ? 999 : baseZ;
+
+          // Transform logic
+          let transform = stackTransform(index);
+
+          if (isMoving) {
+            if (phase === "lift") {
+              transform = liftTransform();
+            } else if (phase === "swap") {
+              // right after reorder, keep it above but behind (no transition on this step)
+              transform = aboveBehindTransform();
+            } else if (phase === "settle") {
+              // now it transitions to its stack position (which is last)
+              transform = stackTransform(index);
+            }
+          }
+
+          // Transition rules
+          // - lift phase: only moving card transitions into lift
+          // - swap phase: moving card has transition NONE (so it doesn't animate from front->back weirdly)
+          // - settle phase: everything transitions to their new stack positions
+          let transition = `transform ${SETTLE_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+          if (isMoving && phase === "lift") {
+            transition = `transform ${LIFT_MS}ms cubic-bezier(0.2, 0.9, 0.2, 1)`;
+          }
+          if (isMoving && phase === "swap") {
+            transition = "none";
+          }
+
+          return (
+            <div
+              key={card.id}
+              onClick={!isAnimating && isTop ? handleNext : undefined}
+              style={{
+                ...styles.card,
+                backgroundColor: card.color,
+                color: card.textColor,
+                transform,
+                transition,
+                zIndex,
+                opacity: 1, // ALWAYS 1 (no fade)
+                cursor: !isAnimating && isTop ? "pointer" : "default",
+                pointerEvents: isTop && !isAnimating ? "auto" : "none",
+                willChange: "transform",
+                transformStyle: "preserve-3d",
+              }}
+            >
+              <div style={styles.content}>
+                <p style={styles.quote}>"{card.quote}"</p>
+
+                <div style={styles.author}>
+                  <div
+                    style={{
+                      ...styles.avatar,
+                      borderColor:
+                        card.textColor === "#FFFFFF"
+                          ? "rgba(255,255,255,0.5)"
+                          : "rgba(0,0,0,0.2)",
+                      color: card.textColor,
+                    }}
+                  >
+                    {card.name[0]}
+                  </div>
+
+                  <div style={styles.info}>
+                    <h4 style={{ ...styles.name, color: card.textColor }}>
+                      {card.name}
+                    </h4>
+                    <p style={{ ...styles.role, color: card.textColor, opacity: 0.8 }}>
+                      {card.role}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {isTop && !isAnimating && (
+                <div style={{ ...styles.hint, color: card.textColor }}>
+                  Click to see next ↑
+                </div>
+              )}
             </div>
-
-            {/* Nav (13px / 500, like reference UI nav) */}
-            <nav className="hidden md:flex items-center gap-3">
-              {["Showcase", "Learn", "Submit"].map((label) => (
-                <a
-                  key={label}
-                  href="#"
-                  className="text-[13px] font-medium px-4 h-[41px] inline-flex items-center rounded-[2px]"
-                  style={{
-                    transition:
-                      "transform 0.2s cubic-bezier(0.9,0,0.1,1), background-color 0.2s cubic-bezier(0.9,0,0.1,1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(18,18,18,0.08)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-
-            {/* Actions (41px height, radius 2px, 13px) */}
-            <div className="flex items-center gap-3">
-              <button
-                className="h-[41px] min-w-[86px] rounded-[2px] text-[13px] font-medium px-4 inline-flex items-center justify-center"
-                style={{
-                  background: TOKENS.white,
-                  color: TOKENS.black,
-                  transition:
-                    "transform 0.2s cubic-bezier(0.9,0,0.1,1), background-color 0.2s cubic-bezier(0.9,0,0.1,1)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-1px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0px)")}
-              >
-                Explore
-              </button>
-              <button
-                className="h-[41px] min-w-[195px] rounded-[2px] text-[13px] font-medium px-4 inline-flex items-center justify-center"
-                style={{
-                  background: TOKENS.black,
-                  color: TOKENS.white,
-                  transition:
-                    "transform 0.2s cubic-bezier(0.9,0,0.1,1), background-color 0.2s cubic-bezier(0.9,0,0.1,1)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-1px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0px)")}
-              >
-                Submit an Effect
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main (pinned area). Leave room for fixed topbar */}
-      <div className="relative" style={{ paddingTop: 91 }}>
-        {/* subtle “grid margin” feel */}
-        <div style={{ paddingLeft: 25, paddingRight: 25 }}>
-          {/* Kicker in mono like reference secondary font */}
-          <div
-            className="pt-[50px] md:pt-[80px]"
-            style={{
-              fontFamily:
-                'IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-            }}
-          >
-            <p className="text-[12px] md:text-[13px] font-medium leading-[40px]">
-              SCROLL TO SCRUB • CUBIC-BEZIER(0.9,0,0.1,1)
-            </p>
-          </div>
-        </div>
-
-        {/* Centered track */}
-        <div className="absolute inset-0 flex items-center">
-          <div
-            ref={trackRef}
-            className="whitespace-nowrap font-medium tracking-tight"
-            style={{
-              // reference: huge type + tight line height
-              fontSize: "clamp(64px, 10vw, 160px)",
-              lineHeight: 0.9,
-              willChange: "transform",
-              paddingLeft: 25,
-              paddingRight: 25,
-            }}
-            aria-label={text}
-          >
-            {chars.map((ch, idx) => {
-              const isSpace = ch === " ";
-              return (
-                <span
-                  key={`${idx}-${ch}`}
-                  data-char
-                  data-space={isSpace ? "1" : "0"}
-                  style={{
-                    display: "inline-block",
-                    whiteSpace: isSpace ? "pre" : "normal",
-                  }}
-                >
-                  {ch}
-                </span>
-              );
-            })}
-          </div>
-        </div>
+          );
+        })}
       </div>
 
-      {/* Footer hint (dark band like reference footer) */}
-      <div
-        className="absolute bottom-0 inset-x-0"
-        style={{
-          height: 120,
-          background: TOKENS.black,
-        }}
-        aria-hidden="true"
-      />
-    </section>
+      <div style={styles.instruction}>Click the front card to animate</div>
+    </div>
   );
-}
+};
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0a0a0f",
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    padding: "40px 20px",
+    gap: "30px",
+  },
+  stackContainer: {
+    position: "relative",
+    width: "400px",
+    height: "300px",
+    perspective: "1200px",
+  },
+  card: {
+    position: "absolute",
+    inset: 0,
+    borderRadius: "28px",
+    padding: "36px",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    border: "3px solid rgba(255,255,255,0.15)",
+    overflow: "hidden",
+    backfaceVisibility: "hidden",
+  },
+  content: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "24px",
+    height: "100%",
+    justifyContent: "space-between",
+  },
+  quote: {
+    fontSize: "19px",
+    lineHeight: "1.6",
+    fontWeight: "600",
+    margin: 0,
+    letterSpacing: "-0.01em",
+  },
+  author: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+  },
+  avatar: {
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "20px",
+    fontWeight: "800",
+    border: "2px solid",
+    flexShrink: 0,
+  },
+  info: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "4px",
+  },
+  name: {
+    margin: 0,
+    fontSize: "17px",
+    fontWeight: "800",
+  },
+  role: {
+    margin: 0,
+    fontSize: "14px",
+    fontWeight: "500",
+  },
+  hint: {
+    position: "absolute",
+    bottom: "20px",
+    right: "24px",
+    fontSize: "13px",
+    opacity: 0.6,
+    fontWeight: "700",
+    letterSpacing: "0.02em",
+  },
+  instruction: {
+    color: "#666",
+    fontSize: "14px",
+    fontWeight: "500",
+    letterSpacing: "0.05em",
+    textTransform: "uppercase",
+  },
+};
+
+export default Testimony;
