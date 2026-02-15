@@ -19,7 +19,6 @@ const ITEMS = [
 
 const CFG = {
   EFFECT_STOP: 0.9,
-  MAX_SCALE: 0.45,
   MAX_ROTATE: 45,
   SMOOTH: 0.08,
   EPS: 0.001,
@@ -178,6 +177,7 @@ function DesktopWorkShowcase() {
     const sinceStart = progressed + vh;
 
     listTargetYRef.current = -progressed;
+    const listY = listTargetYRef.current;
 
     let bestIndex = 0;
     let bestDist = Infinity;
@@ -190,25 +190,15 @@ function DesktopWorkShowcase() {
       // Y position (from bottom to top)
       ty[i] = (1 - progress) * vh;
 
-      // Scale behavior
-      if (i === 0) {
-        if (progress < 0.5) {
-          ts[i] = 1;
-        } else {
-          const exitProgress = clamp((progress - 0.5) / 0.5, 0, 1);
-          ts[i] = 1 - (1 - CFG.MIN_SCALE) * exitProgress;
-        }
-      } else {
-        if (progress <= 0) {
-          ts[i] = 1 + CFG.MAX_SCALE;
-        } else if (progress <= 0.5) {
-          const enterProgress = progress / 0.5;
-          ts[i] = 1 + CFG.MAX_SCALE * (1 - enterProgress);
-        } else {
-          const exitProgress = clamp((progress - 0.5) / 0.5, 0, 1);
-          ts[i] = 1 - (1 - CFG.MIN_SCALE) * exitProgress;
-        }
-      }
+      const cardHeight = CFG.CARD_HEIGHT_VH * vh;
+      const cardHalf = cardHeight * 0.5;
+      const wrapperTop = listY + i * vh;
+      const cardCenterY = wrapperTop + 0.5 * vh + ty[i];
+      const cardTopY = cardCenterY - cardHalf;
+
+      // Scale down once the card enters the viewport, then keep scaling down as it rises.
+      const scaleProgress = clamp((vh - cardTopY) / vh, 0, 1);
+      ts[i] = 1 - (1 - CFG.MIN_SCALE) * scaleProgress;
 
       // Rotation: start untilting when card bottom clears viewport bottom
       if (i === 0) {
@@ -217,11 +207,6 @@ function DesktopWorkShowcase() {
       } else {
         // Cards 2+: start untilting after the card bottom crosses viewport bottom,
         // finish straight when the card center hits viewport center.
-        const cardHeight = CFG.CARD_HEIGHT_VH * vh;
-        const cardHalf = cardHeight * 0.5;
-        const listY = listTargetYRef.current;
-        const wrapperTop = listY + i * vh;
-        const cardCenterY = wrapperTop + 0.5 * vh + ty[i];
         const cardBottomY = cardCenterY + cardHalf;
 
         const untiltStartY = vh; // viewport bottom
