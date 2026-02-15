@@ -1,112 +1,61 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-/* ---------------------------------------------
-   Breakpoint Indicator (DEV HELPER)
----------------------------------------------- */
-function BreakpointIndicator() {
-  const [width, setWidth] = useState(0);
-
-  useEffect(() => {
-    const update = () => setWidth(window.innerWidth);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  return (
-    <div className="fixed top-4 left-4 z-[9999] rounded-xl bg-black/80 px-3 py-2 text-xs font-mono text-white backdrop-blur">
-      <div className="leading-none">{width}px</div>
-
-      <div className="mt-1 opacity-70">
-        <span className="block sm:hidden">xs</span>
-        <span className="hidden sm:block md:hidden">sm</span>
-        <span className="hidden md:block lg:hidden">md</span>
-        <span className="hidden lg:block xl:hidden">lg</span>
-        <span className="hidden xl:block 2xl:hidden">xl</span>
-        <span className="hidden 2xl:block">2xl</span>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------------------------------------
-   Hero Pin Zone
----------------------------------------------- */
 export default function HeroPinZone({ children }) {
-  const heroZoneRef = useRef(null);
-  const heroDimRef = useRef(null);
-
-  const metricsRef = useRef({ top: 0, range: 1 });
-  const rafRef = useRef(0);
-
-  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-
-  const measure = useCallback(() => {
-    const heroZone = heroZoneRef.current;
-    if (!heroZone) return;
-
-    const rect = heroZone.getBoundingClientRect();
-    const scrollY = window.scrollY || window.pageYOffset;
-    const top = rect.top + scrollY;
-    const range = Math.max(rect.height - window.innerHeight, 1);
-
-    metricsRef.current = { top, range };
-  }, []);
-
-  const apply = useCallback(() => {
-    const dim = heroDimRef.current;
-    if (!dim) return;
-
-    const { top, range } = metricsRef.current;
-    const startOffset = range * 0.12;
-    const scrollY = window.scrollY || window.pageYOffset;
-    const progress = clamp((scrollY - top - startOffset) / range, 0, 1);
-    dim.style.opacity = String(progress * 0.7);
-
-    rafRef.current = 0;
-  }, []);
+  const sectionRef = useRef(null);
+  const dimRef = useRef(null);
 
   useEffect(() => {
-    const heroZone = heroZoneRef.current;
-    const dim = heroDimRef.current;
-    if (!heroZone || !dim) return;
+    const section = sectionRef.current;
+    const dim = dimRef.current;
+    if (!section || !dim) return;
 
-    const onScroll = () => {
-      if (rafRef.current) return;
-      rafRef.current = requestAnimationFrame(apply);
+    let rafId = null;
+
+    const handleScroll = () => {
+      if (rafId) return;
+      
+      rafId = requestAnimationFrame(() => {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top;
+        const sectionHeight = rect.height;
+        const viewportHeight = window.innerHeight;
+        
+        // Calculate how far we've scrolled into the section
+        const scrolled = -sectionTop;
+        const scrollRange = sectionHeight - viewportHeight;
+        const startOffset = scrollRange * 0.12;
+        
+        // Progress from 0 to 1
+        const progress = Math.max(0, Math.min(1, 
+          (scrolled - startOffset) / scrollRange
+        ));
+        
+        dim.style.opacity = progress * 0.7;
+        rafId = null;
+      });
     };
 
-    const onResize = () => {
-      measure();
-      onScroll();
-    };
-
-    measure();
-    onScroll();
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
+    handleScroll(); // Initial call
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [apply, measure]);
+  }, []);
 
   return (
-    <section ref={heroZoneRef} className="hero-pinzone relative h-[200vh]">
-      {process.env.NODE_ENV === "development" && <BreakpointIndicator />}
-
+    <section ref={sectionRef} className="relative h-[200vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
         <div className="relative h-full">
           {children}
-
           <div
-            ref={heroDimRef}
-            className="hero-dim pointer-events-none absolute inset-0 bg-black opacity-0 will-change-opacity"
+            ref={dimRef}
+            className="pointer-events-none absolute inset-0 bg-black opacity-0 will-change-opacity"
           />
         </div>
       </div>
