@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, useMemo, useCallback, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
+import HeroWordmark3D from "./HeroWordmark3D";
 
 // Constants for centralized timing control
 const ANIMATION_DURATIONS = {
@@ -193,7 +194,10 @@ export default function Hero() {
         </div>
 
         {/* Hero */}
-        <h1 className="text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
+        <div className="hidden sm:block">
+          <HeroWordmark3D />
+        </div>
+        <h1 className="sm:hidden text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
           formrizk
         </h1>
 
