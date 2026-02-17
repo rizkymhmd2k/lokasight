@@ -1,98 +1,149 @@
 "use client";
 
-import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Center, Text3D, Environment } from "@react-three/drei";
-import * as THREE from "three";
-import groteskBold from "three/examples/fonts/helvetiker_bold.typeface.json";
+import { useEffect, useRef } from "react";
 
 function Wordmark() {
-  const groupRef = useRef(null);
+  const stageRef = useRef(null);
+  const curRef = useRef({ x: 8, y: 0 });
+  const tgtRef = useRef({ x: 8, y: 0 });
+  const lastMoveRef = useRef(0);
+  const rafRef = useRef(null);
 
-  useFrame(({ pointer }) => {
-    if (!groupRef.current) return;
-    // Smoother, lighter rotation math
-    const targetX = -pointer.y * 0.04;
-    const targetY = pointer.x * 0.04;
+  useEffect(() => {
+    const lerp = (a, b, t) => a + (b - a) * t;
 
-    groupRef.current.rotation.x = THREE.MathUtils.lerp(
-      groupRef.current.rotation.x,
-      targetX,
-      0.05,
-    );
-    groupRef.current.rotation.y = THREE.MathUtils.lerp(
-      groupRef.current.rotation.y,
-      targetY,
-      0.05,
-    );
+    const onPointerMove = (e) => {
+      lastMoveRef.current = Date.now();
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = (e.clientY / window.innerHeight) * 2 - 1;
+      tgtRef.current.x = ny * -5;
+      tgtRef.current.y = nx * 7;
+    };
+
+    const tick = () => {
+      rafRef.current = requestAnimationFrame(tick);
+      const idle = Date.now() - lastMoveRef.current > 2000;
+      if (idle) {
+        tgtRef.current.x = 8;
+        tgtRef.current.y = 0;
+      }
+      curRef.current.x = lerp(curRef.current.x, tgtRef.current.x, 0.06);
+      curRef.current.y = lerp(curRef.current.y, tgtRef.current.y, 0.06);
+      if (stageRef.current) {
+        stageRef.current.style.transform = `rotateX(${curRef.current.x}deg) rotateY(${curRef.current.y}deg)`;
+      }
+    };
+
+    document.addEventListener("pointermove", onPointerMove);
+    tick();
+
+    return () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const DEPTH_LAYERS = 15;
+  const layers = Array.from({ length: DEPTH_LAYERS }, (_, i) => {
+    const z = -(i + 1) * 2;
+    const darkness = Math.max(4, 26 - i);
+    const hex = darkness.toString(16).padStart(2, "0");
+    const color = `#${hex}${hex}${hex}`;
+    return { z, color, key: i };
   });
 
   return (
-    <group ref={groupRef}>
-      <Center>
-        <Text3D
-          font={groteskBold}
-          size={2.9}
-          height={0.4} // Thick enough to catch light
-          curveSegments={6} // PERFORMANCE: Reduced from 12 (hardly visible difference)
-          bevelEnabled
-          bevelThickness={0.04}
-          bevelSize={0.02}
-          bevelSegments={2} // PERFORMANCE: Reduced from 4
-          letterSpacing={-0.06}
-        >
-          formrizk
-          {/* NATIVE MESH PHYSICAL MATERIAL
-             This is the performance secret. It simulates glass in a single render pass.
-          */}
-          <meshPhysicalMaterial
-            color="#000000" // Pure black base
-            roughness={0.2} // Frosted glass look
-            metalness={0.1} // Slight polish
-            transmission={0.6} // 60% transparent (Smoked glass)
-            thickness={1.5} // Volume simulation
-            ior={1.5} // Glass refraction index
-            clearcoat={1} // High gloss top layer
-            clearcoatRoughness={0.1}
-            attenuationDistance={1} // How fast light fades inside
-            attenuationColor="#ffffff"
-          />
-        </Text3D>
-      </Center>
-    </group>
-  );
-}
+    <div style={styles.scene}>
+      <div ref={stageRef} style={styles.stage}>
+        <div style={styles.text3d}>
+          {/* Ground shadow */}
+          {/* <div style={styles.shadow}>formrizk</div> */}
 
-export default function HeroWordmark3D() {
-  return (
-    <div className="w-full h-[30vw] min-h-[220px] max-h-[480px] bg-transparent">
-      <Canvas
-        dpr={[1, 1.5]} // PERFORMANCE: Cap pixel ratio to save battery/heat
-        camera={{ position: [0, 0, 8], fov: 35 }}
-        gl={{
-          alpha: true,
-          antialias: true,
-          // Tone mapping helps the bright reflections look realistic, not blown out
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.2,
-        }}
-      >
-        {/* LIGHTING:
-          Glass needs something to reflect. The Environment map is the cheapest way 
-          to get "complex" lighting. "Studio" gives nice white highlights on dark glass.
-        */}
-        <Environment
-          files="/hdri/bell01.exr"
-          intensity={0.9}
-          blur={0.15}
-          rotation={[0, -Math.PI / 2, 0]} // rotate around Y
-        />
+          {/* Extrusion depth layers — back to front */}
+          {[...layers].reverse().map(({ z, color, key }) => (
+            <div
+              key={key}
+              style={{
+                ...styles.layer,
+                transform: `translateZ(${z}px)`,
+                color,
+              }}
+            >
+              formrizk
+            </div>
+          ))}
 
-        {/* One manual light for dramatic edge highlights */}
-        <directionalLight position={[5, 5, 5]} intensity={2} color="#ffffff" />
-
-        <Wordmark />
-      </Canvas>
+          {/* Top face — glossy black with specular sheen */}
+          <div style={styles.faceTop}>formrizk</div>
+        </div>
+      </div>
     </div>
   );
 }
+
+const baseText = {
+  fontFamily: "'Arial Black', 'Helvetica Neue', Impact, sans-serif",
+  fontSize: "clamp(110px, 21vw, 480px)", // bigger
+  fontWeight: 700,
+  letterSpacing: "-0.05em",
+  lineHeight: 1,
+  whiteSpace: "nowrap",
+  userSelect: "none",
+};
+
+const styles = {
+  scene: {
+    perspective: "900px",
+    perspectiveOrigin: "50% 50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stage: {
+    transformStyle: "preserve-3d",
+    willChange: "transform",
+  },
+  text3d: {
+    ...baseText,
+    position: "relative",
+    transformStyle: "preserve-3d",
+  },
+  layer: {
+    ...baseText,
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
+  faceTop: {
+    ...baseText,
+    position: "relative",
+    color: "transparent",
+    background: `linear-gradient(
+      160deg,
+      #3a3a3a 0%,
+      #1a1a1a 18%,
+      #0a0a0a 40%,
+      #1c1c1c 62%,
+      #080808 80%,
+      #2a2a2a 100%
+    )`,
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+    filter: "drop-shadow(0 -1px 0px rgba(255,255,255,0.18))",
+  },
+  // shadow: {
+  //   ...baseText,
+  //   position: 'absolute',
+  //   top: '8%',
+  //   left: 0,
+  //   color: 'transparent',
+  //   textShadow: '0 30px 60px rgba(0,0,0,0.35), 0 60px 100px rgba(0,0,0,0.2)',
+  //   transform: 'translateZ(-32px) scaleY(0.18) translateY(200%)',
+  //   transformOrigin: 'center bottom',
+  //   filter: 'blur(8px)',
+  //   opacity: 0.5,
+  //   pointerEvents: 'none',
+  // },
+};
+
+export default Wordmark;

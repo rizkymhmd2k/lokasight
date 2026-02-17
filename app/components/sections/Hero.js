@@ -5,12 +5,16 @@ import {
   useRef,
   useMemo,
   useCallback,
-  useState,
   useEffect,
+  useState,
 } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
-import HeroWordmark3D from "./HeroWordmark3D";
+
+const HeroWordmark3D = dynamic(() => import("./HeroWordmark3D"), {
+  ssr: false,
+});
 
 // Constants for centralized timing control
 const ANIMATION_DURATIONS = {
@@ -26,7 +30,7 @@ export default function Hero() {
 
   // State for menu status
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   // Refs
   const menuRef = useRef(null);
@@ -123,19 +127,15 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setReduceMotion(mediaQuery.matches);
-
-    updatePreference();
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener("change", updatePreference);
-      return () => mediaQuery.removeEventListener("change", updatePreference);
+    const mq = window.matchMedia("(min-width: 640px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    if (mq.addEventListener) {
+      mq.addEventListener("change", update);
+      return () => mq.removeEventListener("change", update);
     }
-
-    mediaQuery.addListener(updatePreference);
-    return () => mediaQuery.removeListener(updatePreference);
+    mq.addListener(update);
+    return () => mq.removeListener(update);
   }, []);
 
   // Memoized toggle handler
@@ -218,20 +218,15 @@ export default function Hero() {
         </div>
 
         {/* Hero */}
-        {reduceMotion ? (
-          <h1 className="text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
-            formrizk
-          </h1>
-        ) : (
-          <>
-            <div className="hidden sm:block">
-              <HeroWordmark3D />
-            </div>
-            <h1 className="sm:hidden text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
+        <>
+          {isDesktop ? (
+            <HeroWordmark3D />
+          ) : (
+            <h1 className="text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
               formrizk
             </h1>
-          </>
-        )}
+          )}
+        </>
 
         <div className="grid grid-cols-4">
           <div className="col-start-2 max-sm:col-start-1 col-span-2 flex items-center gap-2">
