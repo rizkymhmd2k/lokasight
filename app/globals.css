@@ -1,9 +1,14 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------
+   Theme Tokens (Tailwind v4)
+---------------------------------------------- */
 @theme {
   --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  --font-oswald: var(--font-oswald), var(--font-sans);
+
   --color-reddot: #dc2626;
-  --color-backgroundlight: #F8F7F3;
+  --color-backgroundlight: #f8f7f3;
   --color-yellow1: rgba(242, 245, 75, 0.73);
 }
 
@@ -14,9 +19,13 @@
   body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
+/* ---------------------------------------------
+   Animations
+---------------------------------------------- */
 @keyframes lineReveal {
   from {
     transform: translateY(120%);
@@ -30,4 +39,11 @@
 
 .animate-line {
   animation: lineReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* ---------------------------------------------
+   Utilities (custom classes)
+---------------------------------------------- */
+.font-oswald {
+  font-family: var(--font-oswald);
 }

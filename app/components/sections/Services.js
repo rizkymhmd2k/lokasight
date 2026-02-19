@@ -62,7 +62,9 @@ function PingDot() {
 
 function StatCard({ stat, className = "" }) {
   return (
-    <div className={`w-[180px] h-[180px] rounded-2xl bg-white relative overflow-hidden ${className}`}>
+    <div
+      className={`w-[180px] h-[180px] rounded-2xl bg-white relative overflow-hidden ${className}`}
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-white via-yellow-200 to-yellow-400 opacity-80" />
       <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-200/40 to-transparent" />
 
@@ -146,7 +148,9 @@ function ServiceItem({ item, idx, isLast }) {
           <div className="xl:col-start-1">
             <div className="flex items-center gap-3">
               <PingDot />
-              <h3 className="text-white text-3xl font-semibold">{item.title}</h3>
+              <h3 className="text-white text-3xl font-semibold">
+                {item.title}
+              </h3>
             </div>
             <Tags tags={item.tags} />
 
@@ -183,14 +187,16 @@ const Services = () => {
     <div className="w-full px-4 pt-25 flex flex-col bg-backgroundlight">
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}
-        <div className="w-full lg:w-2/5 2xl:w-3/5 flex flex-col p-6 lg:p-10">
+        <div className="w-full lg:w-2/5 2xl:w-3/5 flex flex-col justify-start p-6 lg:p-10  border border-red-400">
           <span className="text-sm md:text-xl font-medium text-white">
             [services]
           </span>
 
-          <h1 className="text-white text-4xl md:text-6xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]">
-            WHAT WE DO BEST
-          </h1>
+          <div className="flex-1 flex mt-10">
+            <h1 className="text-white text-4xl md:text-6xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]">
+              STRATEGY. DESIGN. GROWTH.{" "}
+            </h1>
+          </div>
         </div>
 
         {/* RIGHT SERVICES */}

@@ -8,6 +8,7 @@ function Wordmark() {
   const tgtRef = useRef({ x: 8, y: 0 });
   const lastMoveRef = useRef(0);
   const rafRef = useRef(null);
+  const idleTimeoutRef = useRef(null);
 
   useEffect(() => {
     const lerp = (a, b, t) => a + (b - a) * t;
@@ -16,17 +17,26 @@ function Wordmark() {
       lastMoveRef.current = Date.now();
       const nx = (e.clientX / window.innerWidth) * 2 - 1;
       const ny = (e.clientY / window.innerHeight) * 2 - 1;
-      tgtRef.current.x = ny * -5;
-      tgtRef.current.y = nx * 7;
+      tgtRef.current.x = ny * -2;
+      tgtRef.current.y = nx * 2;
+
+      if (rafRef.current == null) {
+        tick();
+      }
+
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
+      idleTimeoutRef.current = setTimeout(() => {
+        if (rafRef.current != null) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+      }, 2000);
     };
 
     const tick = () => {
       rafRef.current = requestAnimationFrame(tick);
-      const idle = Date.now() - lastMoveRef.current > 2000;
-      if (idle) {
-        tgtRef.current.x = 8;
-        tgtRef.current.y = 0;
-      }
       curRef.current.x = lerp(curRef.current.x, tgtRef.current.x, 0.06);
       curRef.current.y = lerp(curRef.current.y, tgtRef.current.y, 0.06);
       if (stageRef.current) {
@@ -35,19 +45,24 @@ function Wordmark() {
     };
 
     document.addEventListener("pointermove", onPointerMove);
-    tick();
 
     return () => {
       document.removeEventListener("pointermove", onPointerMove);
-      cancelAnimationFrame(rafRef.current);
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+      }
     };
   }, []);
 
-  const DEPTH_LAYERS = 15;
+  const DEPTH_LAYERS = 26;
   const layers = Array.from({ length: DEPTH_LAYERS }, (_, i) => {
-    const z = -(i + 1) * 2;
-    const darkness = Math.max(4, 26 - i);
-    const hex = darkness.toString(16).padStart(2, "0");
+    const z = -(i + 1) * 2.6;
+    // Deeper extrusion + richer shading for a more dimensional side wall.
+    const shade = Math.max(8, 42 - i * 1.6);
+    const hex = shade.toString(16).padStart(2, "0");
     const color = `#${hex}${hex}${hex}`;
     return { z, color, key: i };
   });
@@ -67,11 +82,17 @@ function Wordmark() {
                 ...styles.layer,
                 transform: `translateZ(${z}px)`,
                 color,
+                textShadow:
+                  "0 0 10px rgba(255,255,255,0.06), 0 10px 18px rgba(0,0,0,0.35)",
+                opacity: 0.95,
               }}
             >
               formrizk
             </div>
           ))}
+
+          {/* Outline pass — forces pure black edge */}
+          <div style={styles.faceOutline}>formrizk</div>
 
           {/* Top face — glossy black with specular sheen */}
           <div style={styles.faceTop}>formrizk</div>
@@ -83,7 +104,7 @@ function Wordmark() {
 
 const baseText = {
   fontFamily: "'Arial Black', 'Helvetica Neue', Impact, sans-serif",
-  fontSize: "clamp(110px, 21vw, 480px)", // bigger
+  fontSize: "clamp(110px, 22vw, 480px)", // bigger
   fontWeight: 700,
   letterSpacing: "-0.05em",
   lineHeight: 1,
@@ -93,7 +114,7 @@ const baseText = {
 
 const styles = {
   scene: {
-    perspective: "900px",
+    perspective: "1100px",
     perspectiveOrigin: "50% 50%",
     display: "flex",
     alignItems: "center",
@@ -102,6 +123,7 @@ const styles = {
   stage: {
     transformStyle: "preserve-3d",
     willChange: "transform",
+    filter: "drop-shadow(0 28px 60px rgba(0,0,0,0.35))",
   },
   text3d: {
     ...baseText,
@@ -119,17 +141,30 @@ const styles = {
     position: "relative",
     color: "transparent",
     background: `linear-gradient(
-      160deg,
-      #3a3a3a 0%,
-      #1a1a1a 18%,
-      #0a0a0a 40%,
-      #1c1c1c 62%,
-      #080808 80%,
-      #2a2a2a 100%
+      155deg,
+      #4a4a4a 0%,
+      #202020 22%,
+      #0b0b0b 44%,
+      #252525 66%,
+      #0a0a0a 82%,
+      #3b3b3b 100%
     )`,
     WebkitBackgroundClip: "text",
     backgroundClip: "text",
-    filter: "drop-shadow(0 -1px 0px rgba(255,255,255,0.18))",
+    WebkitTextStroke: "1px #000",
+    filter:
+      "drop-shadow(0 -1px 0px rgba(255,255,255,0.25)) drop-shadow(0 6px 10px rgba(0,0,0,0.35))",
+  },
+  faceOutline: {
+    ...baseText,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    color: "#000",
+    WebkitTextStroke: "2.5px #000",
+    textShadow: "0 0 1px #000",
+    transform: "translateZ(1.5px)",
+    pointerEvents: "none",
   },
   // shadow: {
   //   ...baseText,

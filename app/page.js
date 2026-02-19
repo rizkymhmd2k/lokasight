@@ -4,8 +4,9 @@ import Work from "./components/sections/Work";
 import WorkShowCase from "./components/sections/WorkShowCase";
 import Services from "./components/sections/Services";
 import About from "./components/sections/About";
-import Testimony from "./components/sections/Testimony";
-
+import Contact from "./components/sections/Contact";
+import Footer from "./components/sections/Footer";
+import Form from "./components/sections/Form";
 
 export default function Home() {
   return (
@@ -23,11 +24,13 @@ export default function Home() {
           rounded-t-4xl
         "
       >
-        <Work />
-        <WorkShowCase />
-        <Services />
-        <About />
-        <Testimony />
+          <Work />
+          <WorkShowCase />
+          <Services />
+          <About />
+          <Contact />
+          {/* <Form /> */}
+          <Footer />
       </section>
     </main>
   );

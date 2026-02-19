@@ -94,8 +94,9 @@ const About = () => {
     <div
       className="
         bg-backgroundlight
-        flex flex-col gap-10 px-4 py-12
-        lg:flex-row lg:gap-0 lg:px-4 lg:pt-25 lg:pb-25
+        h-screen
+        flex flex-col justify-center gap-10 px-4 py-8
+        lg:flex-row lg:items-center lg:gap-0 lg:px-4 lg:py-0
       "
     >
       {/* LEFT (desktop original starts at lg) */}
