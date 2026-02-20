@@ -20,7 +20,7 @@ const Field = ({ label, type }) => (
 export default function Contact() {
   return (
     <div className="w-full px-4 pt-25 flex flex-col bg-backgroundlight">
-      <div className="sticky top-0 h-screen relative">
+      <div className="h-screen relative">
 
         <div className="bg-black w-full rounded-3xl overflow-hidden h-full flex flex-col">
           <h1 className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[clamp(4rem,29vw,35rem)]">
