@@ -7,10 +7,13 @@ import About from "./components/sections/About";
 import Contact from "./components/sections/Contact";
 import Footer from "./components/sections/Footer";
 import Form from "./components/sections/Form";
+import ViewportIndicator from "./components/ViewportIndicator";
 
 export default function Home() {
   return (
     <main className="w-full">
+      <ViewportIndicator />
+
       <HeroPinZone>
         <Hero />
       </HeroPinZone>
