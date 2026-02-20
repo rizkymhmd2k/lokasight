@@ -28,8 +28,8 @@ export default function Contact() {
           </h1>
         </div>
 
-        {/* <section className="absolute bottom-0 right-7 w-[70vw]">
-          <div className="pb-20 rounded-t-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12">
+        <section className="absolute bottom-[-450] right-7 w-[70vw]">
+          <div className="pb-20 rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12">
 
             <div className="flex flex-col gap-10">
               <div className="h-6 w-6 rounded-full bg-black/80" />
@@ -56,7 +56,7 @@ export default function Contact() {
             </form>
 
           </div>
-        </section> */}
+        </section>
 
       </div>
     </div>
