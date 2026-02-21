@@ -75,15 +75,15 @@ export default function Contact() {
     };
   }, []);
 
-  return (
-    <div
-      id="contact"
-      className="w-full px-4 pt-25 flex flex-col bg-backgroundlight"
-    >
+	  return (
+	    <div
+	      id="contact"
+	      className="w-full px-4 pt-24 flex flex-col bg-backgroundlight"
+	    >
       <div ref={containerRef} className="relative">
         <div
           ref={sceneRef}
-          className="sticky top-0 h-screen relative overflow-visible"
+          className="sticky top-0 h-[90vh] relative overflow-visible"
         >
           {/* Black hero card — full height on desktop, h-1/2 inside light bg wrapper on mobile */}
           <div className="w-full h-full rounded-3xl overflow-hidden flex flex-col bg-backgroundlight lg:bg-black">
@@ -102,7 +102,7 @@ export default function Contact() {
             ref={cardRef}
             className="absolute left-1/2 -translate-x-1/2 w-full lg:left-auto lg:translate-x-0 lg:right-7 lg:w-[70vw]"
           >
-            <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-30">
+	            <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
               <div className="flex flex-col gap-10 ">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
                 <h1 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(4rem,8vw,3rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
@@ -112,13 +112,13 @@ export default function Contact() {
                   <br />
                   with formrizk
                 </h1>
-                <blockquote className="max-w-md">
-                  <p className="text-lg font-semibold leading-snug">
-                    "Super smooth experience."
-                    <br />
-                    "Everything was fast, clear, and hassle-free. I got what I
-                    needed in minutes."
-                  </p>
+	                <blockquote className="max-w-md">
+	                  <p className="text-lg font-semibold leading-snug">
+	                    &ldquo;Super smooth experience.&rdquo;
+	                    <br />
+	                    &ldquo;Everything was fast, clear, and hassle-free. I got
+	                    what I needed in minutes.&rdquo;
+	                  </p>
                   <footer className="mt-3 text-sm font-semibold">
                     — Alex R., Verified Customer
                   </footer>
@@ -130,7 +130,7 @@ export default function Contact() {
                 </p>
               </div>
 
-              <form className="flex flex-col  w-full justify-center gap-8 ">
+	              <form className="flex flex-col w-full justify-center gap-8">
                 {FIELDS.map((f) => (
                   <Field key={f.label} {...f} />
                 ))}

@@ -413,7 +413,7 @@ function DesktopWorkShowcase() {
   return (
     <section
       ref={sectionRef}
-      className="bg-backgroundlight hidden lg:block pt-25"
+      className="bg-backgroundlight hidden lg:block pt-24"
       style={{ height: sectionHeight }}
       aria-label="Desktop project showcase"
       role="region"
@@ -424,7 +424,7 @@ function DesktopWorkShowcase() {
         </span>
 
         <div
-          className="w-1/3 flex flex-col justify-end pb-15 overflow-hidden"
+          className="w-1/3 flex flex-col justify-end pb-16 overflow-hidden"
           style={{
             opacity: isInitialized ? 1 : 0,
             transition: "opacity 0.3s",

@@ -186,7 +186,7 @@ const Services = () => {
   return (
     <div
       id="services"
-      className="w-full px-4 pt-25 flex flex-col bg-backgroundlight"
+      className="w-full px-4 pt-24 flex flex-col bg-backgroundlight"
     >
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}

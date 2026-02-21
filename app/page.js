@@ -8,11 +8,13 @@ import Contact from "./components/sections/Contact";
 import Footer from "./components/sections/Footer";
 import Form from "./components/sections/Form";
 import ViewportIndicator from "./components/ViewportIndicator";
+import MobileNav from "./components/MobileNav";
 
 export default function Home() {
   return (
     <main className="w-full">
       <ViewportIndicator />
+      <MobileNav />
 
       <HeroPinZone>
         <Hero />

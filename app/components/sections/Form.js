@@ -2,7 +2,7 @@ import React from "react";
 
 const Form = () => {
   return (
-    <section className="w-[70vw] px-4 pt-25 flex flex-col bg-backgroundlight">
+    <section className="w-[70vw] px-4 pt-24 flex flex-col bg-backgroundlight">
       <div className="w-full rounded-3xl overflow-hidden h-screen bg-[#f6f44a] text-black">
         <div className="h-full w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12">
           {/* Left */}
