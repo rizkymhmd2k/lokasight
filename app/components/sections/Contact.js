@@ -30,8 +30,6 @@ export default function Contact() {
     const card      = cardRef.current;
     if (!container || !scene || !card) return;
 
-    // Mutable state shared between measure() and onScroll()
-    // so onScroll always reads fresh values after a resize
     const state = { startBottom: 0, scrollBudget: 0 };
 
     const measure = () => {
@@ -42,9 +40,8 @@ export default function Contact() {
       const visibleEnd     = cardHeight * 0.80;
 
       state.startBottom  = -(cardHeight - visibleStart);
-      state.scrollBudget = visibleEnd - visibleStart; // same as endBottom - startBottom
+      state.scrollBudget = visibleEnd - visibleStart;
 
-      // Container height drives how much scroll room exists while pinned
       container.style.height = `${sceneHeight + state.scrollBudget}px`;
     };
 
@@ -55,15 +52,12 @@ export default function Contact() {
       card.style.bottom = `${startBottom + scrollBudget * progress}px`;
     };
 
-    // ResizeObserver fires after the browser has reflowed —
-    // unlike window "resize" which fires before layout is settled.
-    // It watches the container itself so font/content changes also trigger it.
     const ro = new ResizeObserver(() => {
       measure();
-      onScroll(); // re-sync card position with fresh measurements
+      onScroll();
     });
-    ro.observe(document.documentElement); // catches viewport resize
-    ro.observe(card);                     // catches card height changes (font load, etc.)
+    ro.observe(document.documentElement);
+    ro.observe(card);
 
     window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -83,19 +77,21 @@ export default function Contact() {
 
         <div ref={sceneRef} className="sticky top-0 h-screen relative overflow-visible">
 
-          {/* Black hero card */}
-          <div className="bg-black w-full rounded-3xl overflow-hidden h-full flex flex-col">
-            <h1 className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[clamp(4rem,29vw,35rem)]">
-              CONTACT
-            </h1>
+          {/* Black hero card — full height on desktop, h-1/2 inside light bg wrapper on mobile */}
+          <div className="w-full h-full rounded-3xl overflow-hidden flex flex-col bg-backgroundlight lg:bg-black">
+            <div className="bg-black rounded-3xl overflow-hidden h-1/2 lg:h-full flex flex-col">
+              <h1 className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[clamp(4rem,29vw,35rem)]">
+                CONTACT
+              </h1>
+            </div>
           </div>
 
           {/* Yellow card */}
           <section
             ref={cardRef}
-            className="absolute right-7 w-[70vw]"
+            className="absolute left-1/2 -translate-x-1/2 w-[90vw] lg:left-auto lg:translate-x-0 lg:right-7 lg:w-[70vw]"
           >
-            <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 lg:pb-30">
+            <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-40">
 
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
