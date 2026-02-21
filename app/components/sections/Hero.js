@@ -4,67 +4,40 @@ import { useLayoutEffect, useRef, useMemo, useCallback, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 
-// Constants for centralized timing control
 const ANIMATION_DURATIONS = {
   CURTAIN: 0.9,
-  ITEMS: 0.7,
+  ITEMS: 0.65,
   HAMBURGER_SHAPE: 0.25,
   COLOR: 0.25,
 };
 
 export default function Hero() {
-  // Static data memoized
   const navItems = useMemo(() => ["HOME", "WORK", "SERVICES", "CONTACT"], []);
-  
-  // State for menu status
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // Refs
-  const menuRef = useRef(null);
-  const buttonRef = useRef(null);
-  const tlRef = useRef(null);
 
-  // Reusable animation functions
+  const menuRef   = useRef(null);
+  const buttonRef = useRef(null);
+  const tlRef     = useRef(null);
+
   const animateToX = useCallback((bars) => {
-    gsap.to(bars[0], { 
-      rotate: 45, 
-      y: 8, 
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE 
-    });
-    gsap.to(bars[1], { 
-      scaleX: 0, 
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE - 0.05 
-    });
-    gsap.to(bars[2], { 
-      rotate: -45, 
-      y: -8, 
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE 
-    });
+    gsap.to(bars[0], { rotate: 45,  y:  8, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
+    gsap.to(bars[1], { scaleX: 0,          duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE - 0.05 });
+    gsap.to(bars[2], { rotate: -45, y: -8, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
   }, []);
 
   const animateToHamburger = useCallback((bars) => {
-    gsap.to(bars[0], { 
-      rotate: 0, 
-      y: 0, 
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE 
-    });
-    gsap.to(bars[1], { 
-      scaleX: 1, 
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE - 0.05,
-      immediateRender: false // Prevents flash on initial render
-    });
-    gsap.to(bars[2], { 
-      rotate: 0, 
-      y: 0, 
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE 
-    });
+    gsap.to(bars[0], { rotate: 0, y: 0, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
+    gsap.to(bars[1], { scaleX: 1,       duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE - 0.05, immediateRender: false });
+    gsap.to(bars[2], { rotate: 0, y: 0, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
   }, []);
 
-  // Setup timeline
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const bars = buttonRef.current.querySelectorAll("span");
+      const bars  = buttonRef.current.querySelectorAll("span");
       const items = menuRef.current.querySelectorAll("[data-nav-item]");
+
+      // Set initial state — items hidden below their containers
+      gsap.set(items, { yPercent: 110 });
 
       tlRef.current = gsap.timeline({
         paused: true,
@@ -73,39 +46,32 @@ export default function Hero() {
           gsap.set(bars, { backgroundColor: "#000" });
           setIsMenuOpen(false);
         },
-        onComplete: () => {
-          setIsMenuOpen(true);
-        },
+        onComplete: () => setIsMenuOpen(true),
       });
 
-      // Curtain animation
+      // 1. Curtain slides down — full duration, nothing else
       tlRef.current.fromTo(
         menuRef.current,
         { yPercent: -100 },
-        { 
-          yPercent: 0, 
-          duration: ANIMATION_DURATIONS.CURTAIN 
-        }
+        { yPercent: 0, duration: ANIMATION_DURATIONS.CURTAIN }
       );
 
-      // Menu items animation
-      tlRef.current.from(
+      // 2. Only after curtain lands — items reveal upward with stagger
+      tlRef.current.to(
         items,
         {
-          yPercent: -120,
-          stagger: 0.08,
+          yPercent: 0,
+          stagger: 0.1,
           duration: ANIMATION_DURATIONS.ITEMS,
-        },
-        `-=${ANIMATION_DURATIONS.CURTAIN * 0.5}` // Better timing calculation
+          ease: "power3.out",
+        }
+        // no overlap — starts exactly when curtain finishes
       );
 
-      // Color change only
+      // Hamburger bars turn white immediately on open
       tlRef.current.to(
         bars,
-        { 
-          backgroundColor: "#fff", 
-          duration: ANIMATION_DURATIONS.COLOR 
-        },
+        { backgroundColor: "#fff", duration: ANIMATION_DURATIONS.COLOR },
         0
       );
     });
@@ -113,39 +79,52 @@ export default function Hero() {
     return () => ctx.revert();
   }, []);
 
-  // Memoized toggle handler
   const toggleMenu = useCallback(() => {
     if (!tlRef.current) return;
     const bars = buttonRef.current.querySelectorAll("span");
-
     if (tlRef.current.progress() === 0 || tlRef.current.reversed()) {
-      // Opening menu
       animateToX(bars);
       tlRef.current.play();
     } else {
-      // Closing menu
+      // On close — reverse sends items back down, then curtain pulls up
       animateToHamburger(bars);
       tlRef.current.reverse();
     }
   }, [animateToX, animateToHamburger]);
 
-  // Handle menu item clicks
-  const handleMenuItemClick = useCallback(() => {
-    if (isMenuOpen) {
-      toggleMenu();
-    }
-  }, [isMenuOpen, toggleMenu]);
+  const handleNavClick = useCallback(
+    (sectionId) => (e) => {
+      if (typeof window === "undefined") return;
+
+      const onHome = window.location.pathname === "/" || window.location.pathname === "";
+      const el = onHome ? document.getElementById(sectionId) : null;
+
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.pushState(null, "", `#${sectionId}`);
+      }
+
+      if (isMenuOpen) toggleMenu();
+    },
+    [isMenuOpen, toggleMenu]
+  );
 
   return (
-    <section className="px-4 py-4 flex flex-col justify-between h-screen bg-[linear-gradient(180deg,rgba(206,216,54,0.5)_0%,#F8F7F3_40%)] ">
+    <section
+      id="home"
+      className="px-4 py-4 flex flex-col justify-between h-screen bg-[linear-gradient(180deg,rgba(206,216,54,0.5)_0%,#F8F7F3_40%)]"
+    >
       <div className="w-full relative">
+
         {/* Desktop Nav */}
-        <div className="hidden sm:grid grid-cols-4">
+        <div className="hidden sm:grid grid-cols-4 relative z-50">
           {navItems.map((item, i) => (
             <div key={item} className={i === 3 ? "text-right" : ""}>
-              <Link 
-                href={`/#${item.toLowerCase()}`} 
+              <Link
+                href={`/#${item.toLowerCase()}`}
                 className="font-bold hover:opacity-70 transition-opacity"
+                onClick={handleNavClick(item.toLowerCase())}
               >
                 {item}
               </Link>
@@ -170,30 +149,59 @@ export default function Hero() {
         {/* Curtain Menu */}
         <div
           ref={menuRef}
-          className="fixed inset-0 bg-black p-6 z-40 md:hidden pointer-events-none"
+          className="fixed inset-0 bg-black z-40 md:hidden flex flex-col justify-between p-6 pb-8"
           style={{ pointerEvents: isMenuOpen ? "auto" : "none" }}
         >
-          <div className="flex flex-col gap-6 mt-20">
+          {/* Top wordmark */}
+          <div>
+            <span className="text-white font-bold text-lg tracking-[-0.04em]">formrizk</span>
+          </div>
+
+          {/* Nav items — overflow-hidden on each wrapper is the mask */}
+          <nav className="flex flex-col">
             {navItems.map((item) => (
-              <div
-                key={item}
-                className="overflow-hidden border-b border-white/20"
-              >
+              <div key={item} className="overflow-hidden">
                 <Link
                   href={`/#${item.toLowerCase()}`}
                   data-nav-item
-                  className="block text-white text-5xl py-2 leading-[0.5] hover:text-gray-300 transition-colors"
-                  onClick={handleMenuItemClick}
+                  className="block text-white font-bold leading-[0.88] tracking-[-0.04em] text-[17vw] hover:text-[#f6f44a] transition-colors duration-200"
+                  onClick={handleNavClick(item.toLowerCase())}
                 >
                   {item}
                 </Link>
               </div>
             ))}
+          </nav>
+
+          {/* Bottom footer */}
+          <div className="flex justify-between items-end">
+            <div className="flex flex-col gap-1.5">
+              {[
+                { label: "INSTAGRAM",   href: "#" },
+                { label: "TWITTER / X", href: "#" },
+                { label: "LINKEDIN",    href: "#" },
+              ].map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  className="text-white/40 text-xs font-semibold tracking-widest hover:text-white transition-colors"
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+            <div className="flex flex-col items-end gap-1.5">
+              <span className="flex items-center gap-1.5 text-white/50 text-xs font-semibold tracking-wide">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                AVAILABLE FOR WORK
+              </span>
+              <span className="text-white/30 text-xs font-semibold tracking-wide">©2026 FORMRIZK</span>
+            </div>
           </div>
         </div>
 
         {/* Hero */}
-        <h1 className="text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
+        <h1 className="pointer-events-none text-[27vw] font-bold tracking-[-0.04em] leading-[0.8] text-center">
           formrizk
         </h1>
 
@@ -207,7 +215,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-      
+
       <div className="w-full grid grid-cols-4">
         <div className="col-span-1">
           <p className="text-sm md:text-md">

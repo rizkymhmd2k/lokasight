@@ -184,7 +184,10 @@ function ServiceItem({ item, idx, isLast }) {
 
 const Services = () => {
   return (
-    <div className="w-full px-4 pt-25 flex flex-col bg-backgroundlight">
+    <div
+      id="services"
+      className="w-full px-4 pt-25 flex flex-col bg-backgroundlight"
+    >
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}
         <div className="w-full lg:w-2/5 2xl:w-3/5 flex flex-col justify-start p-6 lg:p-10  border border-red-400">
