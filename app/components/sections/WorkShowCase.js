@@ -13,9 +13,7 @@ import React, {
 
 const ITEMS = [
   { id: "garis-karsa", title: "GARIS\nKARSA", desc: "Description for project one" },
-  { id: "black-rock", title: "BLACK\nROCK", desc: "Description for project two" },
-  { id: "project-three", title: "Project\nThree", desc: "Description for project three" },
-  { id: "project-four", title: "Project\nFour", desc: "Description for project four" },
+  { id: "black-rock", title: "BLACK\nROCK", desc: "Description for project two" }
 ];
 
 const CONFIG = {

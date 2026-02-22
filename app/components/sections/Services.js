@@ -162,26 +162,50 @@ const Services = () => {
 
       gsap.set(words, { yPercent: 110, opacity: 0 });
 
-      gsap
-        .timeline({
-          defaults: { ease: "power4.inOut" },
-          scrollTrigger: {
-            trigger: heading,
-            start: "top 68%",
-            toggleActions: "play none none reverse",
-            markers: process.env.NODE_ENV === "development",
-          },
-        })
-        .to(words, {
-          yPercent: 0,
-          opacity: 1,
-          duration: 0.65,
-          stagger: 0.1,
-          ease: "power3.out",
-          clearProps: "transform",
-        });
+      const mm = gsap.matchMedia();
+      const makeTimeline = (startValue) => {
+        gsap
+          .timeline({
+            defaults: { ease: "power4.inOut" },
+            scrollTrigger: {
+              trigger: heading,
+              start: startValue,
+              toggleActions: "play none none reverse",
+            },
+          })
+          .to(words, {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.65,
+            stagger: 0.23,
+            ease: "power3.out",
+            clearProps: "transform",
+          });
+      };
+
+      // Tailwind-aligned breakpoints:
+      // base: <640, sm: 640-767, md: 768-1023, lg: 1024-1279, xl: 1280-1535, 2xl: >=1536
+      mm.add("(max-width: 639px)", () => makeTimeline("top 90%")); // base
+      mm.add(
+        "(min-width: 640px) and (max-width: 767px)",
+        () => makeTimeline("top 78%") // sm
+      );
+      mm.add(
+        "(min-width: 768px) and (max-width: 1023px)",
+        () => makeTimeline("top 90%") // md
+      );
+      mm.add(
+        "(min-width: 1024px) and (max-width: 1279px)",
+        () => makeTimeline("top 70%") // lg
+      );
+      mm.add(
+        "(min-width: 1280px) and (max-width: 1535px)",
+        () => makeTimeline("top 68%") // xl
+      );
+      mm.add("(min-width: 1536px)", () => makeTimeline("top 66%")); // 2xl
 
       ScrollTrigger.refresh();
+      return () => mm.revert();
     }, section);
 
     return () => ctx.revert();
@@ -203,7 +227,7 @@ const Services = () => {
           <div className="flex-1 flex lg:mt-10">
             <h1
               ref={headingRef}
-              className="text-white text-4xl sm:text-5xl xl md:text-5xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]"
+              className="text-white text-4xl sm:text-5xl xl md:text-5xl lg:text-6xl xl:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]"
               aria-label="STRATEGY. DESIGN. GROWTH."
             >
               {["STRATEGY.", "DESIGN.", "GROWTH."].map((word, index, all) => (
