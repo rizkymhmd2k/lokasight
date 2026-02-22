@@ -10,31 +10,19 @@ const services = [
   {
     title: "Branding",
     tags: ["Identity", "Competitive Analysis"],
-    desc: `Lorem ipsum dolor sit amet, consectetur
-adipiscing elit. Donec et lectus rutrum, fringilla
-lorem et, pulvinar erat. Donec ante arcu,
-ullamcorper non interdum et, bibendum eu
-quam.`,
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.",
     stat: "143%",
   },
   {
     title: "Branding",
     tags: ["Identity", "Competitive Analysis"],
-    desc: `Lorem ipsum dolor sit amet, consectetur
-adipiscing elit. Donec et lectus rutrum, fringilla
-lorem et, pulvinar erat. Donec ante arcu,
-ullamcorper non interdum et, bibendum eu
-quam.`,
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.",
     stat: "143%",
   },
   {
     title: "Branding",
     tags: ["Identity", "Competitive Analysis"],
-    desc: `Lorem ipsum dolor sit amet, consectetur
-adipiscing elit. Donec et lectus rutrum, fringilla
-lorem et, pulvinar erat. Donec ante arcu,
-ullamcorper non interdum et, bibendum eu
-quam.`,
+    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.",
     stat: "143%",
   },
 ];
@@ -84,9 +72,9 @@ function StatCard({ stat, className = "" }) {
   );
 }
 
-function Tags({ tags }) {
+function Tags({ tags, className = "" }) {
   return (
-    <div className="flex flex-wrap gap-2 mt-3">
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {tags.map((tag) => (
         <span
           key={tag}
@@ -99,86 +87,47 @@ function Tags({ tags }) {
   );
 }
 
-function ServiceItem({ item, idx, isLast }) {
+function ServiceItem({ item, isLast }) {
   return (
     <div className="group w-full">
-      {/* ---------------- MOBILE (same as your original) ---------------- */}
-      <div className="lg:hidden">
-        <div className="flex items-center gap-3 ">
-          <PingDot />
-          <h3 className="text-white text-2xl font-semibold">{item.title}</h3>
+      <div
+        className="
+          grid grid-cols-1 gap-4
+          lg:pt-6 lg:gap-x-10 lg:gap-y-6 lg:grid-cols-[minmax(0,1fr)_180px]
+          xl:grid-cols-[220px_minmax(0,1fr)_180px]
+          items-start content-start
+        "
+      >
+        <div className="order-1 lg:col-start-1 lg:row-start-1 xl:col-start-1 xl:row-start-1">
+          <div className="flex items-center gap-3">
+            <PingDot />
+            <h3 className="text-white text-2xl lg:text-3xl font-semibold">
+              {item.title}
+            </h3>
+          </div>
+          <Tags tags={item.tags} className="mt-1 lg:mt-3" />
         </div>
 
-        <p className="mt-3 text-white/80 text-sm leading-relaxed whitespace-pre-line">
+        <p
+          className="
+            order-2 mt-3
+            text-white/80 lg:text-white/60
+            text-sm leading-relaxed
+            lg:order-2 lg:mt-0 lg:col-start-1 lg:row-start-2
+            xl:col-start-2 xl:row-start-1 2xl:max-w-90
+          "
+        >
           {item.desc}
         </p>
 
-        <div className="flex flex-wrap gap-2 mt-4">
-          {item.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-[11px] px-3 py-1 rounded-full bg-white/10 text-white/60 border border-white/10"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-4 w-full">
-          <div className="w-full h-[180px] rounded-2xl bg-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-white via-yellow-200 to-yellow-400 opacity-80" />
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-200/40 to-transparent" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-center gap-2 text-black/70 font-medium">
-                <span className="text-sm">{item.stat}</span>
-                <span className="text-sm">→</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ---------------- DESKTOP/TABLET ----------------
-          lg: 2 columns via flex (text block | image)
-          xl+: 3 columns via grid (title/tags | desc | image)
-      */}
-      <div className="hidden lg:block pt-6">
         <div
           className="
-            lg:flex lg:gap-10 lg:items-start lg:content-start
-            xl:grid xl:grid-cols-[220px_1fr_200px] xl:gap-10
-            items-start content-start
+            order-3 mt-2 w-full
+            lg:order-3 lg:mt-0 lg:w-[180px] lg:justify-self-end lg:col-start-2 lg:row-start-1 lg:row-span-2
+            xl:col-start-3 xl:row-start-1
           "
         >
-          {/* COL 1 (xl) / TEXT BLOCK (lg) */}
-          <div className="xl:col-start-1">
-            <div className="flex items-center gap-3">
-              <PingDot />
-              <h3 className="text-white text-3xl font-semibold">
-                {item.title}
-              </h3>
-            </div>
-            <Tags tags={item.tags} />
-
-            {/* On lg (2-col), description stays under tags in same left block */}
-            <div className="xl:hidden mt-6">
-              <p className="text-white/60 text-sm leading-relaxed whitespace-pre-line">
-                {item.desc}
-              </p>
-            </div>
-          </div>
-
-          {/* COL 2 (xl only): DESCRIPTION */}
-          <div className="hidden xl:block xl:col-start-2">
-            <p className="text-white/60 text-sm leading-relaxed whitespace-pre-line">
-              {item.desc}
-            </p>
-          </div>
-
-          {/* RIGHT IMAGE (always right on lg+) */}
-          <div className="lg:ml-auto xl:ml-0 xl:col-start-3 flex justify-end self-start">
-            <StatCard stat={item.stat} />
-          </div>
+          <StatCard stat={item.stat} className="w-full lg:w-[180px]" />
         </div>
       </div>
 
@@ -220,7 +169,7 @@ const Services = () => {
             trigger: heading,
             start: "top 68%",
             toggleActions: "play none none reverse",
-            // markers: process.env.NODE_ENV === "development",
+            markers: process.env.NODE_ENV === "development",
           },
         })
         .to(words, {
@@ -242,7 +191,7 @@ const Services = () => {
     <div
       id="services"
       ref={sectionRef}
-      className="w-full px-4 pt-24 flex flex-col bg-backgroundlight"
+      className="w-full px-2 sm:px-4 pt-12 sm:pt-24 flex flex-col bg-backgroundlight"
     >
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}
@@ -251,10 +200,10 @@ const Services = () => {
             [services]
           </span>
 
-          <div className="flex-1 flex mt-10">
+          <div className="flex-1 flex lg:mt-10">
             <h1
               ref={headingRef}
-              className="text-white text-4xl md:text-6xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]"
+              className="text-white text-4xl sm:text-5xl xl md:text-5xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]"
               aria-label="STRATEGY. DESIGN. GROWTH."
             >
               {["STRATEGY.", "DESIGN.", "GROWTH."].map((word, index, all) => (
@@ -282,7 +231,6 @@ const Services = () => {
             <ServiceItem
               key={idx}
               item={item}
-              idx={idx}
               isLast={idx === services.length - 1}
             />
           ))}

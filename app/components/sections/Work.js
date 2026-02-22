@@ -109,7 +109,7 @@ const Work = () => {
 
   const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
   const workHeadingClassName =
-    "text-2xl md:text-3xl lg:text-7xl font-medium leading-[1.08]";
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.08]";
 
   const lines = useMeasuredLines({ wrapperRef, measureRef, words });
 
@@ -144,6 +144,7 @@ const Work = () => {
           trigger: wrapperRef.current,
           start: "top 65%",
           toggleActions: "play none none reverse",
+          // markers: true,
         },
       });
     }, wrapperRef);
@@ -155,7 +156,7 @@ const Work = () => {
   }, [lines]);
 
   return (
-    <div id="work" className="pt-24 bg-backgroundlight px-4 flex flex-col">
+    <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-4 flex flex-col">
       <div ref={wrapperRef} style={{ position: "relative" }}>
         {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
         <h1

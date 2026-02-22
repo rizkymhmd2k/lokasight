@@ -108,12 +108,12 @@ export default function Contact() {
           trigger: title,
           start: "top 28%",
           toggleActions: "restart none none reverse",
-          markers: true,
+          // markers: true,
         },
       }).to(letters, {
         yPercent: 0,
         duration: 0.65,
-        stagger: 0.06,
+        stagger: 0.1,
         clearProps: "transform",
       });
 
