@@ -1,4 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const services = [
   {
@@ -183,9 +187,58 @@ function ServiceItem({ item, idx, isLast }) {
 }
 
 const Services = () => {
+  const sectionRef = useRef(null);
+  const headingRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const heading = headingRef.current;
+    if (!section || !heading) return;
+
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const ctx = gsap.context(() => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      const words = heading.querySelectorAll("[data-services-heading-word]");
+      if (!words.length) return;
+
+      gsap.set(words, { yPercent: 110, opacity: 0 });
+
+      if (prefersReducedMotion) {
+        gsap.set(words, { yPercent: 0, opacity: 1, clearProps: "transform" });
+        return;
+      }
+
+      gsap
+        .timeline({
+          defaults: { ease: "power4.inOut" },
+          scrollTrigger: {
+            trigger: section,
+            start: "top 75%",
+            once: true,
+          },
+        })
+        .to(words, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.65,
+        stagger: 0.1,
+        ease: "power3.out",
+        clearProps: "transform",
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <div
       id="services"
+      ref={sectionRef}
       className="w-full px-4 pt-24 flex flex-col bg-backgroundlight"
     >
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
@@ -196,8 +249,24 @@ const Services = () => {
           </span>
 
           <div className="flex-1 flex mt-10">
-            <h1 className="text-white text-4xl md:text-6xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]">
-              STRATEGY. DESIGN. GROWTH.{" "}
+            <h1
+              ref={headingRef}
+              className="text-white text-4xl md:text-6xl lg:text-8xl font-bold tracking-[-0.04em] pt-6 lg:pt-8 leading-[0.95]"
+              aria-label="STRATEGY. DESIGN. GROWTH."
+            >
+              {["STRATEGY.", "DESIGN.", "GROWTH."].map((word, index, all) => (
+                <React.Fragment key={word}>
+                  <span className="inline-block overflow-hidden align-bottom">
+                    <span
+                      data-services-heading-word
+                      className="inline-block will-change-transform"
+                    >
+                      {word}
+                    </span>
+                  </span>
+                  {index < all.length - 1 ? " " : null}
+                </React.Fragment>
+              ))}
             </h1>
           </div>
         </div>
