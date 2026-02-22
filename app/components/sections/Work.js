@@ -1,6 +1,11 @@
-'use client';
+"use client";
 
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -20,56 +25,55 @@ function useMeasuredLines({ wrapperRef, measureRef, words }) {
   const rafRef = useRef(0);
   const lastLinesRef = useRef(null);
 
-  const measure = () => {
-    const el = measureRef.current;
-    if (!el) return;
-
-    const spans = el.querySelectorAll('span[data-w="1"]');
-    if (!spans.length) return;
-
-    const result = [];
-    let current = [];
-    let currentTop = null;
-
-    // offsetTop is typically cheaper than getBoundingClientRect()
-    for (let i = 0; i < spans.length; i++) {
-      const s = spans[i];
-      const top = s.offsetTop;
-
-      if (currentTop === null) currentTop = top;
-
-      if (top > currentTop) {
-        result.push(current.join(" "));
-        current = [];
-        currentTop = top;
-      }
-
-      current.push(s.textContent);
-    }
-
-    if (current.length) result.push(current.join(" "));
-
-    const filtered = result.filter(Boolean);
-
-    if (!sameArray(lastLinesRef.current, filtered)) {
-      lastLinesRef.current = filtered;
-      setLines(filtered);
-    }
-  };
-
-  const schedule = () => {
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(measure);
-  };
-
   useLayoutEffect(() => {
-    // reset and measure
-    setLines(null);
-    lastLinesRef.current = null;
-    schedule();
-
     const wrapperEl = wrapperRef.current;
     if (!wrapperEl) return;
+
+    const measure = () => {
+      const el = measureRef.current;
+      if (!el) return;
+
+      const spans = el.querySelectorAll('span[data-w="1"]');
+      if (!spans.length) return;
+
+      const result = [];
+      let current = [];
+      let currentTop = null;
+
+      // offsetTop is typically cheaper than getBoundingClientRect()
+      for (let i = 0; i < spans.length; i++) {
+        const s = spans[i];
+        const top = s.offsetTop;
+
+        if (currentTop === null) currentTop = top;
+
+        if (top > currentTop) {
+          result.push(current.join(" "));
+          current = [];
+          currentTop = top;
+        }
+
+        current.push(s.textContent);
+      }
+
+      if (current.length) result.push(current.join(" "));
+
+      const filtered = result.filter(Boolean);
+
+      if (!sameArray(lastLinesRef.current, filtered)) {
+        lastLinesRef.current = filtered;
+        setLines(filtered);
+      }
+    };
+
+    const schedule = () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(measure);
+    };
+
+    // reset and measure
+    lastLinesRef.current = null;
+    schedule();
 
     // Only re-measure when width changes (huge win on pages with height-only changes)
     let lastWidth = wrapperEl.clientWidth;
@@ -90,7 +94,7 @@ function useMeasuredLines({ wrapperRef, measureRef, words }) {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
     };
-  }, [wrapperRef, words]);
+  }, [wrapperRef, measureRef, words]);
 
   return lines;
 }
@@ -104,6 +108,8 @@ const Work = () => {
     "I help service and software businesses create memorable, optimised website experiences as quickly as they need create memorable, optimised website experiences as quickly as they need.";
 
   const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
+  const workHeadingClassName =
+    "text-2xl md:text-3xl lg:text-7xl font-medium leading-[1.08]";
 
   const lines = useMeasuredLines({ wrapperRef, measureRef, words });
 
@@ -115,24 +121,29 @@ const Work = () => {
       const targets = linesRootRef.current.querySelectorAll("[data-line]");
 
       // Set initial state once (no React-driven animation)
-      gsap.set(targets, { y: 52, autoAlpha: 0, willChange: "transform,opacity" });
+      gsap.set(targets, { y: 34, autoAlpha: 0 });
 
       gsap.to(targets, {
         y: 0,
         autoAlpha: 1,
-        duration: 0.8,
+        duration: 0.7,
         ease: "power3.out",
-        stagger: 0.11,
+        stagger: 0.16,
         overwrite: true,
-        scrollTrigger: {
-          trigger: wrapperRef.current,
-          start: "top 80%",
-          once: true,
-          // markers: true,
+        onStart: () => {
+          gsap.set(targets, { willChange: "transform,opacity" });
         },
         onComplete: () => {
           // Release will-change after animation to reduce memory/compositing cost
           gsap.set(targets, { clearProps: "willChange" });
+        },
+        onReverseComplete: () => {
+          gsap.set(targets, { clearProps: "willChange" });
+        },
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          start: "top 65%",
+          toggleActions: "play none none reverse",
         },
       });
     }, wrapperRef);
@@ -150,7 +161,7 @@ const Work = () => {
         <h1
           ref={measureRef}
           aria-hidden={lines !== null ? "true" : undefined}
-          className="text-2xl md:text-3xl lg:text-7xl font-medium"
+          className={workHeadingClassName}
           style={
             lines !== null
               ? {
@@ -176,18 +187,16 @@ const Work = () => {
           <h1
             ref={linesRootRef}
             aria-label={`[WORK] ${bodyText}`}
-            className="text-2xl md:text-3xl lg:text-7xl font-medium"
+            className={workHeadingClassName}
           >
             {lines.map((line, i) => (
-              <span key={i} style={{ display: "block", overflow: "hidden" }}>
-                <span data-line style={{ display: "block" }}>
-                  {i === 0 && (
-                    <span className="text-sm md:text-xl font-medium mr-5 md:mr-48">
-                      [WORK]
-                    </span>
-                  )}
-                  {line}
-                </span>
+              <span key={i} data-line style={{ display: "block" }}>
+                {i === 0 && (
+                  <span className="text-sm md:text-xl font-medium mr-5 md:mr-48">
+                    [WORK]
+                  </span>
+                )}
+                {line}
               </span>
             ))}
           </h1>

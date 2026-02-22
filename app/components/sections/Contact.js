@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const FIELDS = [
   { label: "Type your message here", type: "textarea" },
@@ -27,6 +31,9 @@ export default function Contact() {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const cardRef = useRef(null);
+  const contactTitleRef = useRef(null);
+
+  const contactWord = "CONTACT";
 
   useEffect(() => {
     const container = containerRef.current;
@@ -75,6 +82,47 @@ export default function Contact() {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const title = contactTitleRef.current;
+    if (!title) return;
+
+    const letters = title.querySelectorAll("[data-contact-letter]");
+    if (!letters.length) return;
+
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const ctx = gsap.context(() => {
+      if (prefersReducedMotion) {
+        gsap.set(letters, { yPercent: 0, clearProps: "transform" });
+        return;
+      }
+
+      gsap.set(letters, { yPercent: 120 });
+
+      gsap.timeline({
+        defaults: { ease: "power3.out" },
+        scrollTrigger: {
+          trigger: title,
+          start: "top 28%",
+          toggleActions: "restart none none reverse",
+          markers: true,
+        },
+      }).to(letters, {
+        yPercent: 0,
+        duration: 0.65,
+        stagger: 0.06,
+        clearProps: "transform",
+      });
+
+      ScrollTrigger.refresh();
+    }, title);
+
+    return () => ctx.revert();
+  }, []);
+
 	  return (
 	    <div
 	      id="contact"
@@ -89,10 +137,21 @@ export default function Contact() {
           <div className="w-full h-full rounded-3xl overflow-hidden flex flex-col bg-backgroundlight lg:bg-black">
             <div className="bg-black rounded-3xl overflow-hidden h-1/2 lg:h-full flex flex-col">
               <h1
+                ref={contactTitleRef}
                 style={{ transform: "scaleY(1.25)" }}
                 className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[clamp(4rem,29vw,35rem)]"
+                aria-label={contactWord}
               >
-                CONTACT
+                {[...contactWord].map((char, index) => (
+                  <span
+                    key={`${char}-${index}`}
+                    className="inline-block overflow-hidden align-top"
+                  >
+                    <span data-contact-letter className="inline-block">
+                      {char}
+                    </span>
+                  </span>
+                ))}
               </h1>
             </div>
           </div>

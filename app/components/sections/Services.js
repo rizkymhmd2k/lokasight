@@ -2,7 +2,9 @@
 
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ScrollTrigger from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const services = [
   {
@@ -201,35 +203,36 @@ const Services = () => {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const ctx = gsap.context(() => {
-      gsap.registerPlugin(ScrollTrigger);
-
       const words = heading.querySelectorAll("[data-services-heading-word]");
       if (!words.length) return;
-
-      gsap.set(words, { yPercent: 110, opacity: 0 });
 
       if (prefersReducedMotion) {
         gsap.set(words, { yPercent: 0, opacity: 1, clearProps: "transform" });
         return;
       }
 
+      gsap.set(words, { yPercent: 110, opacity: 0 });
+
       gsap
         .timeline({
           defaults: { ease: "power4.inOut" },
           scrollTrigger: {
-            trigger: section,
-            start: "top 75%",
-            once: true,
+            trigger: heading,
+            start: "top 68%",
+            toggleActions: "play none none reverse",
+            // markers: process.env.NODE_ENV === "development",
           },
         })
         .to(words, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 0.65,
-        stagger: 0.1,
-        ease: "power3.out",
-        clearProps: "transform",
-      });
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: "power3.out",
+          clearProps: "transform",
+        });
+
+      ScrollTrigger.refresh();
     }, section);
 
     return () => ctx.revert();
