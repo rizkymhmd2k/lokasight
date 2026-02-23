@@ -30,7 +30,7 @@ export default function Home() {
         "
       >
           <Work />
-          <WorkShowCase />
+          {/* <WorkShowCase /> */}
           <Services />
           <About />
           <Contact />

@@ -10,6 +10,10 @@ import React, {
   useState,
   useTransition,
 } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ITEMS = [
   { id: "garis-karsa", title: "GARIS\nKARSA", desc: "Description for project one" },
@@ -30,86 +34,8 @@ const CONFIG = {
 
 const SCROLL_KEY = "ws_scrollY";
 const ACTIVE_KEY = "ws_activeIndex";
-const DEBUG = true;
 
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-// ---------------------------------------------------------------------------
-// Debug overlay
-// ---------------------------------------------------------------------------
-function DebugOverlay({ debugRef }) {
-  const textareaRef = useRef(null);
-  const [snapshot, setSnapshot] = useState(null);
-  const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    debugRef.current = (text) => {
-      if (textareaRef.current) textareaRef.current.value = text;
-    };
-  }, [debugRef]);
-
-  const handleSnapshot = useCallback(() => {
-    setSnapshot(textareaRef.current?.value ?? "");
-    setCopied(false);
-  }, []);
-
-  const handleCopy = useCallback(() => {
-    if (!snapshot) return;
-    navigator.clipboard.writeText(snapshot).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [snapshot]);
-
-  if (!DEBUG) return null;
-
-  const base = {
-    position: "fixed", bottom: 16, left: 16, zIndex: 9999,
-    background: "rgba(0,0,0,0.92)", color: "#0f0",
-    fontFamily: "monospace", fontSize: 11,
-    padding: "10px 12px", borderRadius: 8,
-    width: 300, display: "flex", flexDirection: "column",
-    gap: 6, boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
-  };
-  const ta = {
-    width: "100%", height: 200, background: "transparent",
-    color: "#0f0", fontFamily: "monospace", fontSize: 11,
-    border: "none", outline: "none", resize: "none", lineHeight: 1.7,
-  };
-  const btn = (active) => ({
-    padding: "4px 10px",
-    background: active ? "#0f0" : "#1a1a1a",
-    color: active ? "#000" : "#0f0",
-    border: "1px solid #0f0", borderRadius: 4,
-    fontFamily: "monospace", fontSize: 11, cursor: "pointer", flex: 1,
-  });
-
-  return (
-    <div style={base}>
-      <div style={{ color: "#888", fontSize: 10, letterSpacing: 1 }}>▶ LIVE DEBUG</div>
-      <textarea ref={textareaRef} readOnly style={ta} defaultValue="loading…" />
-      <div style={{ display: "flex", gap: 6 }}>
-        <button style={btn(false)} onClick={handleSnapshot}>📋 SNAPSHOT</button>
-        {snapshot && (
-          <button style={btn(copied)} onClick={handleCopy}>
-            {copied ? "✓ COPIED" : "COPY"}
-          </button>
-        )}
-      </div>
-      {snapshot && (
-        <>
-          <div style={{ color: "#888", fontSize: 10, letterSpacing: 1 }}>▶ SNAPSHOT</div>
-          <textarea
-            readOnly
-            style={{ ...ta, height: 120, color: "#ff0", borderTop: "1px solid #333", paddingTop: 6 }}
-            value={snapshot}
-            onFocus={(e) => e.target.select()}
-          />
-        </>
-      )}
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // MaskedLines
@@ -181,7 +107,6 @@ function useScrollAnimation(itemCount) {
   const sectionRef = useRef(null);
   const listRef = useRef(null);
   const cardRefs = useRef([]);
-  const debugRef = useRef(null);
 
   const vhRef = useRef(0);
   const sectionTopRef = useRef(0);
@@ -204,34 +129,6 @@ function useScrollAnimation(itemCount) {
 
   const activeIndexRef = useRef(0);
   const reducedMotionRef = useRef(false);
-
-  // -------------------------------------------------------------------------
-  // writeDebug
-  // -------------------------------------------------------------------------
-  const writeDebug = useCallback(() => {
-    const write = debugRef.current;
-    if (!write || !DEBUG) return;
-    const scrollY = window.scrollY;
-    const sectionTop = sectionTopRef.current;
-    const sectionEnd = sectionTop + sectionHeightPxRef.current;
-    const relY = scrollY - sectionTop;
-    const state = animationStateRef.current;
-    const visLines = ITEMS.map((item, i) =>
-      `  [${i}] ${item.id.padEnd(13)} vis=${(state.visibilityRatio[i] * 100).toFixed(1).padStart(5)}%`
-    ).join("\n");
-    write([
-      `scrollY        : ${Math.round(scrollY)}px`,
-      `sectionTop     : ${Math.round(sectionTop)}px`,
-      `sectionEnd     : ${Math.round(sectionEnd)}px`,
-      `relY (in sect) : ${Math.round(relY)}px`,
-      `vh             : ${Math.round(vhRef.current)}px`,
-      `activeIndex    : ${activeIndexRef.current} → ${ITEMS[activeIndexRef.current]?.id ?? "?"}`,
-      `initialized    : ${isMeasuredRef.current}`,
-      `─────────────────────────────────`,
-      `card visibility:`,
-      visLines,
-    ].join("\n"));
-  }, []);
 
   const checkReducedMotion = useCallback(
     () => !!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches,
@@ -390,9 +287,8 @@ function useScrollAnimation(itemCount) {
       el.style.zIndex = i === activeIndexRef.current ? 50 : itemCount - i;
     }
 
-    writeDebug();
     return needsNextFrame;
-  }, [itemCount, writeDebug]);
+  }, [itemCount]);
 
   const tick = useCallback(
     function runTick() {
@@ -419,6 +315,7 @@ function useScrollAnimation(itemCount) {
     renderFrame();
     setIsInitialized(true);
     requestTick();
+    requestAnimationFrame(() => ScrollTrigger.refresh());
   }, [itemCount, renderFrame, requestTick]);
 
   // -------------------------------------------------------------------------
@@ -488,6 +385,7 @@ function useScrollAnimation(itemCount) {
     const onResize = () => {
       reducedMotionRef.current = checkReducedMotion();
       measure(); computeTargets(); requestTick();
+      requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -505,19 +403,23 @@ function useScrollAnimation(itemCount) {
     };
   }, [checkReducedMotion, measure, computeTargets, requestTick]);
 
-  return { sectionRef, listRef, cardRefs, debugRef, activeIndex, sectionHeight, isInitialized };
+  useEffect(() => {
+    if (!isInitialized) return;
+    ScrollTrigger.refresh();
+  }, [sectionHeight, isInitialized]);
+
+  return { sectionRef, listRef, cardRefs, activeIndex, sectionHeight, isInitialized };
 }
 
 // ---------------------------------------------------------------------------
 // Desktop
 // ---------------------------------------------------------------------------
 function DesktopWorkShowcase() {
-  const { sectionRef, listRef, cardRefs, debugRef, activeIndex, sectionHeight, isInitialized } =
+  const { sectionRef, listRef, cardRefs, activeIndex, sectionHeight, isInitialized } =
     useScrollAnimation(ITEMS.length);
 
   return (
     <>
-      <DebugOverlay debugRef={debugRef} />
       <section
         ref={sectionRef}
         className="bg-backgroundlight hidden lg:block pt-24"
@@ -537,7 +439,7 @@ function DesktopWorkShowcase() {
             <div key={activeIndex}>
               <MaskedLines
                 as="h2"
-                className="text-[140px] font-bold tracking-[-0.04em]"
+                className="text-8xl xl:text-[140px] 2xl:text-[170px] font-bold tracking-[-0.04em]"
                 text={ITEMS[activeIndex].title}
               />
               <div className="mt-3 max-w-md">

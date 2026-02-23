@@ -41,27 +41,39 @@ export default function Contact() {
     const card = cardRef.current;
     if (!container || !scene || !card) return;
 
-    const state = { startBottom: 0, scrollBudget: 0 };
+    const state = { startTop: 0, endTop: 0, scrollBudget: 0 };
 
     const measure = () => {
       const cardHeight = card.offsetHeight;
       const sceneHeight = scene.offsetHeight;
-      const isMobile = window.innerWidth < 1025;
+      const width = window.innerWidth;
+      const isMobile = width < 1025;
+      const isSmToMd = width >= 640 && width <= 1023;
 
       const visibleStart = cardHeight * (isMobile ? 0.5 : 0.2);
       const visibleEnd = cardHeight * 0.8;
 
-      state.startBottom = -(cardHeight - visibleStart);
-      state.scrollBudget = visibleEnd - visibleStart;
+      // Move by explicit top positions to avoid overshooting past the scene top.
+      const smMdUnstickOffset = 40; // Tailwind `top-10`
+
+      state.startTop = isSmToMd
+        ? Math.max(sceneHeight - visibleStart, 0)
+        : sceneHeight - visibleStart;
+      state.endTop = isSmToMd
+        ? Math.min(smMdUnstickOffset, state.startTop)
+        : sceneHeight - visibleEnd;
+      state.scrollBudget = Math.max(state.startTop - state.endTop, 1);
 
       container.style.height = `${sceneHeight + state.scrollBudget}px`;
+      card.style.bottom = "auto";
     };
 
     const onScroll = () => {
-      const { startBottom, scrollBudget } = state;
+      const { startTop, endTop, scrollBudget } = state;
       const scrolled = -container.getBoundingClientRect().top;
       const progress = Math.min(1, Math.max(0, scrolled / scrollBudget));
-      card.style.bottom = `${startBottom + scrollBudget * progress}px`;
+      const nextTop = startTop + (endTop - startTop) * progress;
+      card.style.top = `${nextTop}px`;
     };
 
     const ro = new ResizeObserver(() => {
@@ -102,22 +114,47 @@ export default function Contact() {
 
       gsap.set(letters, { yPercent: 120 });
 
-      gsap.timeline({
-        defaults: { ease: "power3.out" },
-        scrollTrigger: {
-          trigger: title,
-          start: "top 28%",
-          toggleActions: "restart none none reverse",
-          // markers: true,
-        },
-      }).to(letters, {
-        yPercent: 0,
-        duration: 0.65,
-        stagger: 0.1,
-        clearProps: "transform",
-      });
+      const mm = gsap.matchMedia();
+      const makeTimeline = (startValue) => {
+        gsap.timeline({
+          defaults: { ease: "power3.out" },
+          scrollTrigger: {
+            trigger: title,
+            start: startValue,
+            toggleActions: "restart none none reverse",
+            markers: true,
+          },
+        }).to(letters, {
+          yPercent: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          clearProps: "transform",
+        });
+      };
+
+      // Tailwind-aligned breakpoints:
+      // base: <640, sm: 640-767, md: 768-1023, lg: 1024-1279, xl: 1280-1535, 2xl: >=1536
+      mm.add("(max-width: 639px)", () => makeTimeline("top 74%")); // base
+      mm.add(
+        "(min-width: 640px) and (max-width: 767px)",
+        () => makeTimeline("top 72%") // sm
+      );
+      mm.add(
+        "(min-width: 768px) and (max-width: 1023px)",
+        () => makeTimeline("top 75%") // md
+      );
+      mm.add(
+        "(min-width: 1024px) and (max-width: 1279px)",
+        () => makeTimeline("top 60%") // lg
+      );
+      mm.add(
+        "(min-width: 1280px) and (max-width: 1535px)",
+        () => makeTimeline("top 26%") // xl
+      );
+      mm.add("(min-width: 1536px)", () => makeTimeline("top 24%")); // 2xl
 
       ScrollTrigger.refresh();
+      return () => mm.revert();
     }, title);
 
     return () => ctx.revert();
@@ -139,7 +176,7 @@ export default function Contact() {
               <h1
                 ref={contactTitleRef}
                 style={{ transform: "scaleY(1.25)" }}
-                className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[clamp(4rem,29vw,35rem)]"
+                className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[27vw] md:text-[29vw]"
                 aria-label={contactWord}
               >
                 {[...contactWord].map((char, index) => (

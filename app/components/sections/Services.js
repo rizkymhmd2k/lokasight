@@ -160,27 +160,28 @@ const Services = () => {
         return;
       }
 
-      gsap.set(words, { yPercent: 110, opacity: 0 });
-
       const mm = gsap.matchMedia();
       const makeTimeline = (startValue) => {
         gsap
           .timeline({
             defaults: { ease: "power4.inOut" },
             scrollTrigger: {
-              trigger: heading,
+              trigger: section,
               start: startValue,
               toggleActions: "play none none reverse",
             },
           })
-          .to(words, {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.65,
-            stagger: 0.23,
-            ease: "power3.out",
-            clearProps: "transform",
-          });
+          .fromTo(
+            words,
+            { yPercent: 110, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              duration: 0.65,
+              stagger: 0.23,
+              ease: "power3.out",
+            }
+          );
       };
 
       // Tailwind-aligned breakpoints:
@@ -196,13 +197,13 @@ const Services = () => {
       );
       mm.add(
         "(min-width: 1024px) and (max-width: 1279px)",
-        () => makeTimeline("top 70%") // lg
+        () => makeTimeline("top 50%") // lg
       );
       mm.add(
         "(min-width: 1280px) and (max-width: 1535px)",
-        () => makeTimeline("top 68%") // xl
+        () => makeTimeline("top 58%") // xl
       );
-      mm.add("(min-width: 1536px)", () => makeTimeline("top 66%")); // 2xl
+      mm.add("(min-width: 1536px)", () => makeTimeline("top 46%")); // 2xl
 
       ScrollTrigger.refresh();
       return () => mm.revert();
