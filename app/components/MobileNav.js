@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 const ANIMATION_DURATIONS = {
@@ -9,6 +8,14 @@ const ANIMATION_DURATIONS = {
   ITEMS: 0.65,
   HAMBURGER_SHAPE: 0.25,
 };
+const SCROLL_RETRY_DELAY_MS = 80;
+const DARK_BG_THRESHOLD = 0.42;
+const NAV_ITEMS = ["HOME", "WORK", "SERVICES", "CONTACT"];
+const SOCIAL_LINKS = [
+  { label: "INSTAGRAM", href: "#" },
+  { label: "TWITTER / X", href: "#" },
+  { label: "LINKEDIN", href: "#" },
+];
 
 function parseRgb(color) {
   if (!color) return null;
@@ -48,7 +55,6 @@ function getEffectiveBgRgb(startEl) {
 }
 
 export default function MobileNav() {
-  const navItems = useMemo(() => ["HOME", "WORK", "SERVICES", "CONTACT"], []);
   const [isMenuActive, setIsMenuActive] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [measuredIsDarkBg, setMeasuredIsDarkBg] = useState(false);
@@ -59,7 +65,9 @@ export default function MobileNav() {
   const tlRef = useRef(null);
 
   const scrollYRef = useRef(0);
-  const pendingScrollToRef = useRef(null);
+  const skipNextUnlockRestoreRef = useRef(false);
+  const pendingSectionRef = useRef(null);
+  const pendingSectionRetryTimeoutRef = useRef(0);
 
   const lockPageScroll = useCallback(() => {
     const body = document.body;
@@ -79,7 +87,7 @@ export default function MobileNav() {
     html.style.overflow = "hidden";
   }, []);
 
-  const unlockPageScroll = useCallback(() => {
+  const unlockPageScroll = useCallback((restorePosition = true) => {
     const body = document.body;
     const html = document.documentElement;
     if (!body || body.dataset.navLocked !== "true") return;
@@ -93,8 +101,39 @@ export default function MobileNav() {
     body.style.overflow = "";
     html.style.overflow = "";
 
-    window.scrollTo(0, scrollYRef.current || 0);
+    if (restorePosition) window.scrollTo(0, scrollYRef.current || 0);
   }, []);
+
+  const scrollToSection = useCallback((sectionId) => {
+    const el = document.getElementById(sectionId);
+    if (!el) return false;
+
+    const top = Math.max(0, el.getBoundingClientRect().top + window.pageYOffset);
+    window.scrollTo({ top, behavior: "auto" });
+    window.history.pushState(null, "", `#${sectionId}`);
+    return true;
+  }, []);
+
+  const flushPendingSectionScroll = useCallback(() => {
+    const sectionId = pendingSectionRef.current;
+    if (!sectionId) return;
+    pendingSectionRef.current = null;
+
+    const didScroll = scrollToSection(sectionId);
+    if (!didScroll) {
+      window.location.assign(`/#${sectionId}`);
+      return;
+    }
+
+    // Mobile Safari can ignore the first jump right after fixed-body unlock.
+    if (pendingSectionRetryTimeoutRef.current) {
+      window.clearTimeout(pendingSectionRetryTimeoutRef.current);
+    }
+    pendingSectionRetryTimeoutRef.current = window.setTimeout(() => {
+      pendingSectionRetryTimeoutRef.current = 0;
+      scrollToSection(sectionId);
+    }, SCROLL_RETRY_DELAY_MS);
+  }, [scrollToSection]);
 
   const animateToX = useCallback((bars) => {
     gsap.to(bars[0], { rotate: 45, y: 8, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
@@ -132,17 +171,12 @@ export default function MobileNav() {
         defaults: { ease: "power4.inOut" },
         onReverseComplete: () => {
           setIsMenuActive(false);
-          unlockPageScroll();
-
-          const pendingId = pendingScrollToRef.current;
-          pendingScrollToRef.current = null;
-          if (pendingId) {
-            const el = document.getElementById(pendingId);
-            if (el) {
-              el.scrollIntoView({ behavior: "smooth", block: "start" });
-              window.history.pushState(null, "", `#${pendingId}`);
-            }
-          }
+          const shouldRestore = !skipNextUnlockRestoreRef.current;
+          skipNextUnlockRestoreRef.current = false;
+          unlockPageScroll(shouldRestore);
+          requestAnimationFrame(() => {
+            flushPendingSectionScroll();
+          });
         },
       });
 
@@ -158,10 +192,15 @@ export default function MobileNav() {
     }, wrapper);
 
     return () => ctx.revert();
-  }, [unlockPageScroll]);
+  }, [flushPendingSectionScroll, unlockPageScroll]);
 
   useEffect(() => {
     return () => {
+      if (pendingSectionRetryTimeoutRef.current) {
+        window.clearTimeout(pendingSectionRetryTimeoutRef.current);
+      }
+      pendingSectionRef.current = null;
+      skipNextUnlockRestoreRef.current = false;
       unlockPageScroll();
     };
   }, [unlockPageScroll]);
@@ -184,19 +223,40 @@ export default function MobileNav() {
 
   const handleNavClick = useCallback(
     (sectionId) => (e) => {
-      const onHome = window.location.pathname === "/" || window.location.pathname === "";
-      const el = onHome ? document.getElementById(sectionId) : null;
+      const el = document.getElementById(sectionId);
+      const isLocked = document.body?.dataset.navLocked === "true";
+      const menuIsOpen = Boolean(
+        tlRef.current &&
+          tlRef.current.progress() > 0 &&
+          !tlRef.current.reversed()
+      );
 
       if (el) {
         e.preventDefault();
-        pendingScrollToRef.current = sectionId;
-        if (isMenuActive) toggleMenu();
+
+        if (isLocked || isMenuActive || menuIsOpen) {
+          // Section click should not snap back to pre-menu scroll position.
+          skipNextUnlockRestoreRef.current = true;
+          pendingSectionRef.current = sectionId;
+          if (menuIsOpen) {
+            toggleMenu();
+          } else {
+            unlockPageScroll(false);
+            flushPendingSectionScroll();
+          }
+        } else {
+          scrollToSection(sectionId);
+        }
         return;
       }
 
-      if (isMenuActive) toggleMenu();
+      if (isLocked || isMenuActive || menuIsOpen) {
+        e.preventDefault();
+        if (menuIsOpen) toggleMenu();
+        window.location.assign(`/#${sectionId}`);
+      }
     },
-    [isMenuActive, toggleMenu]
+    [flushPendingSectionScroll, isMenuActive, scrollToSection, toggleMenu, unlockPageScroll]
   );
 
   useEffect(() => {
@@ -266,7 +326,7 @@ export default function MobileNav() {
       return;
     }
 
-    setMeasuredIsDarkBg(luminance(rgb) < 0.42);
+    setMeasuredIsDarkBg(luminance(rgb) < DARK_BG_THRESHOLD);
   }, []);
 
   useEffect(() => {
@@ -339,27 +399,23 @@ export default function MobileNav() {
         </div>
 
         <nav className="flex flex-col mt-8">
-          {navItems.map((item) => (
+          {NAV_ITEMS.map((item) => (
             <div key={item} className="overflow-hidden">
-              <Link
-                href={`/#${item.toLowerCase()}`}
+              <a
+                href={`#${item.toLowerCase()}`}
                 data-nav-item
                 className="block text-white font-bold leading-[0.88] tracking-[-0.04em] text-[17vw] hover:text-[#f6f44a] transition-colors duration-200"
                 onClick={handleNavClick(item.toLowerCase())}
               >
                 {item}
-              </Link>
+              </a>
             </div>
           ))}
         </nav>
 
         <div className="flex justify-between items-end mt-10">
           <div className="flex flex-col gap-1.5">
-            {[
-              { label: "INSTAGRAM", href: "#" },
-              { label: "TWITTER / X", href: "#" },
-              { label: "LINKEDIN", href: "#" },
-            ].map(({ label, href }) => (
+            {SOCIAL_LINKS.map(({ label, href }) => (
               <a
                 key={label}
                 href={href}

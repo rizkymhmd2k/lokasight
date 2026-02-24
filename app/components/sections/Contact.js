@@ -115,6 +115,7 @@ export default function Contact() {
       gsap.set(letters, { yPercent: 120 });
 
       const mm = gsap.matchMedia();
+      const showMarkers = process.env.NODE_ENV === "development";
       const makeTimeline = (startValue) => {
         gsap.timeline({
           defaults: { ease: "power3.out" },
@@ -125,7 +126,7 @@ export default function Contact() {
             // onEnter, onLeave, onEnterBack, onLeaveBack
             // Re-entering from top restarts; leaving upward reverses.
             toggleActions: "restart none none reverse",
-            markers: true,
+            markers: showMarkers,
           },
         }).to(letters, {
           yPercent: 0,
