@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -92,14 +92,16 @@ export default function Contact() {
 
     measure();
     onScroll();
+    const refreshRaf = requestAnimationFrame(() => ScrollTrigger.refresh());
 
     return () => {
       ro.disconnect();
       window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(refreshRaf);
     };
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const title = contactTitleRef.current;
     if (!title) return;
 
@@ -117,8 +119,6 @@ export default function Contact() {
         return;
       }
 
-      gsap.set(letters, { yPercent: 120 });
-
       const mm = gsap.matchMedia();
       const makeTimeline = (startValue) => {
         gsap.timeline({
@@ -127,17 +127,21 @@ export default function Contact() {
             id: "contact-title-entry",
             trigger: title,
             start: startValue,
+            invalidateOnRefresh: true,
             // onEnter, onLeave, onEnterBack, onLeaveBack
             // Re-entering from top restarts; leaving upward reverses.
             toggleActions: "restart none none reverse",
             markers: true,
-          },
-        }).to(letters, {
-          yPercent: 0,
-          duration: 0.65,
-          stagger: 0.1,
-          clearProps: "transform",
-        });
+          }
+        }).fromTo(
+          letters,
+          { yPercent: 120 },
+          {
+            yPercent: 0,
+            duration: 0.65,
+            stagger: 0.1,
+          }
+        );
       };
 
       // Tailwind-aligned breakpoints:
