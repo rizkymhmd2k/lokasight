@@ -31,9 +31,11 @@ export default function Contact() {
   const containerRef = useRef(null);
   const sceneRef = useRef(null);
   const cardRef = useRef(null);
+  const heroPanelRef = useRef(null);
   const contactTitleRef = useRef(null);
 
   const contactWord = "CONTACT";
+  const BASE_MD_UNSTICK_GAP = 24;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -46,21 +48,24 @@ export default function Contact() {
     const measure = () => {
       const cardHeight = card.offsetHeight;
       const sceneHeight = scene.offsetHeight;
+      const heroPanel = heroPanelRef.current;
       const width = window.innerWidth;
       const isMobile = width < 1025;
-      const isSmToMd = width >= 640 && width <= 1023;
+      const isBaseToMd = width <= 1023;
 
       const visibleStart = cardHeight * (isMobile ? 0.5 : 0.2);
       const visibleEnd = cardHeight * 0.8;
 
-      // Move by explicit top positions to avoid overshooting past the scene top.
-      const smMdUnstickOffset = 40; // Tailwind `top-10`
+      // On base-md, release when yellow card is almost touching black panel top.
+      const baseMdUnstickOffset = heroPanel
+        ? heroPanel.offsetTop + BASE_MD_UNSTICK_GAP
+        : BASE_MD_UNSTICK_GAP;
 
-      state.startTop = isSmToMd
+      state.startTop = isBaseToMd
         ? Math.max(sceneHeight - visibleStart, 0)
         : sceneHeight - visibleStart;
-      state.endTop = isSmToMd
-        ? Math.min(smMdUnstickOffset, state.startTop)
+      state.endTop = isBaseToMd
+        ? Math.min(baseMdUnstickOffset, state.startTop)
         : sceneHeight - visibleEnd;
       state.scrollBudget = Math.max(state.startTop - state.endTop, 1);
 
@@ -115,7 +120,6 @@ export default function Contact() {
       gsap.set(letters, { yPercent: 120 });
 
       const mm = gsap.matchMedia();
-      const showMarkers = process.env.NODE_ENV === "development";
       const makeTimeline = (startValue) => {
         gsap.timeline({
           defaults: { ease: "power3.out" },
@@ -126,7 +130,7 @@ export default function Contact() {
             // onEnter, onLeave, onEnterBack, onLeaveBack
             // Re-entering from top restarts; leaving upward reverses.
             toggleActions: "restart none none reverse",
-            markers: showMarkers,
+            markers: true,
           },
         }).to(letters, {
           yPercent: 0,
@@ -176,7 +180,10 @@ export default function Contact() {
         >
           {/* Black hero card — full height on desktop, h-1/2 inside light bg wrapper on mobile */}
           <div className="w-full h-full rounded-3xl overflow-hidden flex flex-col bg-backgroundlight lg:bg-black">
-            <div className="bg-black rounded-3xl overflow-hidden h-1/2 lg:h-full flex flex-col">
+            <div
+              ref={heroPanelRef}
+              className="bg-black rounded-3xl overflow-hidden h-1/2 lg:h-full flex flex-col"
+            >
               <h1
                 ref={contactTitleRef}
                 style={{ transform: "scaleY(1.25)" }}
