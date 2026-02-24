@@ -119,8 +119,11 @@ export default function Contact() {
         gsap.timeline({
           defaults: { ease: "power3.out" },
           scrollTrigger: {
+            id: "contact-title-entry",
             trigger: title,
             start: startValue,
+            // onEnter, onLeave, onEnterBack, onLeaveBack
+            // Re-entering from top restarts; leaving upward reverses.
             toggleActions: "restart none none reverse",
             markers: true,
           },
