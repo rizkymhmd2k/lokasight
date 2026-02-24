@@ -10,6 +10,12 @@
   --color-reddot: #dc2626;
   --color-backgroundlight: #f8f7f3;
   --color-yellow1: rgba(242, 245, 75, 0.73);
+
+  --color-footer2-top: #f2f1ed;
+  --color-footer2-mid: #e8ed9a;
+  --color-footer2-bottom: #d9e54d;
+  --color-footer2-glow: rgba(214, 229, 75, 0.95);
+  --color-footer2-glow-soft: rgba(239, 244, 150, 0.8);
 }
 
 /* ---------------------------------------------
@@ -46,4 +52,31 @@
 ---------------------------------------------- */
 .font-oswald {
   font-family: var(--font-oswald);
+}
+
+.footer2-bg {
+  background: linear-gradient(
+    180deg,
+    var(--color-footer2-top) 0%,
+    var(--color-footer2-mid) 40%,
+    var(--color-footer2-bottom) 100%
+  );
+}
+
+.footer2-glow {
+  background: radial-gradient(
+    110% 85% at 50% 94%,
+    var(--color-footer2-glow) 0%,
+    var(--color-footer2-glow-soft) 38%,
+    rgba(236, 236, 232, 0.04) 100%
+  );
+}
+
+.footer2-bloom {
+  background: radial-gradient(
+    75% 75% at 50% 55%,
+    rgba(214, 229, 75, 0.62) 0%,
+    rgba(214, 229, 75, 0.18) 52%,
+    rgba(214, 229, 75, 0) 100%
+  );
 }

@@ -35,7 +35,7 @@ export default function Contact() {
   const contactTitleRef = useRef(null);
 
   const contactWord = "CONTACT";
-  const BASE_MD_UNSTICK_GAP = 24;
+  const BASE_MD_UNSTICK_GAP = 124;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -50,10 +50,12 @@ export default function Contact() {
       const sceneHeight = scene.offsetHeight;
       const heroPanel = heroPanelRef.current;
       const width = window.innerWidth;
-      const isMobile = width < 1025;
+      const isBaseToSm = width <= 767;
+      const isMdOnly = width >= 768 && width <= 1023;
       const isBaseToMd = width <= 1023;
 
-      const visibleStart = cardHeight * (isMobile ? 0.5 : 0.2);
+      const visibleStartRatio = isBaseToSm ? 0.56 : isMdOnly ? 0.5 : 0.2;
+      const visibleStart = cardHeight * visibleStartRatio;
       const visibleEnd = cardHeight * 0.8;
 
       // On base-md, release when yellow card is almost touching black panel top.

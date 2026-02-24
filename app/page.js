@@ -5,10 +5,11 @@ import WorkShowCase from "./components/sections/WorkShowCase";
 import Services from "./components/sections/Services";
 import About from "./components/sections/About";
 import Contact from "./components/sections/Contact";
-import Footer from "./components/sections/Footer";
+import Footer2 from "./components/sections/Footer2";
 import Form from "./components/sections/Form";
 import ViewportIndicator from "./components/ViewportIndicator";
 import MobileNav from "./components/MobileNav";
+import Footer from "./components/sections/Footer";
 
 export default function Home() {
   return (
@@ -35,7 +36,8 @@ export default function Home() {
           <About />
           <Contact />
           {/* <Form /> */}
-          <Footer />
+          <Footer2 />
+          {/* <Footer/> */}
       </section>
     </main>
   );
