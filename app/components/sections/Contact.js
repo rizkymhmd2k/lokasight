@@ -121,6 +121,9 @@ export default function Contact() {
         return;
       }
 
+      // Keep letters hidden until ScrollTrigger reaches its start marker.
+      gsap.set(letters, { yPercent: 120 });
+
       const mm = gsap.matchMedia();
       const makeTimeline = (startValue) => {
         gsap.timeline({
@@ -201,7 +204,10 @@ export default function Contact() {
                     key={`${char}-${index}`}
                     className="inline-block overflow-hidden align-top"
                   >
-                    <span data-contact-letter className="inline-block">
+                    <span
+                      data-contact-letter
+                      className="inline-block"
+                    >
                       {char}
                     </span>
                   </span>
