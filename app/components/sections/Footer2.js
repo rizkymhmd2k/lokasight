@@ -10,7 +10,7 @@ export default function Footer2() {
   return (
     <footer
       id="footer-2"
-      className="relative overflow-hidden bg-backgroundlight px-4 py-6 md:px-7 md:py-7"
+      className="relative overflow-hidden bg-backgroundlight px-4 py-6 md:px-7 md:py-7 h-[150vh]"
     >
       <div aria-hidden className="footer2-bg pointer-events-none absolute inset-0" />
       <div aria-hidden className="footer2-glow pointer-events-none absolute inset-0" />

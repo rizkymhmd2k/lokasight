@@ -31,6 +31,7 @@ const contactWord = "CONTACT";
 
 export default function Contact() {
   const contactTitleRef = useRef(null);
+  const formCardRef = useRef(null);
 
   useEffect(() => {
     const title = contactTitleRef.current;
@@ -92,6 +93,37 @@ export default function Contact() {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    const card = formCardRef.current;
+    if (!card) return;
+
+    const prefersReducedMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        card,
+        { top: "0px" },
+        {
+          top: "-18rem",
+          ease: "none",
+          scrollTrigger: {
+            trigger: card,
+            start: "top bottom",
+            end: "top 20%",
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+    }, card);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
     <div
       id="contact"
@@ -119,7 +151,10 @@ export default function Contact() {
           </h1>
         </div>
         <div className="bg-black border h-[20vh] lg:h-[30vh] relative rounded-b-3xl pb-10">
-          <section className="absolute z-60 top-0 left-1/2 -translate-x-1/2 w-full lg:left-auto lg:translate-x-0 lg:right-7 lg:w-[70vw]">
+          <section
+            ref={formCardRef}
+            className="absolute z-60 top-0 left-1/2 -translate-x-1/2 w-full lg:left-auto lg:translate-x-0 lg:right-7 lg:w-[70vw]"
+          >
             <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
@@ -162,50 +197,6 @@ export default function Contact() {
             </div>
           </section>
         </div>
-
-        {/* Yellow card — absolute, overlaps black card from bottom */}
-        {/* <section className="absolute z-60 -bottom-100 md:-bottom-120 2xl:-bottom-112.5 left-1/2 -translate-x-1/2 w-full lg:left-auto lg:translate-x-0 lg:right-7 lg:w-[70vw]">
-          <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
-            <div className="flex flex-col gap-10">
-              <div className="h-6 w-6 rounded-full bg-black/80" />
-              <h1 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(4rem,8vw,3rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
-                Rizk moves fast,
-                <br />
-                moves faster
-                <br />
-                with formrizk
-              </h1>
-              <blockquote className="max-w-md">
-                <p className="text-lg font-semibold leading-snug">
-                  &ldquo;Super smooth experience.&rdquo;
-                  <br />
-                  &ldquo;Everything was fast, clear, and hassle-free. I got what
-                  I needed in minutes.&rdquo;
-                </p>
-                <footer className="mt-3 text-sm font-semibold">
-                  — Alex R., Verified Customer
-                </footer>
-              </blockquote>
-              <p className="hidden lg:block mt-auto text-sm font-semibold">
-                web design, web development
-                <br />
-                and creative development
-              </p>
-            </div>
-
-            <form className="flex flex-col w-full justify-center gap-8">
-              {FIELDS.map((f) => (
-                <Field key={f.label} {...f} />
-              ))}
-              <button
-                type="submit"
-                className="mt-4 w-full rounded-full bg-black text-white text-lg font-semibold py-4"
-              >
-                Let&apos;s goooooo!!
-              </button>
-            </form>
-          </div>
-        </section> */}
       </div>
     </div>
   );
