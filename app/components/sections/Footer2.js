@@ -15,7 +15,7 @@ export default function Footer2() {
       <div aria-hidden className="footer2-bg pointer-events-none absolute inset-0" />
       <div aria-hidden className="footer2-glow pointer-events-none absolute inset-0" />
 
-      <div className="relative z-10 flex min-h-[84vh] gap-16 flex-col border">
+      <div className="relative z-10 flex min-h-[84vh] flex-col">
         <div className="grid grid-cols-3 pt-[34vh] text-[clamp(1.2rem,1.9vw,2.05rem)] font-semibold tracking-[-0.02em] text-black">
           {TOP_COLUMNS.map((column, index) => (
             <ul key={index} className={`space-y-1 leading-[1.25] ${column.align}`}>
@@ -30,7 +30,7 @@ export default function Footer2() {
           ))}
         </div>
 
-        <h2 className="mt-auto mb-8 text-left text-[12vw] font-bold leading-[0.9] tracking-[-0.06em] text-black">
+        <h2 className="mt-auto mb-8 text-center text-[clamp(3.4rem,10.8vw,12.2rem)] font-black leading-[0.9] tracking-[-0.06em] text-black">
           Ready to Take Risk?
         </h2>
 
