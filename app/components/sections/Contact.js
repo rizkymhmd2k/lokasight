@@ -104,21 +104,31 @@ export default function Contact() {
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        card,
-        { top: "0px" },
-        {
-          top: "-18rem",
-          ease: "none",
-          scrollTrigger: {
-            trigger: card,
-            start: "top bottom",
-            end: "top 20%",
-            scrub: true,
-            invalidateOnRefresh: true,
+      const mm = gsap.matchMedia();
+
+      const makeCardAnimation = (toTop) => {
+        gsap.fromTo(
+          card,
+          { top: "0px" },
+          {
+            top: toTop,
+            ease: "none",
+            scrollTrigger: {
+              trigger: card,
+              start: "top bottom",
+              end: "top 20%",
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
           },
-        },
-      );
+        );
+      };
+
+      mm.add("(max-width: 767px)", () => makeCardAnimation("0px"));
+      mm.add("(min-width: 768px)", () => makeCardAnimation("-18rem"));
+
+      ScrollTrigger.refresh();
+      return () => mm.revert();
     }, card);
 
     return () => ctx.revert();
