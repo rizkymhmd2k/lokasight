@@ -13,7 +13,7 @@ const SOCIAL_LINKS = [
   { label: "LinkedIn", href: "#" },
 ];
 
-const FOOTER_HEADING = "Ready To Take Risk";
+const FOOTER_HEADING = "Ready To Take Risk ?";
 
 const TOP_COLUMNS = [
   {
@@ -47,6 +47,11 @@ const TOP_COLUMNS = [
   },
 ];
 
+// Shared by every letter — same speed, same easing character
+// expo.out gives a strong initial push that decelerates beautifully
+const SPAN = 0.60;
+const EASE = gsap.parseEase("expo.out");
+
 export default function Footer2() {
   const footerRef  = useRef(null);
   const headingRef = useRef(null);
@@ -70,21 +75,13 @@ export default function Footer2() {
         return;
       }
 
-      const n = letters.length;
-
-      // Start at 0: original letter visible, duplicate hidden above clip
       gsap.set(letters, { yPercent: 0 });
 
-      // Random start per letter, fixed short span — all guaranteed to finish before 100%
-      const SPAN = 0.42;
-      const meta = Array.from({ length: n }, () => ({
+      // Only start offset is random — span + ease are identical per letter
+      const meta = Array.from(letters).map(() => ({
         start: gsap.utils.random(0.0, 1 - SPAN),
-        span:  SPAN,
       }));
 
-      const ease = gsap.parseEase("power2.inOut");
-
-      // Direct frame write — no animation layer on top of scrub
       const setY = Array.from(letters).map((el) =>
         gsap.quickSetter(el, "yPercent")
       );
@@ -94,7 +91,9 @@ export default function Footer2() {
           trigger: footer,
           start: startValue,
           end: "max",
-          scrub: 22,
+          // High scrub = heavy inertia — letters keep gliding after you stop scrolling
+          // 80 seconds of lag means a very pronounced coast-to-rest feel
+          scrub: 80,
           markers: true,
           invalidateOnRefresh: true,
           onUpdate({ progress: p }) {
@@ -102,17 +101,12 @@ export default function Footer2() {
               debugRef.current.textContent = `footer anim ${Math.round(p * 100)}%`;
             }
             letters.forEach((_, i) => {
-              const { start, span } = meta[i];
-              const local = gsap.utils.clamp(0, 1, (p - start) / span);
-              const eased = ease(local);
-              // 0 → 100: letter drops down, duplicate above falls into clip
-              setY[i](eased * 100);
+              const local = gsap.utils.clamp(0, 1, (p - meta[i].start) / SPAN);
+              setY[i](EASE(local) * 100);
             });
           },
-          // at 100%: all letters fully dropped, duplicate visible
           onLeave()     { letters.forEach((_, i) => setY[i](100)); },
-          // at 0%: all letters back to original position
-          onLeaveBack() { letters.forEach((_, i) => setY[i](0)); },
+          onLeaveBack() { letters.forEach((_, i) => setY[i](0));   },
         });
         return () => st.kill();
       };
@@ -198,12 +192,11 @@ export default function Footer2() {
 
         <div
           ref={headingRef}
-          className="-mx-4 py-8 lg:py-10 w-[calc(100%+2rem)] -ml-[0.06em] text-[clamp(2rem,11.35vw,7.9rem)] lg:text-[clamp(3.5rem,12vw,235px)] font-bold leading-[0.9] tracking-[-0.06em] text-black"
+          className="-mx-4 py-8 lg:py-10 w-[calc(100%+2rem)] -ml-[0.06em] text-[clamp(2rem,11.35vw,7.9rem)] lg:text-[clamp(3.5rem,10.8vw,235px)] font-bold leading-[0.9] tracking-[-0.06em] text-black"
           aria-label={FOOTER_HEADING}
           role="heading"
           aria-level={2}
         >
-          {/* overflow-hidden on each line row clips duplicates vertically without touching letter widths */}
           <div className="overflow-hidden whitespace-nowrap">
             {FOOTER_HEADING.split("").map((char, index) => {
               if (char === " ") {
