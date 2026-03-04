@@ -115,7 +115,8 @@ export default function Contact() {
             ease: "none",
             scrollTrigger: {
               trigger: card,
-              start: "top bottom",
+              start: "top 70%",
+              // markers:true,
               end: "top 20%",
               scrub: true,
               invalidateOnRefresh: true,
@@ -124,8 +125,8 @@ export default function Contact() {
         );
       };
 
-      mm.add("(max-width: 767px)", () => makeCardAnimation("0px"));
-      mm.add("(min-width: 768px)", () => makeCardAnimation("-18rem"));
+      mm.add("(max-width: 1024px)", () => makeCardAnimation("-4rem"));
+      mm.add("(min-width: 1024px)", () => makeCardAnimation("-25rem"));
 
       ScrollTrigger.refresh();
       return () => mm.revert();
@@ -145,7 +146,7 @@ export default function Contact() {
           <h1
             ref={contactTitleRef}
             style={{ transform: "scaleY(1.25)" }}
-            className="font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[27vw] md:text-[29vw]"
+            className="w-full whitespace-nowrap font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[27vw] md:text-[29vw]"
             aria-label={contactWord}
           >
             {[...contactWord].map((char, index) => (
@@ -160,10 +161,11 @@ export default function Contact() {
             ))}
           </h1>
         </div>
-        <div className="bg-black border h-[20vh] lg:h-[30vh] relative rounded-b-3xl pb-10">
+
+        <div className="bg-backgroundlight lg:bg-black  min-h-[20vh] lg:h-[30vh] relative rounded-b-3xl pb-10">
           <section
             ref={formCardRef}
-            className="absolute z-60 top-0 left-1/2 -translate-x-1/2 w-full lg:left-auto lg:translate-x-0 lg:right-7 lg:w-[70vw]"
+            className="relative z-60 w-full lg:absolute lg:top-0 lg:right-7 lg:w-[70vw]"
           >
             <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
               <div className="flex flex-col gap-10">

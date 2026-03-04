@@ -55,21 +55,20 @@
 }
 
 .footer2-bg {
-  background: linear-gradient(
-    180deg,
-    var(--color-footer2-top) 0%,
-    var(--color-footer2-mid) 40%,
-    var(--color-footer2-bottom) 100%
-  );
-}
-
-.footer2-glow {
-  background: radial-gradient(
-    110% 85% at 50% 94%,
-    var(--color-footer2-glow) 0%,
-    var(--color-footer2-glow-soft) 38%,
-    rgba(236, 236, 232, 0.04) 100%
-  );
+  background:
+    radial-gradient(
+      130% 68% at 50% 78%,
+      rgba(240, 245, 186, 0.5) 0%,
+      rgba(240, 245, 186, 0.24) 38%,
+      rgba(240, 245, 186, 0) 100%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-backgroundlight) 0%,
+      var(--color-backgroundlight) 46%,
+      #eff1d5 72%,
+      #e0ea6a 100%
+    );
 }
 
 .footer2-bloom {

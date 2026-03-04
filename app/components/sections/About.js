@@ -22,7 +22,13 @@ const socials = [
     label: "Instagram",
     href: "#",
     svg: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
         <path
           d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Z"
           stroke="currentColor"
@@ -46,7 +52,13 @@ const socials = [
     label: "TikTok",
     href: "#",
     svg: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
         <path
           d="M14 3v10.2a3.8 3.8 0 1 1-3.1-3.7V7.6a7 7 0 1 0 6.9 7V9.3c.9.7 2 1.1 3.2 1.2V7.7c-2.1-.2-3.8-1.9-4-4H14Z"
           fill="currentColor"
@@ -59,7 +71,13 @@ const socials = [
     label: "LinkedIn",
     href: "#",
     svg: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
         <path d="M6.3 9.2H3.8V20h2.5V9.2Z" fill="currentColor" opacity="0.9" />
         <path
           d="M5.05 7.9a1.45 1.45 0 1 0 0-2.9 1.45 1.45 0 0 0 0 2.9Z"
@@ -78,7 +96,13 @@ const socials = [
     label: "X",
     href: "#",
     svg: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
         <path
           d="M18.8 3H21l-6.9 7.9L22 21h-6.2l-4.8-6.1L5.6 21H3.4l7.4-8.5L2 3h6.3l4.4 5.6L18.8 3Z"
           fill="currentColor"
@@ -92,6 +116,7 @@ const socials = [
 const About = () => {
   return (
     <div
+      id="about"
       className="
         bg-backgroundlight
         h-screen
@@ -112,8 +137,8 @@ const About = () => {
             <span className="text-sm md:text-xl font-medium mr-2 md:mr-5">
               [about]
             </span>
-            Hi, I’m Rizky. I help service and software businesses design and build
-            memorable, optimised websites.
+            Hi, I’m Rizky. I help service and software businesses design and
+            build memorable, optimised websites.
           </h1>
         </div>
 
