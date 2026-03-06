@@ -20,6 +20,16 @@ export default function Hero() {
     },
     []
   );
+  const handleCtaClick = useCallback((e) => {
+    if (typeof window === "undefined") return;
+
+    const el = document.getElementById("contact");
+    if (!el) return;
+
+    e.preventDefault();
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.pushState(null, "", "#contact");
+  }, []);
 
   return (
     <section
@@ -66,8 +76,25 @@ export default function Hero() {
           </p>
         </div>
         <div className="col-start-4 flex flex-col text-right">
-          <h2 className="text-lg md:text-xl font-semibold">WE DESIGN BOLD</h2>
-          <h2 className="text-lg md:text-xl font-semibold">AND MODERN FORMS</h2>
+          <h2 className="text-lg md:text-xl font-semibold">lorem</h2>
+          <h2 className="text-lg md:text-xl font-semibold">Aipsum</h2>
+          <Link
+            href="/#contact"
+            onClick={handleCtaClick}
+            className="group mt-6 inline-flex self-end rounded-md bg-black px-4 py-2.5 text-[#F8F7F3]"
+          >
+            <span className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.08em]">
+              <span>Let&apos;s connect</span>
+              <span className="relative flex h-4 w-5 overflow-hidden">
+                <span className="absolute inset-0 transition-transform duration-400 ease-out group-hover:translate-x-full">
+                  →
+                </span>
+                <span className="absolute inset-0 -translate-x-full transition-transform duration-400 ease-out group-hover:translate-x-0">
+                  →
+                </span>
+              </span>
+            </span>
+          </Link>
         </div>
       </div>
     </section>

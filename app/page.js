@@ -15,7 +15,7 @@ import Footer2 from "./components/sections/Footer2";
 export default function Home() {
   return (
     <main className="w-full">
-      <ViewportIndicator />
+      {/* <ViewportIndicator /> */}
       <MobileNav />
 
       <HeroPinZone>
