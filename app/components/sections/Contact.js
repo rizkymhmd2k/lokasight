@@ -139,7 +139,7 @@ export default function Contact() {
               trigger: card,
               start: "top 70%",
               end: "top 0%",
-              markers: true,
+              // markers: true,
               scrub: 1,
               invalidateOnRefresh: true,
             },

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect, useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -8,22 +9,47 @@ gsap.registerPlugin(ScrollTrigger);
 
 const services = [
   {
-    title: "Branding",
-    tags: ["Identity", "Competitive Analysis"],
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.",
-    stat: "143%",
+    title: "Brand Strategy",
+    tags: [
+      "Research & Insights",
+      "Positioning",
+      "Competitive Analysis",
+      "Messaging",
+      "Voice & Tone",
+      "Naming",
+    ],
+    desc: "Defining brand strategy that sharpens market positioning, strengthens perception, and creates stronger customer preference in competitive spaces.",
+    stat: "",
+    image: "/brand.webp",
+
   },
   {
-    title: "Branding",
-    tags: ["Identity", "Competitive Analysis"],
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.",
-    stat: "143%",
+    title: "Digital Experience",
+    tags: [
+      "Identity Systems",
+      "Wireframing",
+      "UI Design",
+      "UX Design",
+      "Web Design",
+      "Product Design",
+    ],
+    desc: "Designing digital experiences that elevate brand perception, improve usability, and create clearer paths to engagement and conversion.",
+    stat: "",
+    image: "/design2.webp",
   },
   {
-    title: "Branding",
-    tags: ["Identity", "Competitive Analysis"],
-    desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.",
-    stat: "143%",
+    title: "Creative Development",
+    tags: [
+      "Frontend Development",
+      "CMS Integration",
+      "Motion Design",
+      "Interactive Experiences",
+      "WebGL",
+      "Technical SEO",
+    ],
+    desc: "Developing high-performing digital experiences that bring strategy and design to life with precision, scalability, and seamless execution.",
+    stat: "",
+    image: "/development.webp",
   },
 ];
 
@@ -54,18 +80,33 @@ function PingDot() {
   );
 }
 
-function StatCard({ stat, className = "" }) {
+function StatCard({ stat, image, title, className = "" }) {
   return (
     <div
       className={`w-[180px] h-[180px] rounded-2xl bg-white relative overflow-hidden ${className}`}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-yellow-200 to-yellow-400 opacity-80" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-200/40 to-transparent" />
+      {image ? (
+        <>
+          <Image
+            src={image}
+            alt={title}
+            fill
+            sizes="180px"
+            className="object-contain"
+          />
+          <div className="absolute inset-0 bg-white/10" />
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-white via-yellow-200 to-yellow-400 opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-200/40 to-transparent" />
+        </>
+      )}
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="flex items-center gap-2 text-black/70 font-medium">
           <span className="text-sm">{stat}</span>
-          <span className="text-sm">→</span>
+          {/* <span className="text-sm">→</span> */}
         </div>
       </div>
     </div>
@@ -105,15 +146,19 @@ function ServiceItem({ item, isLast }) {
               {item.title}
             </h3>
           </div>
-          <Tags tags={item.tags} className="mt-1 lg:mt-3" />
         </div>
+
+        <Tags
+          tags={item.tags}
+          className="order-2 mt-1 lg:mt-3 lg:col-start-1 lg:row-start-2 xl:mt-0 xl:col-start-2 xl:row-start-2"
+        />
 
         <p
           className="
-            order-2 mt-3
+            order-3 mt-3
             text-white/80 lg:text-white/60
             text-sm leading-relaxed
-            lg:order-2 lg:mt-0 lg:col-start-1 lg:row-start-2
+            lg:order-2 lg:mt-0 lg:col-start-1 lg:row-start-3
             xl:col-start-2 xl:row-start-1 2xl:max-w-90
           "
         >
@@ -122,12 +167,17 @@ function ServiceItem({ item, isLast }) {
 
         <div
           className="
-            order-3 mt-2 w-full
-            lg:order-3 lg:mt-0 lg:w-[180px] lg:justify-self-end lg:col-start-2 lg:row-start-1 lg:row-span-2
+            order-4 mt-2 w-full
+            lg:order-3 lg:mt-0 lg:w-[180px] lg:justify-self-end lg:col-start-2 lg:row-start-1 lg:row-span-3
             xl:col-start-3 xl:row-start-1
           "
         >
-          <StatCard stat={item.stat} className="w-full lg:w-[180px]" />
+          <StatCard
+            stat={item.stat}
+            image={item.image}
+            title={item.title}
+            className="w-full lg:w-[180px]"
+          />
         </div>
       </div>
 
@@ -180,7 +230,7 @@ const Services = () => {
               duration: 0.65,
               stagger: 0.23,
               ease: "power3.out",
-            }
+            },
           );
       };
 
@@ -189,19 +239,19 @@ const Services = () => {
       mm.add("(max-width: 639px)", () => makeTimeline("top 90%")); // base
       mm.add(
         "(min-width: 640px) and (max-width: 767px)",
-        () => makeTimeline("top 78%") // sm
+        () => makeTimeline("top 78%"), // sm
       );
       mm.add(
         "(min-width: 768px) and (max-width: 1023px)",
-        () => makeTimeline("top 90%") // md
+        () => makeTimeline("top 90%"), // md
       );
       mm.add(
         "(min-width: 1024px) and (max-width: 1279px)",
-        () => makeTimeline("top 50%") // lg
+        () => makeTimeline("top 50%"), // lg
       );
       mm.add(
         "(min-width: 1280px) and (max-width: 1535px)",
-        () => makeTimeline("top 58%") // xl
+        () => makeTimeline("top 58%"), // xl
       );
       mm.add("(min-width: 1536px)", () => makeTimeline("top 46%")); // 2xl
 
@@ -220,7 +270,7 @@ const Services = () => {
     >
       <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT MAIN */}
-        <div className="w-full lg:w-2/5 2xl:w-3/5 flex flex-col justify-start p-6 lg:p-10  border border-red-400">
+        <div className="w-full lg:w-2/5 2xl:w-3/5 flex flex-col justify-start p-6 lg:p-10  ">
           <span className="text-sm md:text-xl font-medium text-white">
             [services]
           </span>

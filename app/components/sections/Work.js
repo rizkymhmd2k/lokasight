@@ -103,9 +103,10 @@ const Work = () => {
   const wrapperRef = useRef(null);
   const measureRef = useRef(null);
   const linesRootRef = useRef(null);
+  const labelSlotWidth = "clamp(6rem, 16vw, 12rem)";
 
   const bodyText =
-    "I help service and software businesses create memorable, optimised website experiences as quickly as they need create memorable, optimised website experiences as quickly as they need.";
+    "You have built something worth taking seriously. Your website should reflect that with the kind of clarity and presence that helps the right people pay attention.";
 
   const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
   const workHeadingClassName =
@@ -157,7 +158,7 @@ const Work = () => {
 
   return (
     <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-4 flex flex-col">
-      <div ref={wrapperRef} style={{ position: "relative" }}>
+      <div ref={wrapperRef} className="relative">
         {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
         <h1
           ref={measureRef}
@@ -175,6 +176,10 @@ const Work = () => {
               : { opacity: 0 }
           }
         >
+          <span
+            aria-hidden="true"
+            style={{ display: "inline-block", width: labelSlotWidth }}
+          />
           {words.map((w, i) => (
             <React.Fragment key={i}>
               <span data-w="1">{w}</span>
@@ -193,7 +198,10 @@ const Work = () => {
             {lines.map((line, i) => (
               <span key={i} data-line style={{ display: "block" }}>
                 {i === 0 && (
-                  <span className="text-sm md:text-xl font-medium mr-5 md:mr-48">
+                  <span
+                    className="inline-block text-sm md:text-xl font-medium align-bottom"
+                    style={{ width: labelSlotWidth }}
+                  >
                     [WORK]
                   </span>
                 )}
