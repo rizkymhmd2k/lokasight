@@ -1,16 +1,12 @@
-import HeroPinZone from "./components/HeroPinZone";
-import Hero from "./components/sections/Hero";
-import Work from "./components/sections/Work";
-import WorkShowCase from "./components/sections/WorkShowCase";
-import Services from "./components/sections/Services";
-import About from "./components/sections/About";
-import Contact from "./components/sections/Contact";
-import Form from "./components/sections/Form";
-import ViewportIndicator from "./components/ViewportIndicator";
-import MobileNav from "./components/MobileNav";
-import Footer from "./components/sections/Footer";
-import Footer1 from "./components/sections/Footer1";
-import Footer2 from "./components/sections/Footer2";
+import ViewportIndicator from "./components/dev/ViewportIndicator";
+import Hero from "./components/home/sections/Hero";
+import Work from "./components/home/sections/Work";
+import Services from "./components/home/sections/Services";
+import About from "./components/home/sections/About";
+import Contact from "./components/home/sections/Contact";
+import Footer from "./components/home/sections/Footer";
+import MobileNav from "./components/layout/MobileNav";
+import HeroPinZone from "./components/shared/HeroPinZone";
 
 export default function Home() {
   return (
@@ -31,14 +27,11 @@ export default function Home() {
           rounded-t-4xl
         "
       >
-          <Work />
-          {/* <WorkShowCase /> */}
-          <Services />
-          <About />
-          <Contact />
-          {/* <Form /> */}
-          <Footer2/>
-
+        <Work />
+        <Services />
+        <About />
+        <Contact />
+        <Footer />
       </section>
     </main>
   );

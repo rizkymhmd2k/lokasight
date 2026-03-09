@@ -6,6 +6,15 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const titleBreakpoints = [
+  ["(max-width: 639px)", "top 74%"],
+  ["(min-width: 640px) and (max-width: 767px)", "top 72%"],
+  ["(min-width: 768px) and (max-width: 1023px)", "top 75%"],
+  ["(min-width: 1024px) and (max-width: 1279px)", "top 60%"],
+  ["(min-width: 1280px) and (max-width: 1535px)", "top 26%"],
+  ["(min-width: 1536px)", "top 24%"],
+];
+
 export default function Contact() {
   const contactTitleRef = useRef(null);
   const formCardRef = useRef(null);
@@ -21,15 +30,6 @@ export default function Contact() {
     { label: "Your name", type: "input" },
     { label: "you@email.com", type: "input" },
     { label: "Tell me about your project", type: "input" },
-  ];
-
-  const titleBreakpoints = [
-    ["(max-width: 639px)", "top 74%"],
-    ["(min-width: 640px) and (max-width: 767px)", "top 72%"],
-    ["(min-width: 768px) and (max-width: 1023px)", "top 75%"],
-    ["(min-width: 1024px) and (max-width: 1279px)", "top 60%"],
-    ["(min-width: 1280px) and (max-width: 1535px)", "top 26%"],
-    ["(min-width: 1536px)", "top 24%"],
   ];
 
   /* ---------------------------------

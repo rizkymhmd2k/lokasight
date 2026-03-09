@@ -15,8 +15,6 @@ const services = [
       "Positioning",
       "Competitive Analysis",
       "Messaging",
-      "Voice & Tone",
-      "Naming",
     ],
     desc: "Defining brand strategy that sharpens market positioning, strengthens perception, and creates stronger customer preference in competitive spaces.",
     stat: "",
@@ -44,6 +42,7 @@ const services = [
       "CMS Integration",
       "Motion Design",
       "Interactive Experiences",
+      "3D",
       "WebGL",
       "Technical SEO",
     ],
@@ -83,7 +82,7 @@ function PingDot() {
 function StatCard({ stat, image, title, className = "" }) {
   return (
     <div
-      className={`w-[180px] h-[180px] rounded-2xl bg-white relative overflow-hidden ${className}`}
+      className={`relative h-[180px] w-full overflow-hidden rounded-2xl bg-white sm:h-[220px] lg:h-[180px] ${className}`}
     >
       {image ? (
         <>
@@ -91,8 +90,9 @@ function StatCard({ stat, image, title, className = "" }) {
             src={image}
             alt={title}
             fill
-            sizes="180px"
-            className="object-contain"
+            sizes="(max-width: 1023px) 100vw, 180px"
+            className="object-contain will-change-transform"
+            data-service-image
           />
           <div className="absolute inset-0 bg-white/10" />
         </>
@@ -203,10 +203,14 @@ const Services = () => {
 
     const ctx = gsap.context(() => {
       const words = heading.querySelectorAll("[data-services-heading-word]");
+      const imageTargets = section.querySelectorAll("[data-service-image]");
       if (!words.length) return;
 
       if (prefersReducedMotion) {
         gsap.set(words, { yPercent: 0, opacity: 1, clearProps: "transform" });
+        if (imageTargets.length) {
+          gsap.set(imageTargets, { scale: 1, clearProps: "transform" });
+        }
         return;
       }
 
@@ -254,6 +258,24 @@ const Services = () => {
         () => makeTimeline("top 58%"), // xl
       );
       mm.add("(min-width: 1536px)", () => makeTimeline("top 46%")); // 2xl
+
+      if (imageTargets.length) {
+        gsap.set(imageTargets, { scale: 1 });
+
+        imageTargets.forEach((target) => {
+          gsap.to(target, {
+            scale: 1.2,
+            ease: "none",
+            scrollTrigger: {
+              trigger: target,
+              start: "top 80%",
+              end: "bottom top",
+              scrub: true,
+              // markers: true,
+            },
+          });
+        });
+      }
 
       ScrollTrigger.refresh();
       return () => mm.revert();
