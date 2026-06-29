@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useCallback } from "react";
-import Link from "next/link";
 
 export default function Hero() {
   const navItems = useMemo(() => ["HOME", "WORK", "SERVICES", "CONTACT"], []);
@@ -42,13 +41,13 @@ export default function Hero() {
         <div className="hidden sm:grid grid-cols-4 relative z-50">
           {navItems.map((item, i) => (
             <div key={item} className={i === 3 ? "text-right" : ""}>
-              <Link
+              <a
                 href={`/#${item.toLowerCase()}`}
                 className="font-bold hover:opacity-70 transition-opacity"
                 onClick={handleNavClick(item.toLowerCase())}
               >
                 {item}
-              </Link>
+              </a>
             </div>
           ))}
         </div>
@@ -87,7 +86,7 @@ export default function Hero() {
             Web Design Studio
             </h2>
           </div>
-          <Link
+          <a
             href="/#contact"
             onClick={handleCtaClick}
             className="group mt-5 inline-flex rounded-md bg-black px-5 py-3 text-[#F8F7F3] sm:mt-6 sm:self-end sm:px-4 sm:py-2.5"
@@ -103,7 +102,7 @@ export default function Hero() {
                 </span>
               </span>
             </span>
-          </Link>
+          </a>
         </div>
       </div>
     </section>

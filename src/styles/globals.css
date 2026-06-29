@@ -1,11 +1,13 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Oswald:wght@200..700&display=swap");
 @import "tailwindcss";
 
 /* ---------------------------------------------
    Theme Tokens (Tailwind v4)
 ---------------------------------------------- */
 @theme {
+  --font-inter: "Inter", system-ui, sans-serif;
   --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
-  --font-oswald: var(--font-oswald), var(--font-sans);
+  --font-oswald: "Oswald", var(--font-sans);
 
   --color-reddot: #dc2626;
   --color-backgroundlight: #f8f7f3;
@@ -22,8 +24,13 @@
    Base
 ---------------------------------------------- */
 @layer base {
+  html {
+    background: var(--color-backgroundlight);
+  }
+
   body {
     font-family: var(--font-sans);
+    background: var(--color-backgroundlight);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -79,4 +86,3 @@
     rgba(214, 229, 75, 0) 100%
   );
 }
-
