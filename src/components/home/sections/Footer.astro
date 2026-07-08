@@ -27,36 +27,76 @@ const FOOTER_LINK_CLASS =
 ---
 
 <footer
-  id="footer-2"
-  class="bg-backgroundlight grid p-4 pt-12 lg:pt-24 pb-12 w-full max-w-full grid-cols-[minmax(0,52fr)_minmax(0,24fr)_minmax(0,24fr)] grid-rows-[auto_auto] font-sans font-black  text-black "
+  class="bg-backgroundlight grid grid-cols-[40%_1fr] grid-rows-[auto_auto_auto] p-4 pt-12 pb-12 w-full max-w-full font-sans font-black text-black
+         lg:grid-cols-[minmax(0,52fr)_minmax(0,24fr)_minmax(0,24fr)] lg:grid-rows-[auto_auto] lg:pt-24"
 >
-
-
-
-  <!-- Row 1 – subgrid wrapper (no contents, just subgrid) -->
-  <div class="grid grid-cols-[subgrid] col-span-full leading-[1.2] row-span-1 border ">
-    <div class="min-w-0 ">
+  <!-- row - 0 -->
+  <div class="lg:hidden grid grid-cols-1 md:grid-cols-subgrid col-span-full">
+    <div class="col-span-1 min-w-0">
       <h2
         class="max-w-[48rem] text-[clamp(4rem,6.9vw,7.5rem)] leading-[0.82] font-black max-[900px]:text-[clamp(3.4rem,18vw,6rem)]"
       >
         <span class="block">LET'S</span>
-        <span class="block">JAM <small class="ml-[0.4em] inline-block text-[clamp(1.2rem,1.75vw,2.05rem)] align-middle">(together)</small></span>
+        <span class="block"
+          >JAM <small
+            class="ml-[0.4em] inline-block text-[clamp(1.2rem,1.75vw,2.05rem)] align-middle"
+            >(together)</small
+          ></span
+        >
+      </h2>
+    </div>
+
+    <Picture
+      class="col-span-1 md:flex aspect-[2056/1500] w-[clamp(18rem,24vw,30rem)] object-contain object-center max-[900px]:w-[min(100%,30rem)]"
+      src={gmnEye}
+      formats={["webp"]}
+      alt=""
+      loading="lazy"
+    />
+  </div>
+
+  <!-- Row 1 – subgrid wrapper (no contents, just subgrid) -->
+  <div
+    class="grid grid-cols-subgrid col-span-full leading-[1.2] row-span-1 border"
+  >
+    <div class="hidden lg:flex min-w-0">
+      <h2
+        class="max-w-[48rem] text-[clamp(4rem,6.9vw,7.5rem)] leading-[0.82] font-black max-[900px]:text-[clamp(3.4rem,18vw,6rem)]"
+      >
+        <span class="block">LET'S</span>
+        <span class="block"
+          >JAM <small
+            class="ml-[0.4em] inline-block text-[clamp(1.2rem,1.75vw,2.05rem)] align-middle"
+            >(together)</small
+          ></span
+        >
       </h2>
     </div>
 
     <nav
-      class=" flex min-w-0 flex-col text-[clamp(1.8rem,2.45vw,3rem)] max-[900px]:text-[clamp(2.4rem,11vw,4rem)]"
+      class="flex min-w-0 flex-col text-[clamp(1.8rem,2.45vw,3rem)] max-[900px]:text-[clamp(2.4rem,11vw,4rem)]"
       aria-label="Footer navigation"
     >
-      {NAV_ITEMS.map(({ label, href }) => (
-        <a href={href} class={FOOTER_LINK_CLASS}>{label}</a>
-      ))}
+      {
+        NAV_ITEMS.map(({ label, href }) => (
+          <a href={href} class={FOOTER_LINK_CLASS}>
+            {label}
+          </a>
+        ))
+      }
     </nav>
 
-    <div class="flex min-w-0 flex-col pt-[0.2rem] text-[clamp(1.2rem,1.45vw,1.8rem)]" aria-label="Social links">
-      {SOCIAL_LINKS.map(({ label, href }) => (
-        <a href={href} class={FOOTER_LINK_CLASS}>{label}</a>
-      ))}
+    <div
+      class="flex min-w-0 flex-col pt-[0.2rem] text-[clamp(1.2rem,1.45vw,1.8rem)]"
+      aria-label="Social links"
+    >
+      {
+        SOCIAL_LINKS.map(({ label, href }) => (
+          <a href={href} class={FOOTER_LINK_CLASS}>
+            {label}
+          </a>
+        ))
+      }
       <a
         class:list={[
           FOOTER_LINK_CLASS,
@@ -71,9 +111,9 @@ const FOOTER_LINK_CLASS =
   </div>
 
   <!-- Row 2 – subgrid wrapper -->
-  <div class="grid grid-cols-subgrid col-span-full row-span-1 ">
+  <div class="grid grid-cols-subgrid col-span-full">
     <Picture
-      class="aspect-[2056/1500] w-[clamp(18rem,24vw,30rem)] object-contain object-center max-[900px]:w-[min(100%,30rem)]"
+      class="hidden lg:block aspect-[2056/1500] w-[clamp(18rem,24vw,30rem)] object-contain object-center max-[900px]:w-[min(100%,30rem)]"
       src={gmnEye}
       formats={["webp"]}
       alt=""
@@ -81,15 +121,19 @@ const FOOTER_LINK_CLASS =
     />
 
     <div
-      class="col-span-2 grid  grid-cols-2  self-end text-[clamp(0.95rem,1.15vw,1.45rem)]"
+      class="col-span-2 grid grid-cols-subgrid lg:self-end text-[clamp(0.95rem,1.15vw,1.45rem)] border"
     >
-      <div class="flex min-w-0 flex-col leading-[1.25]  justify-between">
-        {POLICY_LINKS.map(({ label, href }) => (
-          <a href={href} class={FOOTER_LINK_CLASS}>{label}</a>
-        ))}
+      <div class="flex min-w-0 flex-col leading-[1.25] justify-between">
+        {
+          POLICY_LINKS.map(({ label, href }) => (
+            <a href={href} class={FOOTER_LINK_CLASS}>
+              {label}
+            </a>
+          ))
+        }
       </div>
 
-      <div class="flex min-w-0 flex-col justify-between leading-[1.05]">
+      <div class="flex min-w-0 flex-col justify-between leading-[1.05] border">
         <p>WEBSITE BY<br />STUDIO OFF THE WALL</p>
         <p>©2026 WHAT MATTERS AGENCY</p>
       </div>
