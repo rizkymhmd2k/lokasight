@@ -2,167 +2,167 @@
 
 ## Page Meta
 
-- Title: My Landing Page
-- Description: A modern 2026 landing page
+* Title: Lokasight — Strategy, Identity & Digital
+* Description: An independent strategy, identity, and digital studio helping ambitious businesses build lasting perception.
 
 ## Navigation
 
-- HOME
-- WORK
-- SERVICES
-- CONTACT
+* HOME
+* WORK
+* SERVICES
+* ABOUT
+* CONTACT
 
 ## Mobile Navigation
 
-- formrizk
-- MENU
-- HOME
-- WORK
-- SERVICES
-- CONTACT
-- INSTAGRAM
-- TWITTER / X
-- LINKEDIN
-- AVAILABLE FOR WORK
-- ©2026 FORMRIZK
-- Open menu
-- Close menu
+* Lokasight
+* MENU
+* HOME
+* WORK
+* SERVICES
+* ABOUT
+* CONTACT
+* INSTAGRAM
+* TWITTER / X
+* LINKEDIN
+* AVAILABLE FOR NEW PROJECTS
+* ©2026 Lokasight
+* Open menu
+* Close menu
 
 ## Hero
 
-- formrizk
-- working globally
-- STUDIO
-- A website should do more than look modern, move nicely, and leave a good first impression. It should help people understand your value, trust what you do, and make choosing your business feel like the natural next step.
-- Creative Direction
-- Web Design Studio
-- Start a project
+* Lokasight
+* clarity creates preference
+* STUDIO
+* The strongest businesses aren't always the biggest. They're the easiest to understand. We help ambitious companies shape perception through strategy, identity, and digital experiences.
+* Strategy
+* Identity
+* Digital
+* View our work
 
 ## Work
 
-- [WORK]
-- You have built something worth taking seriously. Your website should reflect that with the kind of clarity and presence that helps the right people pay attention.
+* [WORK]
+* Every project begins with the same question: what should people remember when they leave? We design the answer with intention, not assumption.
 
 ## Services
 
-- [services]
-- STRATEGY.
-- DESIGN.
-- GROWTH.
+* [SERVICES]
+* STRATEGY.
+* IDENTITY.
+* DIGITAL.
 
-### Brand Strategy
+### Strategy
 
-- Research & Insights
-- Positioning
-- Competitive Analysis
-- Messaging
-- Defining brand strategy that sharpens market positioning, strengthens perception, and creates stronger customer preference in competitive spaces.
+* Research
+* Positioning
+* Audience
+* Messaging
+* Understanding where your business stands today, where it belongs tomorrow, and how to close the gap with clarity.
 
-### Digital Experience
+### Identity
 
-- Identity Systems
-- Wireframing
-- UI Design
-- UX Design
-- Web Design
-- Product Design
-- Designing digital experiences that elevate brand perception, improve usability, and create clearer paths to engagement and conversion.
+* Visual Identity
+* Verbal Identity
+* Art Direction
+* Design System
+* Guidelines
+* Creating identities that feel distinct, consistent, and built to last across every touchpoint.
 
-### Creative Development
+### Digital
 
-- Frontend Development
-- CMS Integration
-- Motion Design
-- Interactive Experiences
-- 3D
-- WebGL
-- Technical SEO
-- Developing high-performing digital experiences that bring strategy and design to life with precision, scalability, and seamless execution.
+* Websites
+* Content
+* Performance
+* SEO
+* Analytics
+* Growth
+* Turning strategy into digital experiences that build trust and support long-term growth.
 
 ### Service Mockup Labels
 
-- Research
-- Brand
-- 01
-- Positioning
-- Strategy
-- Fit
-- Audience fit
-- 02
-- Feature
-- Experience
-- Art
-- Editorial System
-- 03
-- Proof
-- Motion Studies
-- Build
-- Spec
+* Research
+* Market
+* 01
+* Positioning
+* Strategy
+* Insight
+* Audience
+* 02
+* Identity
+* Systems
+* Voice
+* Direction
+* 03
+* Launch
+* Measure
+* Refine
+* Scale
 
 ## About
 
-- [about]
-- Hi, I’m Rizky. I help service and software businesses design and build memorable, optimised websites.
-- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. Donec ante arcu, ullamcorper non interdum et, bibendum eu quam.
-- Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec et lectus rutrum, fringilla lorem et, pulvinar erat. socmed below
+* [ABOUT]
+* Lokasight is an independent strategy and design studio helping businesses become easier to understand, easier to trust, and harder to overlook.
+* We believe good design begins with good thinking. Every decision is guided by research, shaped by strategy, and refined through execution that feels considered rather than excessive.
+* We intentionally stay small. Every project is led by senior creatives from start to finish, ensuring thoughtful collaboration without layers of unnecessary process.
 
 ### About Social Links
 
-- Instagram
-- TikTok
-- LinkedIn
-- X
+* Instagram
+* TikTok
+* LinkedIn
+* X
 
 ## Contact
 
-- CONTACT
-- Rizk moves fast,
-- moves faster
-- with formrizk
-- “Super smooth experience.”
-- “Everything was fast, clear, and hassle-free. I got what I needed in minutes.”
-- — Alex R., Verified Customer
-- web design, web development
-- and creative development
+* CONTACT
+* Ready when you are.
+* Let's build
+* something worth remembering.
+* "Thoughtful from the first conversation to the final delivery."
+* "Clear process, strong ideas, and work that continues to create value long after launch."
+* — Client, Jakarta
+* Strategy, identity, and digital
+* for businesses with ambition.
 
 ### Contact Form
 
-- Type your message here
-- Your name
-- you@email.com
-- Tell me about your project
-- Let's goooooo!!
+* Tell us about your project
+* Your name
+* [you@email.com](mailto:you@email.com)
+* What are you building?
+* Start the conversation
 
 ## Footer
 
 ### Sitemap
 
-- Home
-- Work
-- Services
-- About
-- Contact
+* Home
+* Work
+* Services
+* About
+* Contact
 
 ### Footer Services
 
-- Brand Websites
-- Web Development
-- Creative Direction
+* Strategy
+* Identity
+* Digital
 
 ### Footer Contact
 
-- hello@formrizk.com
-- Jakarta, Indonesia
-- Replies in 24h
+* [hello@lokasight.com](mailto:hello@lokasight.com)
+* Jakarta, Indonesia
+* Replies within 24 hours
 
 ### Footer Social Links
 
-- Instagram
-- Behance
-- Dribbble
-- LinkedIn
+* Instagram
+* Behance
+* Dribbble
+* LinkedIn
 
 ### Footer Brand
 
-- © 2026 / FORMRIZK STUDIO
-- formrizk
+* © 2026 / Lokasight

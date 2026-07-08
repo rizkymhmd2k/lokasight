@@ -10,7 +10,7 @@ const ANIMATION_DURATIONS = {
 };
 const SCROLL_RETRY_DELAY_MS = 80;
 const DARK_BG_THRESHOLD = 0.42;
-const NAV_ITEMS = ["HOME", "WORK", "SERVICES", "CONTACT"];
+const NAV_ITEMS = ["HOME", "WORK", "SERVICES", "ABOUT", "CONTACT"];
 const SOCIAL_LINKS = [
   { label: "INSTAGRAM", href: "#" },
   { label: "TWITTER / X", href: "#" },
@@ -394,7 +394,7 @@ export default function MobileNav() {
         }}
       >
         <div className="flex items-center justify-between">
-          <span className="text-white font-bold text-lg tracking-[-0.04em]">formrizk</span>
+          <span className="text-white font-bold text-lg tracking-[-0.04em]">Lokasight</span>
           <span className="text-white/40 text-xs font-semibold tracking-widest">MENU</span>
         </div>
 
@@ -428,9 +428,9 @@ export default function MobileNav() {
           <div className="flex flex-col items-end gap-1.5">
             <span className="flex items-center gap-1.5 text-white/50 text-xs font-semibold tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              AVAILABLE FOR WORK
+              AVAILABLE FOR NEW PROJECTS
             </span>
-            <span className="text-white/30 text-xs font-semibold tracking-wide">©2026 FORMRIZK</span>
+            <span className="text-white/30 text-xs font-semibold tracking-wide">©2026 Lokasight</span>
           </div>
         </div>
       </div>

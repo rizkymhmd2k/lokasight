@@ -26,10 +26,10 @@ export default function Contact() {
   const contactWord = "CONTACT";
 
   const fields = [
-    { label: "Type your message here", type: "textarea" },
+    { label: "Tell us about your project", type: "textarea" },
     { label: "Your name", type: "input" },
     { label: "you@email.com", type: "input" },
-    { label: "Tell me about your project", type: "input" },
+    { label: "What are you building?", type: "input" },
   ];
 
   /* ---------------------------------
@@ -157,15 +157,15 @@ export default function Contact() {
   return (
     <div
       id="contact"
-      className="relative z-30 isolate w-full px-4 pt-24 flex flex-col bg-backgroundlight"
+      className="relative z-30 isolate w-full overflow-x-clip px-4 pt-24 flex flex-col bg-backgroundlight"
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
-        <div className="bg-black rounded-t-3xl h-full pb-5 2xl:pb-10 flex flex-col">
+        <div className="bg-black rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col">
           <h1
             ref={contactTitleRef}
             style={{ transform: "scaleY(1.25)" }}
-            className="w-full whitespace-nowrap font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[27vw] md:text-[29vw]"
+            className="w-full max-w-full overflow-hidden whitespace-nowrap font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[20.5vw] md:text-[22vw]"
             aria-label={contactWord}
           >
             {[...contactWord].map((char, index) => (
@@ -195,27 +195,25 @@ export default function Contact() {
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
                 <h1 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(4rem,8vw,3rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
-                  Rizk moves fast,
                   <br />
-                  moves faster
+                  Let&apos;s build
                   <br />
-                  with formrizk
+                  something worth remembering.
                 </h1>
                 <blockquote className="max-w-md">
                   <p className="text-lg font-semibold leading-snug">
-                    &ldquo;Super smooth experience.&rdquo;
+                    &ldquo;Thoughtful from the first conversation to the final delivery.&rdquo;
                     <br />
-                    &ldquo;Everything was fast, clear, and hassle-free. I got
-                    what I needed in minutes.&rdquo;
+                    &ldquo;Clear process, strong ideas, and work that continues to create value long after launch.&rdquo;
                   </p>
                   <footer className="mt-3 text-sm font-semibold">
-                    — Alex R., Verified Customer
+                    — Client, Jakarta
                   </footer>
                 </blockquote>
                 <p className="hidden lg:block mt-auto text-sm font-semibold">
-                  web design, web development
+                  Strategy, identity, and digital
                   <br />
-                  and creative development
+                  for businesses with ambition.
                 </p>
               </div>
 
@@ -241,7 +239,7 @@ export default function Contact() {
                   type="submit"
                   className="mt-4 w-full rounded-full bg-black text-white text-lg font-semibold py-4"
                 >
-                  Let&apos;s goooooo!!
+                  Start the conversation
                 </button>
               </form>
             </div>

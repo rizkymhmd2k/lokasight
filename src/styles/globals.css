@@ -1,12 +1,35 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Oswald:wght@200..700&display=swap");
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-VariableItalic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Oswald";
+  src: url("/fonts/Oswald-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ---------------------------------------------
    Theme Tokens (Tailwind v4)
 ---------------------------------------------- */
 @theme {
-  --font-inter: "Inter", system-ui, sans-serif;
-  --font-sans: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  --font-switzer: "Switzer", system-ui, sans-serif;
+  --font-sans: var(--font-switzer), var(--font-geist-sans), system-ui, sans-serif;
   --font-oswald: "Oswald", var(--font-sans);
 
   --color-reddot: #dc2626;

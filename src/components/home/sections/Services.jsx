@@ -8,42 +8,40 @@ gsap.registerPlugin(ScrollTrigger);
 
 const services = [
   {
-    title: "Brand Strategy",
+    title: "Strategy",
     mockup: "strategy",
     tags: [
-      "Research & Insights",
+      "Research",
       "Positioning",
-      "Competitive Analysis",
+      "Audience",
       "Messaging",
     ],
-    desc: "Defining brand strategy that sharpens market positioning, strengthens perception, and creates stronger customer preference in competitive spaces.",
+    desc: "Understanding where your business stands today, where it belongs tomorrow, and how to close the gap with clarity.",
   },
   {
-    title: "Digital Experience",
+    title: "Identity",
     mockup: "digital",
     tags: [
-      "Identity Systems",
-      "Wireframing",
-      "UI Design",
-      "UX Design",
-      "Web Design",
-      "Product Design",
+      "Visual Identity",
+      "Verbal Identity",
+      "Art Direction",
+      "Design System",
+      "Guidelines",
     ],
-    desc: "Designing digital experiences that elevate brand perception, improve usability, and create clearer paths to engagement and conversion.",
+    desc: "Creating identities that feel distinct, consistent, and built to last across every touchpoint.",
   },
   {
-    title: "Creative Development",
+    title: "Digital",
     mockup: "development",
     tags: [
-      "Frontend Development",
-      "CMS Integration",
-      "Motion Design",
-      "Interactive Experiences",
-      "3D",
-      "WebGL",
-      "Technical SEO",
+      "Websites",
+      "Content",
+      "Performance",
+      "SEO",
+      "Analytics",
+      "Growth",
     ],
-    desc: "Developing high-performing digital experiences that bring strategy and design to life with precision, scalability, and seamless execution.",
+    desc: "Turning strategy into digital experiences that build trust and support long-term growth.",
   },
 ];
 
@@ -110,7 +108,7 @@ function StrategyMockup() {
           Research
         </div>
         <div className="mt-3 font-serif text-[19px] leading-[0.88] tracking-[-0.05em] text-black">
-          Brand
+          Market
         </div>
         <div className="mt-2 h-px w-10 bg-black/10" />
         <div className="mt-2 space-y-1">
@@ -138,7 +136,7 @@ function StrategyMockup() {
             <div className="absolute inset-x-1 top-1/2 h-px -translate-y-1/2 bg-black/10" />
             <div className="absolute left-[60%] top-[34%] h-2 w-2 bg-red-500" />
             <div className="absolute right-1 bottom-1 text-[6px] uppercase tracking-[0.18em] text-black/35">
-              Fit
+              Insight
             </div>
           </div>
         </div>
@@ -159,13 +157,13 @@ function DigitalExperienceMockup() {
       <EditorialSheet className="left-3 top-3 right-3 h-[102px] p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-4 lg:top-4 lg:bottom-4 lg:right-auto lg:h-auto lg:w-[108px] lg:p-3.5">
         <div className="flex items-center justify-between text-[7px] uppercase tracking-[0.22em] text-black/40">
           <span>02</span>
-          <span>Feature</span>
+          <span>Identity</span>
         </div>
         <div className="mt-3 border border-black/10 bg-[#1d1d1d] p-2">
           <div className="h-8 bg-[radial-gradient(circle_at_60%_40%,rgba(247,208,77,0.9),rgba(182,118,10,0.35)_48%,rgba(18,18,18,0)_50%)]" />
         </div>
         <div className="mt-3 font-serif text-[20px] leading-[0.88] tracking-[-0.05em] text-black">
-          Experience
+          Systems
         </div>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <div className="space-y-1">
@@ -183,7 +181,7 @@ function DigitalExperienceMockup() {
 
       <EditorialSheet className="left-3 bottom-3 h-[64px] w-[34%] p-2.5 transition-transform duration-500 group-hover:-translate-y-1 lg:left-auto lg:right-4 lg:top-6 lg:bottom-auto lg:h-[94px] lg:w-[52px] lg:-rotate-2">
         <div className="text-[6px] uppercase tracking-[0.22em] text-black/35">
-          Art
+          Voice
         </div>
         <div className="mt-3 h-[42px] border border-black/10 bg-[#f0c23f]" />
         <div className="mt-3 h-px w-full bg-black/10" />
@@ -195,7 +193,7 @@ function DigitalExperienceMockup() {
 
       <EditorialSheet className="left-[38%] right-3 bottom-3 h-[64px] px-3 py-2 transition-transform duration-500 group-hover:translate-y-1 lg:left-[92px] lg:right-4 lg:bottom-4 lg:h-10">
         <div className="text-[7px] uppercase tracking-[0.22em] text-black/45">
-          Editorial System
+          Direction
         </div>
         <div className="mt-2 h-px w-14 bg-black/10" />
         <div className="mt-2 space-y-1 lg:hidden">
@@ -213,7 +211,7 @@ function CreativeDevelopmentMockup() {
       <EditorialSheet className="left-3 right-3 top-3 h-[96px] p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-4 lg:right-4 lg:top-4 lg:h-[86px] lg:p-3.5">
         <div className="flex items-center justify-between text-[7px] uppercase tracking-[0.22em] text-black/40">
           <span>03</span>
-          <span>Proof</span>
+          <span>Launch</span>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="h-10 bg-[#1d1d1d]" />
@@ -225,17 +223,17 @@ function CreativeDevelopmentMockup() {
         <div className="mt-3 flex items-center gap-2">
           <div className="h-px flex-1 bg-black/10" />
           <div className="text-[6px] uppercase tracking-[0.2em] text-black/35">
-            Motion Studies
+            Measure
           </div>
         </div>
       </EditorialSheet>
 
       <EditorialSheet className="left-3 bottom-3 h-[74px] w-[46%] p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-5 lg:bottom-4 lg:h-[62px] lg:w-[92px] lg:-rotate-2">
         <div className="text-[7px] uppercase tracking-[0.22em] text-black/45">
-          Build
+          Scale
         </div>
         <div className="mt-1 font-serif text-[20px] leading-none tracking-[-0.04em] text-black">
-          Build
+          Scale
         </div>
         <div className="mt-2 space-y-1">
           <div className="h-px w-11 bg-black/10" />
@@ -245,7 +243,7 @@ function CreativeDevelopmentMockup() {
 
       <EditorialSheet className="right-3 bottom-3 h-[74px] w-[34%] p-2.5 transition-transform duration-500 group-hover:translate-y-1 lg:right-4 lg:bottom-5 lg:h-[66px] lg:w-[56px] lg:rotate-3">
         <div className="text-[6px] uppercase tracking-[0.22em] text-black/35">
-          Spec
+          Refine
         </div>
         <div className="mt-2 h-px w-full bg-black/10" />
         <div className="mt-2 grid grid-cols-2 gap-1">
@@ -430,16 +428,16 @@ const Services = () => {
         {/* LEFT MAIN */}
         <div className="w-full md:w-2/5 2xl:w-3/5 flex flex-col justify-start p-6 md:p-10  ">
           <span className="text-sm md:text-xl font-medium text-white">
-            [services]
+            [SERVICES]
           </span>
 
           <div className="flex-1 flex md:mt-10">
             <h1
               ref={headingRef}
               className="text-white text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-8xl font-bold tracking-[-0.04em] pt-6 md:pt-8 leading-[0.95]"
-              aria-label="STRATEGY. DESIGN. GROWTH."
+              aria-label="STRATEGY. IDENTITY. DIGITAL."
             >
-              {["STRATEGY.", "DESIGN.", "GROWTH."].map((word, index, all) => (
+              {["STRATEGY.", "IDENTITY.", "DIGITAL."].map((word, index, all) => (
                 <React.Fragment key={word}>
                   <span className="inline-block overflow-hidden align-bottom">
                     <span

@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import ViewportIndicator from "../components/dev/ViewportIndicator.jsx";
 import MobileNav from "../components/layout/MobileNav.jsx";
-import HeroSection from "../components/home/HeroSection.jsx";
+import HeroSection from "../components/home/HeroSection.astro";
 import Work from "../components/home/sections/Work.jsx";
 import Services from "../components/home/sections/Services.jsx";
 import About from "../components/home/sections/About.astro";
@@ -10,11 +10,14 @@ import Contact from "../components/home/sections/Contact.jsx";
 import Footer from "../components/home/sections/Footer.astro";
 ---
 
-<Layout title="My Landing Page" description="A modern 2026 landing page">
+<Layout
+  title="Lokasight — Strategy, Identity & Digital"
+  description="An independent strategy, identity, and digital studio helping ambitious businesses build lasting perception."
+>
   <main class="w-full">
     <ViewportIndicator client:load />
     <MobileNav client:load />
-    <HeroSection client:load />
+    <HeroSection />
 
     <section
       class="

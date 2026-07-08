@@ -106,7 +106,7 @@ const Work = () => {
   const labelSlotWidth = "clamp(6rem, 16vw, 12rem)";
 
   const bodyText =
-    "You have built something worth taking seriously. Your website should reflect that with the kind of clarity and presence that helps the right people pay attention.";
+    "Every project begins with the same question: what should people remember when they leave? We design the answer with intention, not assumption.";
 
   const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
   const workHeadingClassName =

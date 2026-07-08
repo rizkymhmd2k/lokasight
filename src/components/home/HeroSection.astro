@@ -1,0 +1,21 @@
+---
+import { Picture } from "astro:assets";
+import gmnEye from "../../../public/gmn_eye1.png";
+import Hero from "./sections/Hero.jsx";
+import HeroPinZone from "../shared/HeroPinZone.jsx";
+---
+
+<HeroPinZone client:load>
+  <Hero client:load>
+    <Picture
+      src={gmnEye}
+      formats={["webp"]}
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      widths={[112, 144, 176, 224, 448]}
+      sizes="(min-width: 1024px) 224px, (min-width: 768px) 176px, (min-width: 640px) 144px, 112px"
+      class="h-auto w-68  md:w-44 lg:w-56"
+    />
+  </Hero>
+</HeroPinZone>
