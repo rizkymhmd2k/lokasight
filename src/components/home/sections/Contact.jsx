@@ -179,7 +179,7 @@ export default function Contact() {
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
         <div className="bg-black rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col">
-          <h1
+          <h2
             ref={contactTitleRef}
             style={{
               transform: "translateX(-0.7vw) scaleY(1.25)",
@@ -198,7 +198,7 @@ export default function Contact() {
                 </span>
               </span>
             ))}
-          </h1>
+          </h2>
         </div>
 
         {/* Bottom area with floating yellow card */}
@@ -214,12 +214,12 @@ export default function Contact() {
               {/* Left: copy/testimonial */}
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
-                <h1 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(4rem,8vw,3rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
+                <h3 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(4rem,8vw,3rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
                   <br />
                   Let&apos;s build
                   <br />
                   something worth remembering.
-                </h1>
+                </h3>
                 <blockquote className="max-w-md">
                   <p className="text-lg font-semibold leading-snug">
                     &ldquo;They made the whole process feel clear and fast.
@@ -238,7 +238,7 @@ export default function Contact() {
               </div>
 
               {/* Right: form */}
-              <form className="flex flex-col w-full justify-center gap-8">
+              <form className="flex flex-col w-full justify-center gap-8" aria-label="Start a project with Lokasight">
                 {fields.map((field) => (
                   <label
                     key={field.label}
@@ -247,11 +247,19 @@ export default function Contact() {
                     {field.label}
                     {field.type === "textarea" ? (
                       <textarea
+                        name="project"
+                        aria-label={field.label}
                         rows={1}
                         className="bg-transparent border-b-2 border-black/80 focus:outline-none resize-none"
                       />
                     ) : (
-                      <input className="bg-transparent border-b-2 border-black/80 focus:outline-none" />
+                      <input
+                        name={field.label.toLowerCase().replace(/[^a-z]+/g, "-")}
+                        type={field.label.includes("email") ? "email" : "text"}
+                        autoComplete={field.label === "Your name" ? "name" : undefined}
+                        aria-label={field.label}
+                        className="bg-transparent border-b-2 border-black/80 focus:outline-none"
+                      />
                     )}
                   </label>
                 ))}

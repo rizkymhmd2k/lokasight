@@ -256,7 +256,7 @@ const Services = ({ serviceImages }) => {
           </span>
 
           <div className="flex-1 flex md:mt-10">
-            <h1
+            <h2
               ref={headingRef}
               className="pt-6 text-4xl font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-5xl md:pt-8 md:text-[clamp(2.5rem,6vw,4rem)] md:whitespace-nowrap lg:text-6xl lg:whitespace-normal xl:text-8xl"
               aria-label="STRATEGY. IDENTITY. DIGITAL."
@@ -274,7 +274,7 @@ const Services = ({ serviceImages }) => {
                   {index < all.length - 1 ? " " : null}
                 </React.Fragment>
               ))}
-            </h1>
+            </h2>
           </div>
         </div>
 

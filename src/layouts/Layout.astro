@@ -11,6 +11,10 @@ const {
   title = "Lokasight — Strategy, Identity & Digital",
   description = "An independent strategy, identity, and digital studio helping ambitious businesses build lasting perception.",
 } = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url);
+const siteName = "Lokasight";
+const socialImage = new URL("/eyesvg.svg", canonicalUrl).href;
 ---
 
 <!doctype html>
@@ -18,11 +22,39 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#f8f7f3" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href="/eyesvg.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content="Lokasight eye mark" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      name: siteName,
+      url: canonicalUrl.href,
+      description,
+      email: "hello@lokasight.com",
+      image: socialImage,
+      areaServed: "Worldwide",
+      serviceType: ["Brand strategy", "Visual identity", "Web design", "SEO"],
+    })} />
     <ClientRouter />
   </head>
   <body>
+    <a class="sr-only focus:not-sr-only" href="#main-content">Skip to content</a>
     <slot />
     <script>
       import { initializeLenis } from "../scripts/lenis";

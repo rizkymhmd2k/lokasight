@@ -63,7 +63,9 @@ export default function Hero({ children }) {
         </div>
 
         {/* Hero */}
-        <LokasightLogo className="mt-8" />
+        <h1 className="mt-8">
+          <LokasightLogo />
+        </h1>
         <div className="relative flex justify-center ">
           <div className="relative ">
             <p className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-neutral-500 md:left-auto md:right-full md:top-1/2 md:bottom-auto md:mr-5 lg:mr-25 md:mb-0 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">

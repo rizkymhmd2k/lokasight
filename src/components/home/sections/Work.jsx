@@ -160,7 +160,7 @@ const Work = () => {
     <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-4 flex flex-col">
       <div ref={wrapperRef} className="relative">
         {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
-        <h1
+        <h2
           ref={measureRef}
           aria-hidden={lines !== null ? "true" : undefined}
           className={workHeadingClassName}
@@ -186,11 +186,11 @@ const Work = () => {
               {i < words.length - 1 ? " " : null}
             </React.Fragment>
           ))}
-        </h1>
+        </h2>
 
         {/* Output: no inline per-line transition strings; GSAP controls animation */}
         {lines !== null && (
-          <h1
+          <h2
             ref={linesRootRef}
             aria-label={`[WORK] ${bodyText}`}
             className={workHeadingClassName}
@@ -208,7 +208,7 @@ const Work = () => {
                 {line}
               </span>
             ))}
-          </h1>
+          </h2>
         )}
       </div>
     </div>
