@@ -106,7 +106,7 @@ const Work = () => {
   const labelSlotWidth = "clamp(6rem, 16vw, 12rem)";
 
   const bodyText =
-    "Every project begins with the same question: what should people remember when they leave? We design the answer with intention, not assumption.";
+    "Attention is easy to lose. We build distinctive brands that stay with people long after the first impression.";
 
   const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
   const workHeadingClassName =

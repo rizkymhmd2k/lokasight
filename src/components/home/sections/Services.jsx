@@ -9,7 +9,8 @@ gsap.registerPlugin(ScrollTrigger);
 const services = [
   {
     title: "Strategy",
-    mockup: "strategy",
+    imageKey: "strategy",
+    imageAlt: "Strategy service visual",
     tags: [
       "Research",
       "Positioning",
@@ -20,7 +21,8 @@ const services = [
   },
   {
     title: "Identity",
-    mockup: "digital",
+    imageKey: "identity",
+    imageAlt: "Identity service visual",
     tags: [
       "Visual Identity",
       "Verbal Identity",
@@ -32,7 +34,8 @@ const services = [
   },
   {
     title: "Digital",
-    mockup: "development",
+    imageKey: "digital",
+    imageAlt: "Digital service visual",
     tags: [
       "Websites",
       "Content",
@@ -72,206 +75,23 @@ function PingDot() {
   );
 }
 
-function MockupFrame({ children, className = "" }) {
+function ServiceImage({ src, alt, className = "" }) {
   return (
     <div
-      aria-hidden="true"
-      className={`relative isolate aspect-square w-full overflow-hidden rounded-lg border border-black/10 bg-[#dca92e] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ${className}`}
+      className={`relative isolate aspect-square w-full overflow-hidden rounded-lg bg-[#FFFF04] ${className}`}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,#efcc58_0%,#dca92e_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.14),transparent_34%,rgba(0,0,0,0.06)_100%)]" />
-      <div className="absolute inset-[10px] rounded-md border border-white/20" />
-      <div className="absolute inset-x-5 top-5 h-px bg-white/25" />
-      <div className="absolute inset-y-5 right-5 w-px bg-black/10" />
-      <div className="relative z-10 h-full w-full">{children}</div>
+      <img
+        src={src.src}
+        srcSet={src.srcSet}
+        alt={alt}
+        width={src.width}
+        height={src.height}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
     </div>
   );
-}
-
-function EditorialSheet({ children, className = "" }) {
-  return (
-    <div
-      className={`absolute overflow-hidden rounded-sm border border-black/10 bg-[#fbf7ea] shadow-[0_18px_38px_rgba(74,50,0,0.18)] ${className}`}
-    >
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.78),rgba(246,239,223,0.9))]" />
-      <div className="absolute inset-x-0 top-0 h-px bg-white/80" />
-      <div className="relative z-10 h-full w-full">{children}</div>
-    </div>
-  );
-}
-
-function StrategyMockup() {
-  return (
-    <>
-      <EditorialSheet className="left-3 top-3 right-[34%] h-[88px] -rotate-1 p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-4 lg:top-6 lg:right-auto lg:h-[76px] lg:w-[74px] lg:-rotate-3">
-        <div className="text-[7px] uppercase tracking-[0.22em] text-black/45">
-          Research
-        </div>
-        <div className="mt-3 font-serif text-[19px] leading-[0.88] tracking-[-0.05em] text-black">
-          Market
-        </div>
-        <div className="mt-2 h-px w-10 bg-black/10" />
-        <div className="mt-2 space-y-1">
-          <div className="h-px w-10 bg-black/10" />
-          <div className="h-px w-8 bg-black/10" />
-        </div>
-      </EditorialSheet>
-
-      <EditorialSheet className="left-[42%] right-3 top-3 bottom-14 rotate-1 p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-auto lg:right-4 lg:top-4 lg:bottom-4 lg:w-[102px] lg:rotate-2 lg:p-3.5">
-        <div className="flex items-center justify-between text-[7px] uppercase tracking-[0.22em] text-black/40">
-          <span>01</span>
-          <span>Positioning</span>
-        </div>
-        <div className="mt-4 font-serif text-[22px] leading-[0.86] tracking-[-0.05em] text-black">
-          Strategy
-        </div>
-        <div className="mt-3 space-y-1.5">
-          <div className="h-px w-16 bg-black/10" />
-          <div className="h-px w-12 bg-black/10" />
-          <div className="h-px w-14 bg-black/10" />
-        </div>
-        <div className="absolute inset-x-3 bottom-3 top-[82px] border border-black/10 p-2">
-          <div className="relative h-full w-full">
-            <div className="absolute inset-y-1 left-1/2 w-px -translate-x-1/2 bg-black/10" />
-            <div className="absolute inset-x-1 top-1/2 h-px -translate-y-1/2 bg-black/10" />
-            <div className="absolute left-[60%] top-[34%] h-2 w-2 bg-red-500" />
-            <div className="absolute right-1 bottom-1 text-[6px] uppercase tracking-[0.18em] text-black/35">
-              Insight
-            </div>
-          </div>
-        </div>
-      </EditorialSheet>
-
-      <div className="absolute left-4 bottom-4 h-10 w-[44%] border-t border-black/10 pt-2 text-[7px] uppercase tracking-[0.22em] text-black/40 lg:hidden">
-        Audience fit
-      </div>
-      <div className="absolute left-[84px] top-[72px] hidden h-px w-10 bg-black/10 lg:block" />
-      <div className="absolute left-[124px] top-[72px] hidden h-1.5 w-1.5 bg-red-500 lg:block" />
-    </>
-  );
-}
-
-function DigitalExperienceMockup() {
-  return (
-    <>
-      <EditorialSheet className="left-3 top-3 right-3 h-[102px] p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-4 lg:top-4 lg:bottom-4 lg:right-auto lg:h-auto lg:w-[108px] lg:p-3.5">
-        <div className="flex items-center justify-between text-[7px] uppercase tracking-[0.22em] text-black/40">
-          <span>02</span>
-          <span>Identity</span>
-        </div>
-        <div className="mt-3 border border-black/10 bg-[#1d1d1d] p-2">
-          <div className="h-8 bg-[radial-gradient(circle_at_60%_40%,rgba(247,208,77,0.9),rgba(182,118,10,0.35)_48%,rgba(18,18,18,0)_50%)]" />
-        </div>
-        <div className="mt-3 font-serif text-[20px] leading-[0.88] tracking-[-0.05em] text-black">
-          Systems
-        </div>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <div className="h-px w-10 bg-black/10" />
-            <div className="h-px w-8 bg-black/10" />
-            <div className="h-px w-9 bg-black/10" />
-          </div>
-          <div className="space-y-1">
-            <div className="h-px w-9 bg-black/10" />
-            <div className="h-px w-11 bg-black/10" />
-            <div className="h-px w-7 bg-black/10" />
-          </div>
-        </div>
-      </EditorialSheet>
-
-      <EditorialSheet className="left-3 bottom-3 h-[64px] w-[34%] p-2.5 transition-transform duration-500 group-hover:-translate-y-1 lg:left-auto lg:right-4 lg:top-6 lg:bottom-auto lg:h-[94px] lg:w-[52px] lg:-rotate-2">
-        <div className="text-[6px] uppercase tracking-[0.22em] text-black/35">
-          Voice
-        </div>
-        <div className="mt-3 h-[42px] border border-black/10 bg-[#f0c23f]" />
-        <div className="mt-3 h-px w-full bg-black/10" />
-        <div className="mt-2 space-y-1">
-          <div className="h-px w-7 bg-black/10" />
-          <div className="h-px w-6 bg-black/10" />
-        </div>
-      </EditorialSheet>
-
-      <EditorialSheet className="left-[38%] right-3 bottom-3 h-[64px] px-3 py-2 transition-transform duration-500 group-hover:translate-y-1 lg:left-[92px] lg:right-4 lg:bottom-4 lg:h-10">
-        <div className="text-[7px] uppercase tracking-[0.22em] text-black/45">
-          Direction
-        </div>
-        <div className="mt-2 h-px w-14 bg-black/10" />
-        <div className="mt-2 space-y-1 lg:hidden">
-          <div className="h-px w-16 bg-black/10" />
-          <div className="h-px w-10 bg-black/10" />
-        </div>
-      </EditorialSheet>
-    </>
-  );
-}
-
-function CreativeDevelopmentMockup() {
-  return (
-    <>
-      <EditorialSheet className="left-3 right-3 top-3 h-[96px] p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-4 lg:right-4 lg:top-4 lg:h-[86px] lg:p-3.5">
-        <div className="flex items-center justify-between text-[7px] uppercase tracking-[0.22em] text-black/40">
-          <span>03</span>
-          <span>Launch</span>
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="h-10 bg-[#1d1d1d]" />
-          <div className="h-10 border border-black/10 bg-[#efe5cc]" />
-          <div className="relative h-10 bg-[#1d1d1d]">
-            <div className="absolute inset-2 border border-[#f0c23f]/60" />
-          </div>
-        </div>
-        <div className="mt-3 flex items-center gap-2">
-          <div className="h-px flex-1 bg-black/10" />
-          <div className="text-[6px] uppercase tracking-[0.2em] text-black/35">
-            Measure
-          </div>
-        </div>
-      </EditorialSheet>
-
-      <EditorialSheet className="left-3 bottom-3 h-[74px] w-[46%] p-3 transition-transform duration-500 group-hover:-translate-y-1 lg:left-5 lg:bottom-4 lg:h-[62px] lg:w-[92px] lg:-rotate-2">
-        <div className="text-[7px] uppercase tracking-[0.22em] text-black/45">
-          Scale
-        </div>
-        <div className="mt-1 font-serif text-[20px] leading-none tracking-[-0.04em] text-black">
-          Scale
-        </div>
-        <div className="mt-2 space-y-1">
-          <div className="h-px w-11 bg-black/10" />
-          <div className="h-px w-14 bg-black/10" />
-        </div>
-      </EditorialSheet>
-
-      <EditorialSheet className="right-3 bottom-3 h-[74px] w-[34%] p-2.5 transition-transform duration-500 group-hover:translate-y-1 lg:right-4 lg:bottom-5 lg:h-[66px] lg:w-[56px] lg:rotate-3">
-        <div className="text-[6px] uppercase tracking-[0.22em] text-black/35">
-          Refine
-        </div>
-        <div className="mt-2 h-px w-full bg-black/10" />
-        <div className="mt-2 grid grid-cols-2 gap-1">
-          <div className="h-4 bg-black/10" />
-          <div className="h-4 bg-[#e8bb3b]" />
-          <div className="h-4 bg-[#efe5cc]" />
-          <div className="h-4 bg-black/10" />
-        </div>
-        <div className="mt-2 h-px w-6 bg-red-400/80" />
-      </EditorialSheet>
-    </>
-  );
-}
-
-function ServiceVisualCard({ variant, className = "" }) {
-  let content = <StrategyMockup />;
-
-  if (variant === "digital") {
-    content = <DigitalExperienceMockup />;
-  } else if (variant === "development") {
-    content = <CreativeDevelopmentMockup />;
-  }
-
-  return <MockupFrame className={className}>{content}</MockupFrame>;
-}
-
-function StatCard({ variant, className = "" }) {
-  return <ServiceVisualCard variant={variant} className={className} />;
 }
 
 function Tags({ tags, className = "" }) {
@@ -289,7 +109,7 @@ function Tags({ tags, className = "" }) {
   );
 }
 
-function ServiceItem({ item, isLast }) {
+function ServiceItem({ item, isLast, image }) {
   return (
     <div className="group w-full">
       <div
@@ -333,7 +153,11 @@ function ServiceItem({ item, isLast }) {
             xl:col-start-3 xl:row-start-1
           "
         >
-          <StatCard variant={item.mockup} className="w-full md:w-[180px]" />
+          <ServiceImage
+            src={image}
+            alt={item.imageAlt}
+            className="w-full md:w-[180px]"
+          />
         </div>
       </div>
 
@@ -343,7 +167,7 @@ function ServiceItem({ item, isLast }) {
   );
 }
 
-const Services = () => {
+const Services = ({ serviceImages }) => {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
 
@@ -424,9 +248,9 @@ const Services = () => {
       ref={sectionRef}
       className="w-full px-2 sm:px-4 pt-12 sm:pt-24 flex flex-col bg-backgroundlight"
     >
-      <div className="bg-black w-full rounded-3xl overflow-hidden flex flex-col md:flex-row">
+      <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black lg:flex-row">
         {/* LEFT MAIN */}
-        <div className="w-full md:w-2/5 2xl:w-3/5 flex flex-col justify-start p-6 md:p-10  ">
+        <div className="flex w-full flex-col justify-start p-6 md:p-10 lg:w-2/5 2xl:w-3/5">
           <span className="text-sm md:text-xl font-medium text-white">
             [SERVICES]
           </span>
@@ -434,7 +258,7 @@ const Services = () => {
           <div className="flex-1 flex md:mt-10">
             <h1
               ref={headingRef}
-              className="text-white text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-8xl font-bold tracking-[-0.04em] pt-6 md:pt-8 leading-[0.95]"
+              className="pt-6 text-4xl font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-5xl md:pt-8 md:text-[clamp(2.5rem,6vw,4rem)] md:whitespace-nowrap lg:text-6xl lg:whitespace-normal xl:text-8xl"
               aria-label="STRATEGY. IDENTITY. DIGITAL."
             >
               {["STRATEGY.", "IDENTITY.", "DIGITAL."].map((word, index, all) => (
@@ -462,6 +286,7 @@ const Services = () => {
             <ServiceItem
               key={idx}
               item={item}
+              image={serviceImages[item.imageKey]}
               isLast={idx === services.length - 1}
             />
           ))}

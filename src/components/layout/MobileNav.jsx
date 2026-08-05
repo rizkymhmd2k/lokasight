@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import TextScramble from "../shared/TextScramble.jsx";
 
 const ANIMATION_DURATIONS = {
   CURTAIN: 0.9,
@@ -11,11 +12,6 @@ const ANIMATION_DURATIONS = {
 const SCROLL_RETRY_DELAY_MS = 80;
 const DARK_BG_THRESHOLD = 0.42;
 const NAV_ITEMS = ["HOME", "WORK", "SERVICES", "ABOUT", "CONTACT"];
-const SOCIAL_LINKS = [
-  { label: "INSTAGRAM", href: "#" },
-  { label: "TWITTER / X", href: "#" },
-  { label: "LINKEDIN", href: "#" },
-];
 
 function parseRgb(color) {
   if (!color) return null;
@@ -136,22 +132,32 @@ export default function MobileNav() {
   }, [scrollToSection]);
 
   const animateToX = useCallback((bars) => {
-    gsap.to(bars[0], { rotate: 45, y: 8, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
-    gsap.to(bars[1], {
-      scaleX: 0,
-      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE - 0.05,
+    gsap.to(bars[0], {
+      rotate: 45,
+      y: 5,
+      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE,
     });
-    gsap.to(bars[2], { rotate: -45, y: -8, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
+    gsap.to(bars[1], {
+      rotate: -45,
+      y: -5,
+      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE,
+    });
   }, []);
 
   const animateToHamburger = useCallback((bars) => {
-    gsap.to(bars[0], { rotate: 0, y: 0, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
+    gsap.to(bars[0], {
+      rotate: 0,
+      x: 0,
+      y: 0,
+      duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE,
+    });
     gsap.to(bars[1], {
-      scaleX: 1,
+      rotate: 0,
+      x: 0,
+      y: 0,
       duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE - 0.05,
       immediateRender: false,
     });
-    gsap.to(bars[2], { rotate: 0, y: 0, duration: ANIMATION_DURATIONS.HAMBURGER_SHAPE });
   }, []);
 
   useLayoutEffect(() => {
@@ -188,7 +194,7 @@ export default function MobileNav() {
         ease: "power3.out",
       });
 
-      gsap.set(bars, { rotate: 0, y: 0, scaleX: 1 });
+      gsap.set(bars, { rotate: 0, x: 0, y: 0, scaleX: 1 });
     }, wrapper);
 
     return () => ctx.revert();
@@ -355,8 +361,8 @@ export default function MobileNav() {
   const isDarkBg = isMenuActive || measuredIsDarkBg;
   const barClass = isDarkBg ? "bg-white" : "bg-black";
   const buttonShellClass = isDarkBg
-    ? "border-white/15 bg-black/30"
-    : "border-black/10 bg-white/60";
+    ? "border-white/70 bg-black/80"
+    : "border-black/70 bg-[#F8F7F3]/85";
 
   return (
     <div ref={wrapperRef} className="sm:hidden fixed inset-0 z-[60] pointer-events-none">
@@ -369,17 +375,16 @@ export default function MobileNav() {
           aria-expanded={isMenuActive}
           aria-controls="mobile-curtain-menu"
           className={[
-            "grid place-items-center rounded-full border backdrop-blur-md",
+            "grid place-items-center rounded-full border-2 backdrop-blur-md",
             "w-12 h-12",
             "transition-[transform,opacity,background-color,border-color] duration-200 ease-out",
             isButtonVisible || isMenuActive ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3 pointer-events-none",
             buttonShellClass,
           ].join(" ")}
         >
-          <span className="flex flex-col gap-1.5">
-            <span data-bar className={`block w-6 h-0.5 ${barClass} transition-colors duration-200`} />
-            <span data-bar className={`block w-6 h-0.5 ${barClass} transition-colors duration-200`} />
-            <span data-bar className={`block w-6 h-0.5 ${barClass} transition-colors duration-200`} />
+          <span className="relative block h-3 w-6" aria-hidden="true">
+            <span data-bar className={`absolute left-0 top-0 block h-0.5 w-6 origin-center ${barClass} transition-colors duration-200`} />
+            <span data-bar className={`absolute bottom-0 left-0 block h-0.5 w-6 origin-center ${barClass} transition-colors duration-200`} />
           </span>
         </button>
       </div>
@@ -387,7 +392,8 @@ export default function MobileNav() {
       <div
         id="mobile-curtain-menu"
         ref={menuRef}
-        className="fixed inset-0 bg-black z-[65] flex flex-col justify-between p-6 pb-8 overflow-y-auto overscroll-contain"
+        data-lenis-prevent
+        className="fixed inset-0 bg-black z-[65] flex flex-col p-6 pb-8 overflow-y-auto overscroll-contain"
         style={{ pointerEvents: isMenuActive ? "auto" : "none" }}
         onClick={(e) => {
           if (e.target === e.currentTarget && isMenuActive) toggleMenu();
@@ -404,34 +410,24 @@ export default function MobileNav() {
               <a
                 href={`#${item.toLowerCase()}`}
                 data-nav-item
+                aria-label={item}
                 className="block text-white font-bold leading-[0.88] tracking-[-0.04em] text-[17vw] hover:text-[#f6f44a] transition-colors duration-200"
                 onClick={handleNavClick(item.toLowerCase())}
               >
-                {item}
+                <TextScramble>{item}</TextScramble>
               </a>
             </div>
           ))}
         </nav>
 
-        <div className="flex justify-between items-end mt-10">
-          <div className="flex flex-col gap-1.5">
-            {SOCIAL_LINKS.map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                className="text-white/40 text-xs font-semibold tracking-widest hover:text-white transition-colors"
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <span className="flex items-center gap-1.5 text-white/50 text-xs font-semibold tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              AVAILABLE FOR NEW PROJECTS
-            </span>
-            <span className="text-white/30 text-xs font-semibold tracking-wide">©2026 Lokasight</span>
-          </div>
+        <div className="mt-auto pt-10 flex items-end justify-between border-t border-white/10">
+          <span className="text-white/40 text-xs font-semibold tracking-widest">GET IN TOUCH</span>
+          <a
+            href="mailto:hello@lokasight.com"
+            className="text-white font-bold tracking-[-0.02em] text-xl leading-none hover:text-[#f6f44a] transition-colors duration-200"
+          >
+            hello@lokasight.com
+          </a>
         </div>
       </div>
     </div>

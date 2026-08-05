@@ -1,6 +1,8 @@
 ---
+import teamImage from "../../../assets/images/team1.png";
+
 const ICON_BTN =
-  "inline-flex h-11 w-11 md:h-12 md:w-12 lg:h-14 lg:w-14 items-center justify-center rounded-full border border-black/15 text-black/45 hover:text-black/70 hover:border-black/25 transition";
+  "inline-flex h-11 w-11 md:h-12 md:w-12 lg:h-14 lg:w-14 items-center justify-center rounded-full text-black/45 hover:text-black/70 transition";
 
 const socials = [
   {
@@ -28,50 +30,81 @@ const socials = [
 
 <div
   id="about"
-  class="
-    bg-backgroundlight
+  class="bg-backgroundlight
     min-h-screen
-    flex flex-col justify-center gap-6 px-4 py-5
-    md:gap-8 md:py-6
-    lg:h-screen lg:flex-row lg:items-center lg:justify-center lg:gap-0 lg:overflow-visible lg:px-4 lg:py-0
-  "
+    flex flex-col justify-center gap-6 px-4 py-12
+    md:gap-8 md:py-12
+    lg:h-screen lg:flex-row lg:items-center lg:justify-center lg:gap-0 lg:overflow-visible lg:px-4 lg:py-0"
 >
-  <div class="self-center w-[80vw] sm:w-[75vw] lg:w-4/5 flex justify-center">
-    <div class="bg-gray-300 w-full max-h-[28vh] aspect-video rounded-3xl md:max-h-[32vh] lg:w-4/5 lg:max-h-none lg:aspect-auto lg:h-[400px]" />
+  <div
+    class="hidden self-center w-[80vw] sm:w-[75vw] lg:w-4/5 lg:flex justify-center"
+  >
+    <img
+      src={teamImage.src}
+      width={teamImage.width}
+      height={teamImage.height}
+      alt="Lokasight team"
+      class="w-full rounded-3xl object-cover lg:w-4/5 lg:h-[400px] xl:h-auto xl:aspect-square"
+      loading="lazy"
+      decoding="async"
+    />
   </div>
 
-  <div class="w-full pl-0 flex flex-col lg:pl-12">
+  <div class="w-full pl-0 flex flex-col lg:pl-12 gap-12 md:gap-0">
     <div class="shrink-0">
-      <h1 class="text-xl sm:text-2xl md:text-[1.75rem] lg:text-4xl font-medium leading-tight">
-        <span class="text-xs sm:text-sm md:text-lg lg:text-xl font-medium mr-2 md:mr-4 lg:mr-5">
+      <h1
+        class="text-xl sm:text-2xl md:text-[1.75rem] lg:text-4xl font-medium leading-tight"
+      >
+        <span
+          class="text-xs sm:text-sm md:text-lg lg:text-xl font-medium mr-2 md:mr-4 lg:mr-5"
+        >
           [ABOUT]
         </span>
-        Lokasight is an independent strategy and design studio helping businesses become easier to understand, easier to trust, and harder to overlook.
+        Lokasight is an independent brand studio helping businesses become clearer,
+        more distinctive, and easier to remember.
       </h1>
+    </div>
+
+    <div class="self-center mt-6 w-[80vw] sm:w-[75vw] md:mt-8 lg:hidden">
+      <img
+        src={teamImage.src}
+        width={teamImage.width}
+        height={teamImage.height}
+        alt="Lokasight team"
+        class="w-full aspect-[3/2] rounded-3xl object-cover"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
 
     <div class="mt-4 md:mt-5 lg:mt-8 lg:grid lg:grid-cols-5">
       <div class="lg:col-start-1 lg:col-span-5 2xl:col-start-3 2xl:col-span-2">
         <p class="text-sm leading-relaxed md:text-base lg:text-lg">
-          We believe good design begins with good thinking. Every decision is guided by research, shaped by strategy, and refined through execution that feels considered rather than excessive.
+          We believe strong brands begin with clear thinking. Research uncovers
+          what matters, strategy defines the direction, and identity brings it
+          to life.
         </p>
 
         <p class="mt-4 text-sm leading-relaxed md:mt-5 md:text-base lg:text-lg">
-          We intentionally stay small. Every project is led by senior creatives from start to finish, ensuring thoughtful collaboration without layers of unnecessary process.
+          We stay intentionally small so every project receives senior attention
+          from first conversation to final delivery. This means closer
+          collaboration, sharper decisions, and no unnecessary layers.
         </p>
 
         <div class="mt-5 flex flex-wrap gap-3 md:gap-4 lg:mt-6 lg:gap-6">
-          {socials.map((social) => (
-            <a
-              href={social.href}
-              aria-label={social.label}
-              class={ICON_BTN}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Fragment set:html={social.svg} />
-            </a>
-          ))}
+          {
+            socials.map((social) => (
+              <a
+                href={social.href}
+                aria-label={social.label}
+                class={ICON_BTN}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Fragment set:html={social.svg} />
+              </a>
+            ))
+          }
         </div>
       </div>
     </div>

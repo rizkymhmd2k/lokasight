@@ -6,13 +6,32 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const screens = {
+  base: 0,
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
+  "2xl": 1536,
+};
+
+const breakpoint = (name) => {
+  const min = screens[name];
+  const next = Object.values(screens).find((value) => value > min);
+
+  if (name === "base") return `(max-width: ${screens.sm - 1}px)`;
+  if (!next) return `(min-width: ${min}px)`;
+
+  return `(min-width: ${min}px) and (max-width: ${next - 1}px)`;
+};
+
 const titleBreakpoints = [
-  ["(max-width: 639px)", "top 74%"],
-  ["(min-width: 640px) and (max-width: 767px)", "top 72%"],
-  ["(min-width: 768px) and (max-width: 1023px)", "top 75%"],
-  ["(min-width: 1024px) and (max-width: 1279px)", "top 60%"],
-  ["(min-width: 1280px) and (max-width: 1535px)", "top 26%"],
-  ["(min-width: 1536px)", "top 24%"],
+  [breakpoint("base"), "top 84%"],
+  [breakpoint("sm"), "top 76%"],
+  [breakpoint("md"), "top 75%"],
+  [breakpoint("lg"), "top 75%"],
+  [breakpoint("xl"), "top 76%"],
+  [breakpoint("2xl"), "top 64%"],
 ];
 
 export default function Contact() {
@@ -107,7 +126,7 @@ export default function Contact() {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // < lg: keep old fixed offset behavior
+      // < lg: keep fixed scroll lift; transform handles static overlap.
       mm.add("(max-width: 1023px)", () => {
         gsap.fromTo(
           card,
@@ -119,7 +138,6 @@ export default function Contact() {
               trigger: card,
               start: "top 70%",
               end: "top 20%",
-              // markers: true,
               scrub: true,
               invalidateOnRefresh: true,
             },
@@ -139,7 +157,6 @@ export default function Contact() {
               trigger: card,
               start: "top 70%",
               end: "top 0%",
-              // markers: true,
               scrub: 1,
               invalidateOnRefresh: true,
             },
@@ -157,21 +174,24 @@ export default function Contact() {
   return (
     <div
       id="contact"
-      className="relative z-30 isolate w-full overflow-x-clip px-4 pt-24 flex flex-col bg-backgroundlight"
+      className="relative z-30 isolate w-full overflow-x-clip px-4 py-12 md:py-24 flex flex-col bg-backgroundlight"
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
         <div className="bg-black rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col">
           <h1
             ref={contactTitleRef}
-            style={{ transform: "scaleY(1.25)" }}
-            className="w-full max-w-full overflow-hidden whitespace-nowrap font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[20.5vw] md:text-[22vw]"
+            style={{
+              transform: "translateX(-0.7vw) scaleY(1.25)",
+              transformOrigin: "center",
+            }}
+            className="mx-auto w-full max-w-none overflow-visible whitespace-nowrap text-center font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[22.7vw] md:text-[22.1vw]"
             aria-label={contactWord}
           >
             {[...contactWord].map((char, index) => (
               <span
                 key={`${char}-${index}`}
-                className="inline-block overflow-hidden align-top"
+                className="inline-block overflow-hidden align-top px-[0.035em] pt-[0.1em] pb-[0.08em] -mx-[0.035em] -mt-[0.1em]"
               >
                 <span data-contact-letter className="inline-block">
                   {char}
@@ -188,9 +208,9 @@ export default function Contact() {
         >
           <section
             ref={formCardRef}
-            className="relative z-60 w-full lg:absolute lg:top-0 lg:right-7 lg:w-[70vw]"
+            className="relative z-60 -mb-[5vh] w-full -translate-y-[5vh] lg:absolute lg:top-0 lg:right-7 lg:mb-0 lg:w-[70vw] lg:translate-y-0"
           >
-            <div className="rounded-t-3xl rounded-b-3xl bg-[#f6f44a] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
+            <div className="rounded-t-3xl rounded-b-3xl bg-[#FFFF04] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
               {/* Left: copy/testimonial */}
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
@@ -202,18 +222,18 @@ export default function Contact() {
                 </h1>
                 <blockquote className="max-w-md">
                   <p className="text-lg font-semibold leading-snug">
-                    &ldquo;Thoughtful from the first conversation to the final delivery.&rdquo;
+                    &ldquo;They made the whole process feel clear and fast.
+                    We’re really happy with where we landed.&rdquo;
                     <br />
-                    &ldquo;Clear process, strong ideas, and work that continues to create value long after launch.&rdquo;
                   </p>
                   <footer className="mt-3 text-sm font-semibold">
-                    — Client, Jakarta
+                    — Wendy, Jakarta
                   </footer>
                 </blockquote>
                 <p className="hidden lg:block mt-auto text-sm font-semibold">
                   Strategy, identity, and digital
                   <br />
-                  for businesses with ambition.
+                  for ambitious businesses.
                 </p>
               </div>
 

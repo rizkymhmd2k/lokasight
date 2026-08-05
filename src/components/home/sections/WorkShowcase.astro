@@ -1,0 +1,326 @@
+---
+import { Picture } from "astro:assets";
+import Button from "../../shared/Button.jsx";
+import antaraDesktop from "../../../assets/images/antara169.png";
+import antaraMobile from "../../../assets/images/antara43.png";
+import hangitDesktop from "../../../assets/images/hangit169.png";
+import hangitMobile from "../../../assets/images/hangit43.png";
+
+const items = [
+  {
+    title: "Antara",
+    desc: "Modern wealth advisory for life’s most consequential decisions.",
+    image: { desktop: antaraDesktop, mobile: antaraMobile },
+  },
+  {
+    title: "Hangit",
+    desc: "A content and social media agency creating work people want to follow.",
+    image: { desktop: hangitDesktop, mobile: hangitMobile },
+  },
+];
+
+const clientItems = items.map(({ title, desc }) => ({ title, desc }));
+
+const splitLines = (text) => String(text).split("\n");
+---
+
+<section id="work" class="bg-backgroundlight px-4 py-10 lg:hidden flex flex-col">
+  <div class="flex items-center justify-between mb-6">
+    <span class="font-semibold">2026 SHOWCASE</span>
+    <span class="text-sm font-medium opacity-70">[WORK]</span>
+  </div>
+
+  <div class="flex flex-col gap-12 md:gap-8">
+    {
+      items.map((item, i) => (
+        <article class="rounded-xl bg-neutral-200 p-5 flex flex-col gap-3 md:flex-row">
+          <div class="aspect-[4/3] overflow-hidden rounded-lg bg-neutral-300 md:w-1/2">
+            <Picture
+              src={item.image.mobile}
+              formats={["webp"]}
+              widths={[320, 480, 640, 768]}
+              sizes="calc(100vw - 2rem)"
+              alt={item.title}
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="flex flex-col gap-3 md:w-1/2">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="text-xl md:text-3xl font-bold leading-tight">{item.title}</h3>
+              <span class="text-sm font-medium opacity-70">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+            <p class="text-base opacity-80">{item.desc}</p>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <Button className="mt-5 self-center">SEE MORE</Button>
+</section>
+
+<section
+  class="bg-backgroundlight hidden lg:block pt-25"
+  data-work-showcase
+  data-items={JSON.stringify(clientItems)}
+>
+  <div class="sticky top-0 h-screen flex px-4 overflow-hidden">
+    <div class="w-2/5 flex flex-col justify-center pr-12">
+      <span class="absolute bottom-5 text-xl font-medium mr-50 flex gap-1">
+        <span>[WORK / </span>
+        <span class="flex flex-col justify-center text-xl" data-work-index>
+          <span class="block overflow-hidden leading-tight">
+            <span class="block animate-line will-change-transform">01</span>
+          </span>
+        </span>
+        <span>]</span>
+      </span>
+
+      <h2
+        class="flex flex-col justify-center text-8xl font-bold tracking-[-0.04em]"
+        data-work-title
+      >
+        {
+          splitLines(items[0].title).map((line, i) => (
+            <span class="block overflow-hidden leading-tight">
+              <span
+                class="block animate-line will-change-transform"
+                style={`animation-delay: ${i * 70}ms`}
+              >
+                {line}
+              </span>
+            </span>
+          ))
+        }
+      </h2>
+
+      <div class="mt-3 max-w-md">
+        <div class="flex flex-col justify-center text-2xl" data-work-desc>
+          {
+            splitLines(items[0].desc).map((line, i) => (
+              <span class="block overflow-hidden leading-tight">
+                <span
+                  class="block animate-line will-change-transform"
+                  style={`animation-delay: ${i * 70}ms`}
+                >
+                  {line}
+                </span>
+              </span>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="w-3/5 relative overflow-hidden">
+      <span class="absolute top-5 right-0 text-xl font-semibold">[2026 SHOWCASE]</span>
+      <Button className="absolute bottom-5 right-0 z-50">
+        SEE MORE
+      </Button>
+
+      <div class="relative h-full grid place-items-center" style="perspective: 500px">
+        {
+          items.map((item, i) => (
+            <div
+              class="col-start-1 row-start-1 m-auto aspect-[16/9] w-[70%] rounded-xl bg-neutral-200 overflow-hidden flex items-center justify-center text-2xl font-medium will-change-transform"
+              data-work-card
+              data-card-index={i}
+              style="transform-style: preserve-3d; transform-origin: center bottom;"
+            >
+              <Picture
+                src={item.image.desktop}
+                formats={["webp"]}
+                widths={[720, 960, 1200, 1440]}
+                sizes="42vw"
+                alt={item.title}
+                loading={i === 0 ? "eager" : "lazy"}
+                decoding="async"
+                class="h-full w-full object-cover"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const cfg = {
+    effectStop: 0.9,
+    maxScale: 0.18,
+    maxRotate: 16,
+    smooth: 0.08,
+    eps: 0.001,
+    animDelay: 0.12,
+    postScaleRange: 0.35,
+    minScale: 0.92,
+    focus: 0.8,
+    switchMargin: 0.16,
+    admireVh: 0.25,
+  };
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const renderMasked = (el, text) => {
+    el.textContent = "";
+    String(text)
+      .split("\n")
+      .forEach((line, i) => {
+        const outer = document.createElement("span");
+        const inner = document.createElement("span");
+
+        outer.className = "block overflow-hidden leading-tight";
+        inner.className = "block animate-line will-change-transform";
+        inner.style.animationDelay = `${i * 70}ms`;
+        inner.textContent = line;
+
+        outer.append(inner);
+        el.append(outer);
+      });
+  };
+
+  document.querySelectorAll("[data-work-showcase]").forEach((section) => {
+    const items = JSON.parse(section.getAttribute("data-items") || "[]");
+    const cards = Array.from(section.querySelectorAll("[data-work-card]"));
+    const title = section.querySelector("[data-work-title]");
+    const desc = section.querySelector("[data-work-desc]");
+    const index = section.querySelector("[data-work-index]");
+    if (!items.length || !title || !desc || !index) return;
+
+    let vh = 1;
+    let sectionTop = 0;
+    let activeIndex = 0;
+    let rafScroll = 0;
+    let rafAnim = 0;
+    let prevRaw = null;
+    let admireFrozen = false;
+    let admireBaseRaw = 0;
+
+    const ty = new Float32Array(items.length);
+    const ts = new Float32Array(items.length).fill(1);
+    const tr = new Float32Array(items.length);
+    const cy = new Float32Array(items.length);
+    const cs = new Float32Array(items.length).fill(1);
+    const cr = new Float32Array(items.length);
+
+    const setActive = (nextIndex) => {
+      if (nextIndex === activeIndex) return;
+      activeIndex = nextIndex;
+      renderMasked(index, String(nextIndex + 1).padStart(2, "0"));
+      renderMasked(title, items[nextIndex].title);
+      renderMasked(desc, items[nextIndex].desc);
+    };
+
+    const measure = () => {
+      vh = window.innerHeight || 1;
+      section.style.height = `${Math.max((items.length + 1) * vh, vh * 2)}px`;
+      sectionTop = section.getBoundingClientRect().top + (window.scrollY || 0);
+    };
+
+    const animate = () => {
+      let keep = false;
+
+      cards.forEach((card, i) => {
+        cy[i] += (ty[i] - cy[i]) * cfg.smooth;
+        cs[i] += (ts[i] - cs[i]) * cfg.smooth;
+        cr[i] += (tr[i] - cr[i]) * cfg.smooth;
+
+        card.style.transform = `translate3d(0, ${cy[i]}px, 0) scale(${cs[i]}) rotateX(${cr[i]}deg)`;
+        card.style.zIndex = String(i === activeIndex ? 50 : items.length - i);
+
+        if (
+          Math.abs(ty[i] - cy[i]) > cfg.eps ||
+          Math.abs(ts[i] - cs[i]) > cfg.eps ||
+          Math.abs(tr[i] - cr[i]) > cfg.eps
+        ) {
+          keep = true;
+        }
+      });
+
+      rafAnim = keep ? requestAnimationFrame(animate) : 0;
+    };
+
+    const applyTransforms = () => {
+      const raw = (window.scrollY || 0) - sectionTop;
+      const trackLen = items.length * vh;
+
+      if (prevRaw !== null && prevRaw < 0 && raw >= 0) {
+        admireFrozen = true;
+        admireBaseRaw = raw;
+      }
+      prevRaw = raw;
+
+      if (raw >= 0 && admireFrozen) {
+        if (raw - admireBaseRaw < vh * cfg.admireVh) return;
+        admireFrozen = false;
+      }
+      if (raw < 0) {
+        admireFrozen = false;
+        admireBaseRaw = 0;
+      }
+
+      const progressed = clamp(raw - vh * cfg.animDelay, 0, trackLen);
+      const sinceStart = progressed + vh;
+      let bestIndex = 0;
+      let bestDist = Infinity;
+
+      items.forEach((_, i) => {
+        const progress = (sinceStart - i * vh) / vh;
+        ty[i] = (1 - progress) * vh;
+
+        if (progress < cfg.effectStop) {
+          const norm = 1 - progress / cfg.effectStop;
+          ts[i] = 1 + cfg.maxScale * norm;
+          tr[i] = cfg.maxRotate * norm;
+        } else {
+          const t = clamp((progress - cfg.effectStop) / cfg.postScaleRange, 0, 1);
+          ts[i] = 1 - (1 - cfg.minScale) * t;
+          tr[i] = 0;
+        }
+
+        const dist = Math.abs(progress - cfg.focus);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestIndex = i;
+        }
+      });
+
+      if (activeIndex !== bestIndex) {
+        const prevProgress = (sinceStart - activeIndex * vh) / vh;
+        const improvedBy = Math.abs(prevProgress - cfg.focus) - bestDist;
+        if (improvedBy > cfg.switchMargin) setActive(bestIndex);
+      }
+
+      if (!rafAnim) rafAnim = requestAnimationFrame(animate);
+    };
+
+    const schedule = (fn) => {
+      if (rafScroll) return;
+      rafScroll = requestAnimationFrame(() => {
+        rafScroll = 0;
+        fn();
+      });
+    };
+
+    const recalc = () => {
+      measure();
+      applyTransforms();
+    };
+
+    const onScroll = () => schedule(applyTransforms);
+    const onResize = () => schedule(recalc);
+    const ro = "ResizeObserver" in window ? new ResizeObserver(() => schedule(recalc)) : null;
+
+    recalc();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    window.addEventListener("load", onResize);
+    ro?.observe(section);
+    document.fonts?.ready.then(onResize).catch(() => {});
+  });
+</script>

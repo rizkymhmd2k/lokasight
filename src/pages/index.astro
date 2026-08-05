@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import ViewportIndicator from "../components/dev/ViewportIndicator.jsx";
+import { getImage } from "astro:assets";
 import MobileNav from "../components/layout/MobileNav.jsx";
 import HeroSection from "../components/home/HeroSection.astro";
 import Work from "../components/home/sections/Work.jsx";
@@ -8,6 +8,38 @@ import Services from "../components/home/sections/Services.jsx";
 import About from "../components/home/sections/About.astro";
 import Contact from "../components/home/sections/Contact.jsx";
 import Footer from "../components/home/sections/Footer.astro";
+import WorkShowcase from "../components/home/sections/WorkShowcase.astro";
+import strategyImage from "../assets/images/strategy1.png";
+import identityImage from "../assets/images/identity1.png";
+import digitalImage from "../assets/images/digital1.png";
+
+const serviceImageEntries = await Promise.all(
+  [
+    ["strategy", strategyImage],
+    ["identity", identityImage],
+    ["digital", digitalImage],
+  ].map(async ([key, src]) => {
+    const image = await getImage({
+      src,
+      width: 360,
+      densities: [1, 2],
+      format: "webp",
+      quality: 75,
+    });
+
+    return [
+      key,
+      {
+        src: image.src,
+        srcSet: image.srcSet.attribute,
+        width: image.attributes.width,
+        height: image.attributes.height,
+      },
+    ];
+  }),
+);
+
+const serviceImages = Object.fromEntries(serviceImageEntries);
 ---
 
 <Layout
@@ -15,21 +47,20 @@ import Footer from "../components/home/sections/Footer.astro";
   description="An independent strategy, identity, and digital studio helping ambitious businesses build lasting perception."
 >
   <main class="w-full">
-    <ViewportIndicator client:load />
     <MobileNav client:load />
     <HeroSection />
 
     <section
-      class="
-        relative z-10
+      class="relative z-10
         min-h-screen
         -mt-[100vh]
         bg-neutral-950
-        rounded-t-4xl
-      "
+        rounded-t-4xl"
     >
       <Work client:load />
-      <Services client:load />
+      <WorkShowcase />
+
+      <Services client:load serviceImages={serviceImages} />
       <About />
       <Contact client:load />
       <Footer />

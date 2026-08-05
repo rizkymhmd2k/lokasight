@@ -2,6 +2,8 @@
 
 import { useMemo, useCallback } from "react";
 import LokasightLogo from "../../shared/LokasightLogo.jsx";
+import TextScramble from "../../shared/TextScramble.jsx";
+import Button from "../../shared/Button.jsx";
 
 export default function Hero({ children }) {
   const navItems = useMemo(
@@ -27,7 +29,7 @@ export default function Hero({ children }) {
   const handleCtaClick = useCallback((e) => {
     if (typeof window === "undefined") return;
 
-    const el = document.getElementById("work");
+    const el = document.getElementById("contact");
     if (!el) return;
 
     e.preventDefault();
@@ -40,7 +42,7 @@ export default function Hero({ children }) {
       id="home"
       className="px-4 py-4 flex flex-col justify-between h-screen "
     >
-      <div className="w-full relative">
+      <div className="w-full relative h-full flex flex-col justify-between">
         {/* Desktop Nav */}
         <div className="hidden sm:grid grid-cols-5 relative z-50">
           {navItems.map((item, i) => (
@@ -50,30 +52,31 @@ export default function Hero({ children }) {
             >
               <a
                 href={`/#${item.toLowerCase()}`}
-                className="text-xs font-bold hover:opacity-70 transition-opacity text-gray-800"
+                aria-label={item}
+                className="text-xs font-bold"
                 onClick={handleNavClick(item.toLowerCase())}
               >
-                {item}
+                <TextScramble>{item}</TextScramble>
               </a>
             </div>
           ))}
         </div>
 
         {/* Hero */}
-        <LokasightLogo className="mt-8  " />
-        <div className="relative mt-16 md:mt-4 flex justify-center ">
+        <LokasightLogo className="mt-8" />
+        <div className="relative flex justify-center ">
           <div className="relative ">
-            <p className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-bold md:left-auto md:right-full md:top-1/2 md:bottom-auto md:mr-5 md:mb-0 md:-translate-x-0 md:-translate-y-1/2 md:text-2xl">
-              branding
+            <p className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-neutral-500 md:left-auto md:right-full md:top-1/2 md:bottom-auto md:mr-5 lg:mr-25 md:mb-0 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">
+              [<TextScramble>BRAND</TextScramble>]
             </p>
             {children}
-            <p className="absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-bold md:left-full md:top-1/2 md:mt-0 md:ml-5 md:-translate-x-0 md:-translate-y-1/2 md:text-2xl">
-              studio
+            <p className="absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-neutral-500 md:left-full md:top-1/2 md:mt-0 md:ml-5 lg:ml-25 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">
+              [<TextScramble>STUDIO</TextScramble>]
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-4 ">
           <div className="col-start-2 max-sm:col-start-1 col-span-2 flex items-center gap-2">
             {/* <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
             <h2 className="text-sm md:text-base">clarity creates preference</h2> */}
@@ -87,9 +90,8 @@ export default function Hero({ children }) {
       <div className="grid w-full gap-8 sm:grid-cols-4 sm:items-end">
         <div className="order-2 max-w-sm sm:order-none sm:col-span-2 lg:col-span-1">
           <p className="text-sm leading-relaxed md:text-md">
-            The strongest businesses aren't always the biggest. They're the
-            easiest to understand. We help ambitious companies shape perception
-            through strategy, identity, and digital experiences.{" "}
+            The strongest brands aren't always the biggest. They're the
+            easiest to understand. {" "}
           </p>
         </div>
         <div className="order-1 flex flex-col items-start sm:order-none sm:col-span-2 lg:col-span-1 lg:col-start-4 sm:text-right sm:items-end">
@@ -104,23 +106,13 @@ export default function Hero({ children }) {
             Digital
             </h2>
           </div> */}
-          <a
+          <Button
             href="/#work"
             onClick={handleCtaClick}
-            className="group mt-5 inline-flex rounded-md bg-black px-5 py-3 text-[#F8F7F3] sm:mt-6 sm:self-end sm:px-4 sm:py-2.5"
+            className="mt-5 sm:mt-6 sm:self-end"
           >
-            <span className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.08em]">
-              <span>View our work</span>
-              <span className="relative flex h-4 w-5 overflow-hidden">
-                <span className="absolute inset-0 transition-transform duration-300 ease-out group-hover:translate-x-full">
-                  →
-                </span>
-                <span className="absolute inset-0 -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0">
-                  →
-                </span>
-              </span>
-            </span>
-          </a>
+            contact now
+          </Button>
         </div>
       </div>
     </section>
