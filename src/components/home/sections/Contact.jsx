@@ -185,7 +185,7 @@ export default function Contact() {
               transform: "translateX(-0.7vw) scaleY(1.25)",
               transformOrigin: "center",
             }}
-            className="mx-auto w-full max-w-none overflow-visible whitespace-nowrap text-center font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[22.7vw] md:text-[22.1vw]"
+            className="mx-auto w-full max-w-none overflow-visible whitespace-nowrap text-center font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[19vw] md:text-[22.1vw]"
             aria-label={contactWord}
           >
             {[...contactWord].map((char, index) => (
@@ -214,7 +214,7 @@ export default function Contact() {
               {/* Left: copy/testimonial */}
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
-                <h3 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(4rem,8vw,3rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
+                <h3 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(2.5rem,10vw,4rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
                   <br />
                   Let&apos;s build
                   <br />
