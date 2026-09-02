@@ -48,29 +48,10 @@ const services = [
   },
 ];
 
-function PingDot() {
+function NumberDot({ number }) {
   return (
-    <span className="relative flex h-2 w-2">
-      <span
-        className="
-          absolute inline-flex h-full w-full rounded-full
-          bg-red-500
-          opacity-0
-          group-hover:opacity-60
-          group-hover:animate-ping
-          motion-reduce:group-hover:animate-none
-        "
-      />
-      <span
-        className="
-          relative inline-flex h-2 w-2 rounded-full
-          bg-red-500
-          opacity-40
-          transition-all duration-300 ease-out
-          group-hover:opacity-100
-          group-hover:shadow-[0_0_10px_rgba(239,68,68,0.85)]
-        "
-      />
+    <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#FFFF04] text-xs font-semibold text-black">
+      {number}
     </span>
   );
 }
@@ -78,7 +59,7 @@ function PingDot() {
 function ServiceImage({ src, alt, className = "" }) {
   return (
     <div
-      className={`relative isolate aspect-square w-full overflow-hidden rounded-lg bg-[#FFFF04] ${className}`}
+      className={`relative isolate aspect-video w-full overflow-hidden rounded-lg bg-[#F9F8EF] ${className}`}
     >
       <img
         src={src.src}
@@ -88,7 +69,7 @@ function ServiceImage({ src, alt, className = "" }) {
         height={src.height}
         loading="lazy"
         decoding="async"
-        className="h-full w-full object-cover"
+        className="h-full w-full object-contain"
       />
     </div>
   );
@@ -109,20 +90,20 @@ function Tags({ tags, className = "" }) {
   );
 }
 
-function ServiceItem({ item, isLast, image }) {
+function ServiceItem({ item, number, isLast, image }) {
   return (
     <div className="group w-full">
       <div
         className="
-          grid grid-cols-1 gap-4
-          md:pt-6 md:gap-x-10 md:gap-y-6 md:grid-cols-[minmax(0,1fr)_180px]
-          xl:grid-cols-[220px_minmax(0,1fr)_180px]
+          grid grid-cols-1 gap-4 pb-14
+          md:pt-6 md:gap-x-10 md:gap-y-6 md:grid-cols-[minmax(0,1fr)_220px]
+          xl:grid-cols-[220px_minmax(0,1fr)_220px]
           items-start content-start
         "
       >
         <div className="order-1 md:col-start-1 md:row-start-1 xl:col-start-1 xl:row-start-1">
           <div className="flex items-center gap-3">
-            <PingDot />
+            <NumberDot number={number} />
             <h3 className="text-white text-2xl lg:text-3xl font-semibold">
               {item.title}
             </h3>
@@ -148,15 +129,15 @@ function ServiceItem({ item, isLast, image }) {
 
         <div
           className="
-            order-4 mt-2 w-full
-            md:order-3 md:mt-0 md:w-[180px] md:justify-self-end md:col-start-2 md:row-start-1 md:row-span-3
+            order-4 mt-2 w-[70%] justify-self-start
+            md:order-3 md:mt-0 md:w-[220px] md:justify-self-end md:col-start-2 md:row-start-1 md:row-span-3
             xl:col-start-3 xl:row-start-1
           "
         >
           <ServiceImage
             src={image}
             alt={item.imageAlt}
-            className="w-full md:w-[180px]"
+            className="w-full md:w-[220px]"
           />
         </div>
       </div>
@@ -286,6 +267,7 @@ const Services = ({ serviceImages }) => {
             <ServiceItem
               key={idx}
               item={item}
+              number={idx + 1}
               image={serviceImages[item.imageKey]}
               isLast={idx === services.length - 1}
             />
