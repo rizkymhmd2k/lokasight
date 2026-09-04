@@ -9,9 +9,9 @@ import About from "../components/home/sections/About.astro";
 import Contact from "../components/home/sections/Contact.jsx";
 import Footer from "../components/home/sections/Footer.astro";
 import WorkShowcase from "../components/home/sections/WorkShowcase.astro";
-import strategyImage from "../assets/images/strategy1.png";
-import identityImage from "../assets/images/identity1.png";
-import digitalImage from "../assets/images/digital1.png";
+import strategyImage from "../assets/images/strategy-ai.png";
+import identityImage from "../assets/images/identity-ai.png";
+import digitalImage from "../assets/images/digital-ai.png";
 
 const serviceImageEntries = await Promise.all(
   [
@@ -48,6 +48,37 @@ const serviceImages = Object.fromEntries(serviceImageEntries);
 >
   <main class="w-full">
     <MobileNav client:load />
+
+    <div class="progressive-blur" aria-hidden="true">
+      {Array.from({ length: 10 }, (_, index) => (
+        <div class={`progressive-blur__layer progressive-blur__layer--${index + 1}`} />
+      ))}
+    </div>
+
+    <script>
+      const progressiveBlur = document.querySelector(".progressive-blur");
+
+      if (progressiveBlur) {
+        let frameId;
+
+        const updateBlur = () => {
+          progressiveBlur.classList.toggle(
+            "progressive-blur--visible",
+            window.scrollY > 24,
+          );
+          frameId = undefined;
+        };
+
+        const handleScroll = () => {
+          if (frameId !== undefined) return;
+          frameId = requestAnimationFrame(updateBlur);
+        };
+
+        updateBlur();
+        window.addEventListener("scroll", handleScroll, { passive: true });
+      }
+    </script>
+
     <HeroSection />
 
     <section

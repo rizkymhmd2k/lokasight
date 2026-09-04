@@ -59,7 +59,7 @@ function NumberDot({ number }) {
 function ServiceImage({ src, alt, className = "" }) {
   return (
     <div
-      className={`relative isolate aspect-video w-full overflow-hidden rounded-lg bg-[#F9F8EF] ${className}`}
+      className={`relative isolate aspect-video w-full overflow-hidden rounded-lg bg-[#F9F8EF] md:aspect-[4/3] ${className}`}
     >
       <img
         src={src.src}
@@ -69,7 +69,7 @@ function ServiceImage({ src, alt, className = "" }) {
         height={src.height}
         loading="lazy"
         decoding="async"
-        className="h-full w-full object-contain"
+        className="h-full w-full object-cover"
       />
     </div>
   );
@@ -96,8 +96,8 @@ function ServiceItem({ item, number, isLast, image }) {
       <div
         className="
           grid grid-cols-1 gap-4 pb-14
-          md:pt-6 md:gap-x-10 md:gap-y-6 md:grid-cols-[minmax(0,1fr)_220px]
-          xl:grid-cols-[220px_minmax(0,1fr)_220px]
+          md:pt-6 md:gap-x-10 md:gap-y-6 md:grid-cols-[minmax(0,1fr)_240px]
+          xl:grid-cols-[220px_minmax(0,1fr)_240px]
           items-start content-start
         "
       >
@@ -130,14 +130,14 @@ function ServiceItem({ item, number, isLast, image }) {
         <div
           className="
             order-4 mt-2 w-[70%] justify-self-start
-            md:order-3 md:mt-0 md:w-[220px] md:justify-self-end md:col-start-2 md:row-start-1 md:row-span-3
+            md:order-3 md:mt-0 md:w-[240px] md:justify-self-end md:col-start-2 md:row-start-1 md:row-span-3
             xl:col-start-3 xl:row-start-1
           "
         >
           <ServiceImage
             src={image}
             alt={item.imageAlt}
-            className="w-full md:w-[220px]"
+            className="w-full md:w-[240px]"
           />
         </div>
       </div>

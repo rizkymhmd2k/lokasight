@@ -34,15 +34,15 @@ export default function Hero({ children }) {
 
     e.preventDefault();
     el.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.history.pushState(null, "", "#work");
+    window.history.pushState(null, "", "#contact");
   }, []);
 
   return (
     <section
       id="home"
-      className="px-4 py-4 flex flex-col justify-between h-screen "
+      className="flex min-h-svh flex-col px-4 py-4"
     >
-      <div className="w-full relative h-full flex flex-col justify-between">
+      <div className="relative flex min-h-0 w-full flex-1 flex-col justify-between">
         {/* Desktop Nav */}
         <div className="hidden sm:grid grid-cols-5 relative z-50">
           {navItems.map((item, i) => (
@@ -89,14 +89,14 @@ export default function Hero({ children }) {
         </div>
       </div>
 
-      <div className="grid w-full gap-8 sm:grid-cols-4 sm:items-end">
-        <div className="order-2 max-w-sm sm:order-none sm:col-span-2 lg:col-span-1">
+      <div className="grid w-full gap-5 sm:grid-cols-4 sm:items-end sm:gap-8">
+        <div className="max-w-sm sm:col-span-2 lg:col-span-1">
           <p className="text-sm leading-relaxed md:text-md">
             The strongest brands aren't always the biggest. They're the
             easiest to understand. {" "}
           </p>
         </div>
-        <div className="order-1 flex flex-col items-start sm:order-none sm:col-span-2 lg:col-span-1 lg:col-start-4 sm:text-right sm:items-end">
+        <div className="flex flex-col items-start sm:col-span-2 sm:items-end sm:text-right lg:col-span-1 lg:col-start-4">
           {/* <div className="space-y-1">
             <h2 className="text-xl font-semibold tracking-[-0.04em] md:text-xl">
             Strategy
@@ -109,9 +109,9 @@ export default function Hero({ children }) {
             </h2>
           </div> */}
           <Button
-            href="/#work"
+            href="/#contact"
             onClick={handleCtaClick}
-            className="mt-5 sm:mt-6 sm:self-end"
+            className="sm:self-end"
           >
             contact now
           </Button>
