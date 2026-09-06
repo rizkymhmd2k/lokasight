@@ -110,7 +110,8 @@ const Work = () => {
 
   const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
   const workHeadingClassName =
-    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.08]";
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[0.3]";
+  const workHeadingStyle = { lineHeight: 1 };
 
   const lines = useMeasuredLines({ wrapperRef, measureRef, words });
 
@@ -157,7 +158,7 @@ const Work = () => {
   }, [lines]);
 
   return (
-    <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-4 flex flex-col">
+    <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-big flex flex-col">
       <div ref={wrapperRef} className="relative">
         {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
         <h2
@@ -167,13 +168,14 @@ const Work = () => {
           style={
             lines !== null
               ? {
+                  ...workHeadingStyle,
                   position: "absolute",
                   visibility: "hidden",
                   pointerEvents: "none",
                   opacity: 0,
                   inset: 0,
                 }
-              : { opacity: 0 }
+              : { ...workHeadingStyle, opacity: 0 }
           }
         >
           <span
@@ -194,6 +196,7 @@ const Work = () => {
             ref={linesRootRef}
             aria-label={`[WORK] ${bodyText}`}
             className={workHeadingClassName}
+            style={workHeadingStyle}
           >
             {lines.map((line, i) => (
               <span key={i} data-line style={{ display: "block" }}>

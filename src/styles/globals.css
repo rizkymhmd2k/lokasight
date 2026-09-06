@@ -66,6 +66,14 @@
 /* ---------------------------------------------
    Utilities (custom classes)
 ---------------------------------------------- */
+@utility px-small {
+  padding-inline: 1rem;
+}
+
+@utility px-big {
+  padding-inline: 2rem;
+}
+
 .font-oswald {
   font-family: var(--font-oswald);
 }

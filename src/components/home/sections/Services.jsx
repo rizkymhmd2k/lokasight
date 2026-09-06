@@ -48,12 +48,8 @@ const services = [
   },
 ];
 
-function NumberDot({ number }) {
-  return (
-    <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#FFFF04] text-xs font-semibold text-black">
-      {number}
-    </span>
-  );
+function YellowDot() {
+  return <span className="h-1 w-1 shrink-0 rounded-full bg-[#FFFF04]" />;
 }
 
 function ServiceImage({ src, alt, className = "" }) {
@@ -90,20 +86,22 @@ function Tags({ tags, className = "" }) {
   );
 }
 
-function ServiceItem({ item, number, isLast, image }) {
+function ServiceItem({ item, isFirst, isLast, image }) {
   return (
-    <div className="group w-full">
+    <div
+      className={`group w-full border-white/20 ${isFirst ? "border-t" : ""} ${isLast ? "" : "border-b"}`}
+    >
       <div
         className="
-          grid grid-cols-1 gap-4 pb-14
-          md:pt-6 md:gap-x-10 md:gap-y-6 md:grid-cols-[minmax(0,1fr)_240px]
+          grid grid-cols-1 gap-4 pb-14 pt-6
+          md:gap-x-10 md:gap-y-6 md:grid-cols-[minmax(0,1fr)_240px]
           xl:grid-cols-[220px_minmax(0,1fr)_240px]
           items-start content-start
         "
       >
         <div className="order-1 md:col-start-1 md:row-start-1 xl:col-start-1 xl:row-start-1">
           <div className="flex items-center gap-3">
-            <NumberDot number={number} />
+            <YellowDot />
             <h3 className="text-white text-2xl lg:text-3xl font-semibold">
               {item.title}
             </h3>
@@ -141,9 +139,6 @@ function ServiceItem({ item, number, isLast, image }) {
           />
         </div>
       </div>
-
-      {/* DIVIDER */}
-      {!isLast && <div className="mt-8 lg:mt-10 border-t border-white/10" />}
     </div>
   );
 }
@@ -229,20 +224,20 @@ const Services = ({ serviceImages }) => {
       ref={sectionRef}
       className="w-full px-2 sm:px-4 pt-12 sm:pt-24 flex flex-col bg-backgroundlight"
     >
-      <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black lg:flex-row">
-        {/* LEFT MAIN */}
-        <div className="flex w-full flex-col justify-start p-6 md:p-10 lg:w-2/5 2xl:w-3/5">
+      <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black">
+        {/* HEADER */}
+        <div className="flex w-full flex-col justify-start p-6 md:p-10">
           <span className="text-sm md:text-xl font-medium text-white">
             [SERVICES]
           </span>
 
-          <div className="flex-1 flex md:mt-10">
+          <div className="flex w-full md:mt-10">
             <h2
               ref={headingRef}
-              className="pt-6 text-4xl font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-5xl md:pt-8 md:text-[clamp(2.5rem,6vw,4rem)] md:whitespace-nowrap lg:text-6xl lg:whitespace-normal xl:text-8xl"
+              className="flex flex-row justify-center max-md:pt-6 w-full gap-2 mb-0 md:mb-5 text-[clamp(1.5rem,8vw,68rem)] font-bold leading-[0.95] tracking-[-0.04em] text-white"
               aria-label="STRATEGY. IDENTITY. DIGITAL."
             >
-              {["STRATEGY.", "IDENTITY.", "DIGITAL."].map((word, index, all) => (
+              {["DEFINE.", "DESIGN.", "DELIVER."].map((word) => (
                 <React.Fragment key={word}>
                   <span className="inline-block overflow-hidden align-bottom">
                     <span
@@ -252,26 +247,27 @@ const Services = ({ serviceImages }) => {
                       {word}
                     </span>
                   </span>
-                  {index < all.length - 1 ? " " : null}
                 </React.Fragment>
               ))}
             </h2>
           </div>
         </div>
 
-        {/* RIGHT SERVICES */}
-        <div className="w-full p-6 md:p-10 flex flex-col">
-          <div className="border-t border-white/10 mb-6 md:hidden" />
+        {/* SERVICES */}
+        <div className="grid w-full grid-cols-1 px-6 pb-6 md:px-10 md:pb-10 lg:grid-cols-12">
+          <div className="flex w-full flex-col lg:col-span-8 lg:col-start-5">
+          {/* <div className="border-t border-white/10 mb-6 md:hidden" /> */}
 
           {services.map((item, idx) => (
             <ServiceItem
               key={idx}
               item={item}
-              number={idx + 1}
               image={serviceImages[item.imageKey]}
+              isFirst={idx === 0}
               isLast={idx === services.length - 1}
             />
           ))}
+          </div>
         </div>
       </div>
     </div>
