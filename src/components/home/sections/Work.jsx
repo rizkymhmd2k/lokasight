@@ -158,7 +158,7 @@ const Work = () => {
   }, [lines]);
 
   return (
-    <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-big flex flex-col">
+    <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-small md:px-big flex flex-col">
       <div ref={wrapperRef} className="relative">
         {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
         <h2

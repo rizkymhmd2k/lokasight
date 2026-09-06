@@ -234,12 +234,12 @@ const Services = ({ serviceImages }) => {
           <div className="flex w-full md:mt-10">
             <h2
               ref={headingRef}
-              className="flex flex-row justify-center max-md:pt-6 w-full gap-2 mb-0 md:mb-5 text-[clamp(1.5rem,8vw,68rem)] font-bold leading-[0.95] tracking-[-0.04em] text-white"
+              className="flex flex-row justify-center max-md:pt-6 w-full gap-1 md:gap-2 mb-0 md:mb-5 text-[5.5vw] md:text-[clamp(1.5rem,8vw,68rem)] font-bold leading-[0.95] tracking-[-0.04em] text-white"
               aria-label="STRATEGY. IDENTITY. DIGITAL."
             >
               {["DEFINE.", "DESIGN.", "DELIVER."].map((word) => (
                 <React.Fragment key={word}>
-                  <span className="inline-block overflow-hidden align-bottom">
+                  <span className="inline-block overflow-hidden align-bottom py-[0.12em]">
                     <span
                       data-services-heading-word
                       className="inline-block will-change-transform"
