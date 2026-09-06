@@ -1,21 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
-
-@font-face {
-  font-family: "Switzer";
-  src: url("/fonts/Switzer-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Switzer";
-  src: url("/fonts/Switzer-VariableItalic.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: italic;
-  font-display: swap;
-}
 
 @font-face {
   font-family: "Oswald";
@@ -29,8 +14,8 @@
    Theme Tokens (Tailwind v4)
 ---------------------------------------------- */
 @theme {
-  --font-switzer: "Switzer", system-ui, sans-serif;
-  --font-sans: var(--font-switzer), var(--font-geist-sans), system-ui, sans-serif;
+  --font-manrope: "Manrope", system-ui, sans-serif;
+  --font-sans: var(--font-manrope), var(--font-geist-sans), system-ui, sans-serif;
   --font-oswald: "Oswald", var(--font-sans);
 
   --color-reddot: #dc2626;
