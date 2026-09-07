@@ -148,6 +148,37 @@ const Services = ({ serviceImages }) => {
   const headingRef = useRef(null);
 
   useLayoutEffect(() => {
+    const heading = headingRef.current;
+    if (!heading) return;
+
+    let disposed = false;
+    const fitHeading = () => {
+      if (disposed) return;
+      const words = heading.querySelectorAll("[data-services-heading-word]");
+      const styles = getComputedStyle(heading);
+      const textWidth = Array.from(words).reduce(
+        (width, word) => width + word.getBoundingClientRect().width,
+        0,
+      );
+      const availableWidth =
+        heading.clientWidth - parseFloat(styles.columnGap) * (words.length - 1);
+      if (textWidth > 0 && availableWidth > 0) {
+        heading.style.fontSize = `${parseFloat(styles.fontSize) * availableWidth / textWidth}px`;
+      }
+    };
+
+    const observer = new ResizeObserver(fitHeading);
+    observer.observe(heading.parentElement);
+    document.fonts.ready.then(fitHeading);
+    fitHeading();
+
+    return () => {
+      disposed = true;
+      observer.disconnect();
+    };
+  }, []);
+
+  useLayoutEffect(() => {
     const section = sectionRef.current;
     const heading = headingRef.current;
     if (!section || !heading) return;
@@ -234,12 +265,12 @@ const Services = ({ serviceImages }) => {
           <div className="flex w-full md:mt-10">
             <h2
               ref={headingRef}
-              className="flex flex-row justify-center max-md:pt-6 w-full gap-1 md:gap-2 mb-0 md:mb-5 text-[5.5vw] md:text-[clamp(1.5rem,8vw,68rem)] font-bold leading-[0.95] tracking-[-0.04em] text-white"
-              aria-label="STRATEGY. IDENTITY. DIGITAL."
+              className="flex flex-row justify-between max-md:pt-6 w-full gap-1 md:gap-2 mb-0 md:mb-5 text-[5.5vw] md:text-[clamp(1.5rem,8vw,68rem)] font-bold leading-[0.95] tracking-[-0.04em] text-white"
+              aria-label="DEFINE. DESIGN. DELIVER."
             >
               {["DEFINE.", "DESIGN.", "DELIVER."].map((word) => (
                 <React.Fragment key={word}>
-                  <span className="inline-block overflow-hidden align-bottom py-[0.12em]">
+                  <span className="inline-block shrink-0 overflow-hidden whitespace-nowrap align-bottom py-[0.12em]">
                     <span
                       data-services-heading-word
                       className="inline-block will-change-transform"
