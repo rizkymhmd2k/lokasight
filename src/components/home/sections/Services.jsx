@@ -4,7 +4,10 @@ import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
+import SplitText from "gsap/SplitText";
+import CustomEase from "gsap/CustomEase";
+
+gsap.registerPlugin(ScrollTrigger, SplitText, CustomEase);
 
 const services = [
   {
@@ -55,8 +58,10 @@ function YellowDot() {
 function ServiceImage({ src, alt, className = "" }) {
   return (
     <div
+      data-service-image
       className={`relative isolate aspect-video w-full overflow-hidden rounded-lg bg-[#F9F8EF] md:aspect-[4/3] ${className}`}
     >
+      <div data-service-image-reveal className="absolute inset-0">
       <img
         src={src.src}
         srcSet={src.srcSet}
@@ -65,15 +70,16 @@ function ServiceImage({ src, alt, className = "" }) {
         height={src.height}
         loading="lazy"
         decoding="async"
-        className="h-full w-full object-cover"
+        className="absolute -top-[3vh] h-[calc(100%+6vh)] w-full object-cover"
       />
+      </div>
     </div>
   );
 }
 
 function Tags({ tags, className = "" }) {
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div data-service-tags className={`flex flex-wrap gap-2 ${className}`}>
       {tags.map((tag) => (
         <span
           key={tag}
@@ -102,7 +108,7 @@ function ServiceItem({ item, isFirst, isLast, image }) {
         <div className="order-1 md:col-start-1 md:row-start-1 xl:col-start-1 xl:row-start-1">
           <div className="flex items-center gap-3">
             <YellowDot />
-            <h3 className="text-white text-2xl lg:text-3xl font-semibold">
+            <h3 data-service-copy className="text-white text-2xl lg:text-3xl font-semibold">
               {item.title}
             </h3>
           </div>
@@ -114,6 +120,7 @@ function ServiceItem({ item, isFirst, isLast, image }) {
         />
 
         <p
+          data-service-copy
           className="
             order-3 mt-3
             text-white/80 md:text-white/60
@@ -183,70 +190,71 @@ const Services = ({ serviceImages }) => {
     const heading = headingRef.current;
     if (!section || !heading) return;
 
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const ctx = gsap.context(() => {
-      const words = heading.querySelectorAll("[data-services-heading-word]");
-      if (!words.length) return;
-
-      if (prefersReducedMotion) {
-        gsap.set(words, { yPercent: 0, opacity: 1, clearProps: "transform" });
-        return;
-      }
-
-      const mm = gsap.matchMedia();
-      const makeTimeline = (startValue) => {
-        gsap
-          .timeline({
-            defaults: { ease: "power4.inOut" },
-            scrollTrigger: {
-              trigger: section,
-              start: startValue,
-              toggleActions: "play none none reverse",
-            },
-          })
-          .fromTo(
-            words,
-            { yPercent: 110, opacity: 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              duration: 0.65,
-              stagger: 0.23,
-              ease: "power3.out",
-            },
-          );
-      };
-
-      // Tailwind-aligned breakpoints:
-      // base: <640, sm: 640-767, md: 768-1023, lg: 1024-1279, xl: 1280-1535, 2xl: >=1536
-      mm.add("(max-width: 639px)", () => makeTimeline("top 90%")); // base
-      mm.add(
-        "(min-width: 640px) and (max-width: 767px)",
-        () => makeTimeline("top 78%"), // sm
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const tagEase = CustomEase.create("services-tags", "0.16,1,0.3,1");
+      const imageEase = CustomEase.create("services-image", "0.87,0,0.13,1");
+      const splits = Array.from(section.querySelectorAll("[data-service-copy]"), (element) =>
+        SplitText.create(element, {
+          type: "lines",
+          mask: "lines",
+          autoSplit: true,
+          onSplit: (split) => gsap.from(split.lines, {
+            yPercent: 100,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power4.out",
+            scrollTrigger: { trigger: element, start: "top 75%", once: true },
+          }),
+        }),
       );
-      mm.add(
-        "(min-width: 768px) and (max-width: 1023px)",
-        () => makeTimeline("top 90%"), // md
-      );
-      mm.add(
-        "(min-width: 1024px) and (max-width: 1279px)",
-        () => makeTimeline("top 50%"), // lg
-      );
-      mm.add(
-        "(min-width: 1280px) and (max-width: 1535px)",
-        () => makeTimeline("top 58%"), // xl
-      );
-      mm.add("(min-width: 1536px)", () => makeTimeline("top 46%")); // 2xl
 
-      ScrollTrigger.refresh();
-      return () => mm.revert();
+      gsap.from(heading.querySelectorAll("[data-services-heading-word]"), {
+        yPercent: 100,
+        duration: 1,
+        stagger: 0.1,
+        ease: "power4.out",
+        scrollTrigger: { trigger: heading, start: "top 75%", once: true },
+      });
+
+      section.querySelectorAll("[data-service-tags]").forEach((tags) => {
+        gsap.from(tags.children, {
+          y: 24,
+          opacity: 0,
+          scale: 0.9,
+          duration: 1,
+          stagger: 0.025,
+          ease: tagEase,
+          scrollTrigger: { trigger: tags, start: "top 85%", once: true },
+        });
+      });
+
+      section.querySelectorAll("[data-service-image]").forEach((frame) => {
+        gsap.fromTo(frame.querySelector("[data-service-image-reveal]"),
+          { clipPath: "inset(0 0 100% 0)" },
+          {
+            clipPath: "inset(0 0 0% 0)",
+            duration: 1.6,
+            ease: imageEase,
+            scrollTrigger: { trigger: frame, start: "top 90%", once: true },
+          },
+        );
+        gsap.fromTo(frame.querySelector("img"), { y: "-3vh" }, {
+          y: "3vh",
+          ease: "none",
+          scrollTrigger: {
+            trigger: frame,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      });
+
+      return () => splits.forEach((split) => split.revert());
     }, section);
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, []);
 
   return (
@@ -258,7 +266,7 @@ const Services = ({ serviceImages }) => {
       <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black">
         {/* HEADER */}
         <div className="flex w-full flex-col justify-start p-6 md:p-10">
-          <span className="text-sm md:text-xl font-medium text-white">
+          <span data-service-copy className="text-sm md:text-xl font-medium text-white">
             [SERVICES]
           </span>
 

@@ -39,20 +39,25 @@ const socials = [
   <div
     class="hidden self-center w-[80vw] sm:w-[75vw] lg:w-4/5 lg:flex justify-center"
   >
-    <img
-      src={teamImage.src}
-      width={teamImage.width}
-      height={teamImage.height}
-      alt="Lokasight team"
-      class="w-full h-auto rounded-3xl lg:w-4/5"
-      loading="lazy"
-      decoding="async"
-    />
+    <div data-about-image class="relative w-full overflow-hidden rounded-3xl lg:w-4/5" style={{ aspectRatio: `${teamImage.width} / ${teamImage.height}` }}>
+      <div data-about-image-reveal class="absolute inset-0">
+        <img
+          src={teamImage.src}
+          width={teamImage.width}
+          height={teamImage.height}
+          alt="Lokasight team"
+          class="absolute -top-[3vh] h-[calc(100%+6vh)] w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
   </div>
 
   <div class="w-full pl-0 flex flex-col lg:pl-12 gap-12 md:gap-0">
     <div class="shrink-0">
       <h2
+        data-about-copy
         class="text-xl sm:text-2xl md:text-[1.75rem] lg:text-4xl font-medium leading-tight"
       >
         <span
@@ -66,26 +71,30 @@ const socials = [
     </div>
 
     <div class="self-center mt-6 w-[80vw] sm:w-[75vw] md:mt-8 lg:hidden">
-      <img
-        src={teamImage.src}
-        width={teamImage.width}
-        height={teamImage.height}
-        alt="Lokasight team"
-        class="w-full h-auto rounded-3xl"
-        loading="lazy"
-        decoding="async"
-      />
+      <div data-about-image class="relative w-full overflow-hidden rounded-3xl" style={{ aspectRatio: `${teamImage.width} / ${teamImage.height}` }}>
+        <div data-about-image-reveal class="absolute inset-0">
+          <img
+            src={teamImage.src}
+            width={teamImage.width}
+            height={teamImage.height}
+            alt="Lokasight team"
+            class="absolute -top-[3vh] h-[calc(100%+6vh)] w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
     </div>
 
     <div class="mt-4 md:mt-5 lg:mt-8 lg:grid lg:grid-cols-5">
       <div class="lg:col-start-1 lg:col-span-5 2xl:col-start-3 2xl:col-span-2">
-        <p class="text-sm leading-relaxed md:text-base lg:text-lg">
+        <p data-about-copy class="text-sm leading-relaxed md:text-base lg:text-lg">
           We believe strong brands begin with clear thinking. Research uncovers
           what matters, strategy defines the direction, and identity brings it
           to life.
         </p>
 
-        <p class="mt-4 text-sm leading-relaxed md:mt-5 md:text-base lg:text-lg">
+        <p data-about-copy class="mt-4 text-sm leading-relaxed md:mt-5 md:text-base lg:text-lg">
           We stay intentionally small so every project receives senior attention
           from first conversation to final delivery. This means closer
           collaboration, sharper decisions, and no unnecessary layers.
@@ -110,3 +119,76 @@ const socials = [
     </div>
   </div>
 </div>
+
+<script>
+  import gsap from "gsap";
+  import ScrollTrigger from "gsap/ScrollTrigger";
+  import SplitText from "gsap/SplitText";
+  import CustomEase from "gsap/CustomEase";
+
+  gsap.registerPlugin(ScrollTrigger, SplitText, CustomEase);
+
+  let cleanup: (() => void) | undefined;
+
+  function initAbout() {
+    cleanup?.();
+    const section = document.querySelector("#about");
+    if (!section) return;
+
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const splits = Array.from(section.querySelectorAll("[data-about-copy]"), (element) =>
+        SplitText.create(element as HTMLElement, {
+          type: "lines",
+          mask: "lines",
+          autoSplit: true,
+          onSplit: (split) => gsap.from(split.lines, {
+            yPercent: 100,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power4.out",
+            scrollTrigger: { trigger: element, start: "top 75%", once: true },
+          }),
+        }),
+      );
+      return () => splits.forEach((split) => split.revert());
+    }, section);
+
+    mm.add({
+      desktop: "(min-width: 1024px)",
+      mobile: "(max-width: 1023px)",
+      reducedMotion: "(prefers-reduced-motion: reduce)",
+    }, (context) => {
+      if (context.conditions?.reducedMotion) return;
+      const imageEase = CustomEase.create("about-image", "0.87,0,0.13,1");
+      section.querySelectorAll<HTMLElement>("[data-about-image]").forEach((frame) => {
+        if (!frame.getClientRects().length) return;
+        gsap.fromTo(frame.querySelector("[data-about-image-reveal]"),
+          { clipPath: "inset(0 0 100% 0)" },
+          {
+            clipPath: "inset(0 0 0% 0)",
+            duration: 1.6,
+            ease: imageEase,
+            scrollTrigger: { trigger: frame, start: "top 90%", once: true },
+          },
+        );
+        gsap.fromTo(frame.querySelector("img"), { y: "-3vh" }, {
+          y: "3vh",
+          ease: "none",
+          scrollTrigger: {
+            trigger: frame,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      });
+    }, section);
+
+    cleanup = () => mm.revert();
+  }
+
+  initAbout();
+  document.addEventListener("astro:page-load", initAbout);
+  document.addEventListener("astro:before-swap", () => cleanup?.());
+</script>
