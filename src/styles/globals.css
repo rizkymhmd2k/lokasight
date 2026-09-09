@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@200..800&display=swap");
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
@@ -16,11 +16,12 @@
 @theme {
   --font-manrope: "Manrope", system-ui, sans-serif;
   --font-sans: var(--font-manrope), var(--font-geist-sans), system-ui, sans-serif;
+  --font-anton: "Anton", "Arial Narrow", sans-serif;
   --font-oswald: "Oswald", var(--font-sans);
 
   --color-reddot: #dc2626;
   --color-backgroundlight: #f8f7f3;
-  --color-yellow1: rgba(242, 245, 75, 0.73);
+  --color-yellow1: #ffff04;
 
   --color-footer2-top: #f2f1ed;
   --color-footer2-mid: #e8ed9a;
@@ -76,6 +77,10 @@
 
 .font-oswald {
   font-family: var(--font-oswald);
+}
+
+.font-anton {
+  font-family: var(--font-anton);
 }
 
 .footer2-bg {

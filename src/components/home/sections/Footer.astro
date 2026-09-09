@@ -1,7 +1,6 @@
 ---
-import { Picture } from "astro:assets";
+import LokasightLogo from "../../shared/LokasightLogo.jsx";
 import TextScramble from "../../shared/TextScramble.jsx";
-import gmnEye from "../../../../public/gmn_eye1.png";
 
 const NAV_ITEMS = [
   { label: "HOME", href: "#home" },
@@ -17,149 +16,75 @@ const SOCIAL_LINKS = [
   { label: "LINKEDIN", href: "#" },
 ];
 
-const POLICY_LINKS = [
-  { label: "PRIVACY POLICY", href: "#" },
-  { label: "TERMS OF SERVICE", href: "#" },
-  { label: "COOKIE POLICY", href: "#" },
-];
-
-const FOOTER_LINK_CLASS =
-  "w-fit decoration-[0.08em] underline-offset-[0.08em] transition-[opacity] duration-[160ms] ease-[ease] hover:opacity-[0.62]";
-const FOOTER_SCRAMBLE_LINK_CLASS = "w-fit decoration-[0.08em] underline-offset-[0.08em]";
-
-const FOOTER_TYPE = {
-  hero: "text-8xl sm:text-8xl lg:text-8xl xl:text-9xl",
-  heroSmall: "text-lg sm:text-xl lg:text-2xl",
-  nav: "text-2xl sm:text-2xl lg:text-4xl xl:text-4xl",
-  social: "text-2xl sm:text-2xl lg:text-2xl xl:text-2xl",
-  email: "text-sm sm:text-lg lg:text-lg xl:text-xl",
-  meta: "text-sm sm:text-base lg:text-md xl:text-lg",
-};
+const LINK_CLASS =
+  "w-fit transition-opacity duration-200 hover:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black";
 ---
 
-<footer
-  id="site-footer"
-  class="bg-backgroundlight grid  h-max max-h-none grid-cols-[45%_1fr] grid-rows-[auto_auto_auto] overflow-visible p-4 pt-12 md:pb-6 pb-4 w-full max-w-full font-sans text-black
-         md:h-auto
-         lg:grid-cols-[minmax(0,52fr)_minmax(0,24fr)_minmax(0,24fr)] lg:grid-rows-[auto_auto] lg:pt-24 gap-12"
->
-  <!-- row - 0 -->
-  <div class="lg:hidden grid grid-cols-1 md:grid-cols-subgrid col-span-full gap-4 md:gap-12 mb-0 md:mb-12 font-black">
-    <div class="col-span-1 min-w-0">
-      <h2
-        class:list={["max-w-[48rem] leading-[0.82] font-black", FOOTER_TYPE.hero]}
-      >
-        <span class="block">LET'S</span>
-        <span class="hiddenblock"
-          >JAM <small
-            class:list={[
-              "ml-[0.4em] inline-block align-middle",
-              FOOTER_TYPE.heroSmall,
-            ]}
-            >(together)</small
-          ></span
+<footer id="site-footer" class="w-full bg-backgroundlight font-sans text-black">
+  <div class="px-4 pb-3 pt-8 sm:px-6 md:px-8 md:pt-12 lg:px-12">
+    <div class="grid grid-cols-1 gap-8 pb-8 md:grid-cols-12 md:gap-x-8 md:pb-10">
+      <div class="md:col-span-8">
+        <p class="mb-6 max-w-[18rem] text-sm font-semibold leading-tight md:mb-8">
+          Independent brand studio<br />for ambitious businesses.
+        </p>
+        <a
+          href="mailto:hello@lokasight.com"
+          class:list={[
+            LINK_CLASS,
+            "block border-b border-black pb-2 text-[clamp(2rem,5.3vw,5.5rem)] font-semibold leading-none tracking-[-0.055em]",
+          ]}
         >
-      </h2>
+          hello@lokasight.com
+        </a>
+      </div>
+
+      <div class="flex items-start md:col-span-4 md:justify-end">
+        <div class="w-full max-w-[18rem]">
+          <img
+            src="/eyesvg.svg"
+            alt=""
+            class="h-auto w-full"
+            loading="lazy"
+          />
+        </div>
+      </div>
     </div>
 
-    <Picture
-      class="col-span-1 justify-self-end md:col-start-2 aspect-[2056/1500] w-[min(42vw,10rem)] sm:w-[min(34vw,12rem)] md:w-[clamp(18rem,10vw,30rem)] object-contain object-center"
-      src={gmnEye}
-      formats={["webp"]}
-      alt=""
-      loading="lazy"
-    />
-  </div>
-
-  <!-- Row 1 – subgrid wrapper (no contents, just subgrid) -->
-  <div
-    class="grid grid-cols-subgrid col-span-full leading-[1.2] row-span-1  py-4   font-black"
-  >
-    <div class="hidden lg:flex min-w-0">
-      <h2
-        class:list={["max-w-[48rem] leading-[0.82] font-black", FOOTER_TYPE.hero]}
-      >
-        <span class="block">LET'S</span>
-        <span class="block"
-          >JAM <small
-            class:list={[
-              "ml-[0.4em] inline-block align-middle",
-              FOOTER_TYPE.heroSmall,
-            ]}
-            >(together)</small
-          ></span
-        >
-      </h2>
-    </div>
-
-    <nav
-      class:list={["flex min-w-0 flex-col", FOOTER_TYPE.nav]}
-      aria-label="Footer navigation"
-    >
-      {
-        NAV_ITEMS.map(({ label, href }) => (
-          <a href={href} aria-label={label} class={FOOTER_SCRAMBLE_LINK_CLASS}>
-            <TextScramble client:load text={label} />
-          </a>
-        ))
-      }
-    </nav>
-
-    <div
-      class:list={["flex min-w-0 flex-col pt-[0.2rem] font-bold", FOOTER_TYPE.social]}
-      aria-label="Social links"
-    >
-      {
-        SOCIAL_LINKS.map(({ label, href }) => (
-          <a href={href} aria-label={label} class={FOOTER_SCRAMBLE_LINK_CLASS}>
-            <TextScramble client:load text={label} />
-          </a>
-        ))
-      }
-      <a
-        class:list={[
-          FOOTER_LINK_CLASS,
-          "mt-auto max-w-full whitespace-nowrap underline max-[900px]:mt-8 max-[900px]:self-start ",
-          FOOTER_TYPE.email,
-        ]}
-        href="mailto:hello@lokasight.com"
-      >
-        <span aria-hidden="true">↳</span>
-        hello@lokasight.com
-      </a>
-    </div>
-  </div>
-
-  <!-- Row 2 – subgrid wrapper -->
-  <div class="grid grid-cols-subgrid col-span-full text-black/70 font-bold">
-    <Picture
-      class="hidden lg:block aspect-[2056/1500] w-[5vw] md:w-[clamp(18rem,24vw,30rem)] object-contain object-center max-[900px]:w-[min(100%,30rem)]"
-      src={gmnEye}
-      formats={["webp"]}
-      alt=""
-      loading="lazy"
-    />
-
-    <div
-      class:list={[
-        "col-span-2 grid grid-cols-subgrid lg:self-center",
-        FOOTER_TYPE.meta,
-      ]}
-    >
-      <div class="flex min-w-0 flex-col leading-[1.55] justify-between">
+    <div class="grid grid-cols-2 gap-x-8 gap-y-8 py-8 md:grid-cols-12 md:py-10">
+      <nav class="flex flex-col text-xl font-bold leading-tight md:col-span-4 md:text-2xl" aria-label="Footer navigation">
         {
-          POLICY_LINKS.map(({ label, href }) => (
-            <a href={href} class={FOOTER_LINK_CLASS}>
-              {label}
+          NAV_ITEMS.map(({ label, href }) => (
+            <a href={href} class={LINK_CLASS} aria-label={label}>
+              <TextScramble client:load text={label} />
             </a>
           ))
         }
+      </nav>
+
+      <div class="md:col-span-3 md:col-start-7">
+        <p class="text-lg font-semibold leading-snug">Bali, Indonesia<br />GMT+8</p>
       </div>
 
-      <div class="flex min-w-0 flex-col justify-between leading-[1.05]">
-        <p>WEBSITE BY<br />FORMRIZK</p>
-        <p>©2026 FORMRIZK STUDIO</p>
+      <div class="col-span-2 md:col-span-3 md:col-start-10 md:text-right">
+        <div class="flex flex-wrap gap-x-5 gap-y-2 md:flex-col md:items-end md:gap-0">
+          {
+            SOCIAL_LINKS.map(({ label, href }) => (
+              <a href={href} class={`${LINK_CLASS} text-lg font-semibold`} aria-label={label}>
+                <TextScramble client:load text={label} />
+              </a>
+            ))
+          }
+        </div>
       </div>
     </div>
+
+    <div class="overflow-hidden">
+      <LokasightLogo client:visible className="w-full text-black" />
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between gap-3 whitespace-nowrap bg-yellow1 px-4 py-4 text-[clamp(0.5rem,2.2vw,0.75rem)] font-bold sm:px-6 md:px-8 lg:px-12">
+    <p>©2026 LOKASIGHT STUDIO</p>
+    <p class="text-right">WEBSITE BY NEWRIZK</p>
   </div>
 </footer>

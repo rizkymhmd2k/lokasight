@@ -67,7 +67,7 @@ export default function Contact() {
       }, 0);
       const availableWidth = title.clientWidth;
 
-      if (textWidth > availableWidth && availableWidth > 0) {
+      if (textWidth > 0 && availableWidth > 0) {
         const fontSize = parseFloat(getComputedStyle(title).fontSize);
         title.style.fontSize = `${(fontSize * availableWidth) / textWidth}px`;
       }
@@ -211,7 +211,7 @@ export default function Contact() {
   return (
     <div
       id="contact"
-      className="relative z-30 isolate w-full overflow-x-clip px-4 pb-12 md:pb-24 flex flex-col bg-backgroundlight"
+      className="relative z-30 isolate w-full overflow-x-clip px-4 flex flex-col bg-backgroundlight"
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
@@ -219,10 +219,10 @@ export default function Contact() {
           <h2
             ref={contactTitleRef}
             style={{
-              transform: "translateX(-0.7vw) scaleY(1.25)",
+              transform: "translateX(-0.7vw) scaleY(1.18)",
               transformOrigin: "center",
             }}
-            className="mx-auto min-w-0 w-full max-w-full overflow-visible whitespace-nowrap text-center font-oswald font-bold text-white leading-none tracking-[-0.04em] text-[19vw] md:text-[22.1vw]"
+            className="mx-auto min-w-0 w-full max-w-full overflow-visible whitespace-nowrap text-center font-anton font-normal text-white leading-none tracking-[-0.035em] text-[19vw] md:text-[22.1vw]"
             aria-label={contactWord}
           >
             {[...contactWord].map((char, index) => (
