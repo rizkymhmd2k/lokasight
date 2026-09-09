@@ -52,6 +52,7 @@ function getEffectiveBgRgb(startEl) {
 
 export default function MobileNav() {
   const [isMenuActive, setIsMenuActive] = useState(false);
+  const [isBackdropVisible, setIsBackdropVisible] = useState(false);
   const [isButtonVisible, setIsButtonVisible] = useState(true);
   const [measuredIsDarkBg, setMeasuredIsDarkBg] = useState(false);
 
@@ -164,6 +165,7 @@ export default function MobileNav() {
         defaults: { ease: "power4.inOut" },
         onReverseComplete: () => {
           setIsMenuActive(false);
+          setIsBackdropVisible(false);
           const shouldRestore = !skipNextUnlockRestoreRef.current;
           skipNextUnlockRestoreRef.current = false;
           unlockPageScroll(shouldRestore);
@@ -206,9 +208,11 @@ export default function MobileNav() {
       lockPageScroll();
       setIsButtonVisible(true);
       setIsMenuActive(true);
+      setIsBackdropVisible(true);
       animateToX(icon);
       tlRef.current.play();
     } else {
+      setIsBackdropVisible(false);
       animateToPlus(icon);
       tlRef.current.reverse();
     }
@@ -350,6 +354,12 @@ export default function MobileNav() {
 
   return (
     <div ref={wrapperRef} className="sm:hidden fixed inset-0 z-[60] pointer-events-none">
+      <div
+        aria-hidden="true"
+        className={`fixed inset-0 z-[64] bg-black/15 transition-opacity duration-200 ${
+          isBackdropVisible ? "opacity-100" : "opacity-0"
+        }`}
+      />
       <div className="fixed top-4 right-4 z-[70] pointer-events-auto">
         <button
           ref={buttonRef}
