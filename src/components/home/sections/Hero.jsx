@@ -68,11 +68,11 @@ export default function Hero({ children }) {
         </h1>
         <div className="relative flex justify-center ">
           <div className="relative ">
-            <p className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-neutral-500 md:left-auto md:right-full md:top-1/2 md:bottom-auto md:mr-5 lg:mr-25 md:mb-0 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">
+            <p className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-black-500 md:left-auto md:right-full md:top-1/2 md:bottom-auto md:mr-5 lg:mr-25 md:mb-0 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">
               [<TextScramble>BRAND</TextScramble>]
             </p>
             {children}
-            <p className="absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-neutral-500 md:left-full md:top-1/2 md:mt-0 md:ml-5 lg:ml-25 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">
+            <p className="absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap font-oswald text-base font-medium text-black-500 md:left-full md:top-1/2 md:mt-0 md:ml-5 lg:ml-25 md:-translate-x-0 md:-translate-y-1/2 md:text-xl lg:text-2xl">
               [<TextScramble>STUDIO</TextScramble>]
             </p>
           </div>

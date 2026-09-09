@@ -111,7 +111,7 @@ const Work = ({
 
   const words = useMemo(() => text.trim().split(/\s+/), [text]);
   const workHeadingClassName =
-    "text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.15] sm:leading-[0.3]";
+    "text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.15] sm:leading-[1]";
   const workHeadingStyle = {};
 
   const lines = useMeasuredLines({ wrapperRef, measureRef, words });
