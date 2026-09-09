@@ -350,12 +350,6 @@ export default function MobileNav() {
 
   return (
     <div ref={wrapperRef} className="sm:hidden fixed inset-0 z-[60] pointer-events-none">
-      <div
-        aria-hidden="true"
-        className={`fixed inset-0 z-[64] bg-black/15 transition-opacity duration-700 ${
-          isMenuActive ? "opacity-100" : "opacity-0"
-        }`}
-      />
       <div className="fixed top-4 right-4 z-[70] pointer-events-auto">
         <button
           ref={buttonRef}
