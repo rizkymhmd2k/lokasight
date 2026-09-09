@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -50,6 +50,43 @@ export default function Contact() {
     { label: "you@email.com", type: "input" },
     { label: "What are you building?", type: "input" },
   ];
+
+  /* Keep nowrap title inside available width at every viewport. */
+  useLayoutEffect(() => {
+    const title = contactTitleRef.current;
+    if (!title) return;
+
+    const fitTitle = () => {
+      title.style.fontSize = "";
+
+      const textWidth = [...title.children].reduce((width, letter) => {
+        const styles = getComputedStyle(letter);
+        const margin =
+          parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
+        return width + letter.getBoundingClientRect().width + margin;
+      }, 0);
+      const availableWidth = title.clientWidth;
+
+      if (textWidth > availableWidth && availableWidth > 0) {
+        const fontSize = parseFloat(getComputedStyle(title).fontSize);
+        title.style.fontSize = `${(fontSize * availableWidth) / textWidth}px`;
+      }
+    };
+
+    const observer = new ResizeObserver(fitTitle);
+    observer.observe(title.parentElement);
+    fitTitle();
+
+    let cancelled = false;
+    document.fonts?.ready.then(() => {
+      if (!cancelled) fitTitle();
+    });
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, []);
 
   /* ---------------------------------
    * CONTACT title letter animation
@@ -174,24 +211,24 @@ export default function Contact() {
   return (
     <div
       id="contact"
-      className="relative z-30 isolate w-full overflow-x-clip px-4 py-12 md:py-24 flex flex-col bg-backgroundlight"
+      className="relative z-30 isolate w-full overflow-x-clip px-4 pb-12 md:pb-24 flex flex-col bg-backgroundlight"
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
-        <div className="bg-black rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col">
+        <div className="bg-black px-small md:px-big rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col pt-10 sm:pt-12 md:pt-24">
           <h2
             ref={contactTitleRef}
             style={{
               transform: "translateX(-0.7vw) scaleY(1.25)",
               transformOrigin: "center",
             }}
-            className="mx-auto w-full max-w-none overflow-visible whitespace-nowrap text-center font-oswald font-bold text-white leading-none tracking-[-0.07em] text-[19vw] md:text-[22.1vw]"
+            className="mx-auto min-w-0 w-full max-w-full overflow-visible whitespace-nowrap text-center font-oswald font-bold text-white leading-none tracking-[-0.04em] text-[19vw] md:text-[22.1vw]"
             aria-label={contactWord}
           >
             {[...contactWord].map((char, index) => (
               <span
                 key={`${char}-${index}`}
-                className="inline-block overflow-hidden align-top px-[0.035em] pt-[0.1em] pb-[0.08em] -mx-[0.035em] -mt-[0.1em]"
+                className="inline-block overflow-hidden align-top px-[0.02em] pt-[0.1em] pb-[0.08em] -mx-[0.01em] -mt-[0.1em]"
               >
                 <span data-contact-letter className="inline-block">
                   {char}

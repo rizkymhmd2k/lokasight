@@ -6,6 +6,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 import SplitText from "gsap/SplitText";
 import CustomEase from "gsap/CustomEase";
+import Work from "./Work.jsx";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, CustomEase);
 
@@ -150,45 +151,16 @@ function ServiceItem({ item, isFirst, isLast, image }) {
   );
 }
 
-const Services = ({ serviceImages }) => {
+const Services = ({
+  serviceImages,
+  workLabel = "[SERVICES]",
+  workText = "Strategy, identity, and digital experiences designed to turn ambitious ideas into brands built for growth.",
+}) => {
   const sectionRef = useRef(null);
-  const headingRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const heading = headingRef.current;
-    if (!heading) return;
-
-    let disposed = false;
-    const fitHeading = () => {
-      if (disposed) return;
-      const words = heading.querySelectorAll("[data-services-heading-word]");
-      const styles = getComputedStyle(heading);
-      const textWidth = Array.from(words).reduce(
-        (width, word) => width + word.getBoundingClientRect().width,
-        0,
-      );
-      const availableWidth =
-        heading.clientWidth - parseFloat(styles.columnGap) * (words.length - 1);
-      if (textWidth > 0 && availableWidth > 0) {
-        heading.style.fontSize = `${parseFloat(styles.fontSize) * availableWidth / textWidth}px`;
-      }
-    };
-
-    const observer = new ResizeObserver(fitHeading);
-    observer.observe(heading.parentElement);
-    document.fonts.ready.then(fitHeading);
-    fitHeading();
-
-    return () => {
-      disposed = true;
-      observer.disconnect();
-    };
-  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
-    const heading = headingRef.current;
-    if (!section || !heading) return;
+    if (!section) return;
 
     const mm = gsap.matchMedia();
     mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -208,14 +180,6 @@ const Services = ({ serviceImages }) => {
           }),
         }),
       );
-
-      gsap.from(heading.querySelectorAll("[data-services-heading-word]"), {
-        yPercent: 100,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power4.out",
-        scrollTrigger: { trigger: heading, start: "top 75%", once: true },
-      });
 
       section.querySelectorAll("[data-service-tags]").forEach((tags) => {
         gsap.from(tags.children, {
@@ -263,33 +227,10 @@ const Services = ({ serviceImages }) => {
       ref={sectionRef}
       className="w-full px-2 sm:px-4 pt-12 sm:pt-24 flex flex-col bg-backgroundlight"
     >
-      <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black">
+      <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black ">
         {/* HEADER */}
-        <div className="flex w-full flex-col justify-start p-6 md:p-10">
-          <span data-service-copy className="text-sm md:text-xl font-medium text-white">
-            [SERVICES]
-          </span>
-
-          <div className="flex w-full md:mt-10">
-            <h2
-              ref={headingRef}
-              className="flex flex-row justify-between max-md:pt-6 w-full gap-1 md:gap-2 mb-0 md:mb-5 text-[5.5vw] md:text-[clamp(1.5rem,8vw,68rem)] font-bold leading-[0.95] tracking-[-0.04em] text-white"
-              aria-label="DEFINE. DESIGN. DELIVER."
-            >
-              {["DEFINE.", "DESIGN.", "DELIVER."].map((word) => (
-                <React.Fragment key={word}>
-                  <span className="inline-block shrink-0 overflow-hidden whitespace-nowrap align-bottom py-[0.12em]">
-                    <span
-                      data-services-heading-word
-                      className="inline-block will-change-transform"
-                    >
-                      {word}
-                    </span>
-                  </span>
-                </React.Fragment>
-              ))}
-            </h2>
-          </div>
+        <div className="p-6  pt-12 pb-6 md:p-10 md:pt-24 md:pb-12 border">
+          <Work embedded label={workLabel} text={workText} />
         </div>
 
         {/* SERVICES */}

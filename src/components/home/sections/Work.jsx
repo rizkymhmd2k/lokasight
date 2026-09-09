@@ -99,19 +99,20 @@ function useMeasuredLines({ wrapperRef, measureRef, words }) {
   return lines;
 }
 
-const Work = () => {
+const Work = ({
+  embedded = false,
+  label = "[WORK]",
+  text = "Attention is easy to lose. We build distinctive brands that stay with people long after the first impression.",
+}) => {
   const wrapperRef = useRef(null);
   const measureRef = useRef(null);
   const linesRootRef = useRef(null);
   const labelSlotWidth = "clamp(6rem, 16vw, 12rem)";
 
-  const bodyText =
-    "Attention is easy to lose. We build distinctive brands that stay with people long after the first impression.";
-
-  const words = useMemo(() => bodyText.trim().split(/\s+/), [bodyText]);
+  const words = useMemo(() => text.trim().split(/\s+/), [text]);
   const workHeadingClassName =
-    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[0.3]";
-  const workHeadingStyle = { lineHeight: 1 };
+    "text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.15] sm:leading-[0.3]";
+  const workHeadingStyle = {};
 
   const lines = useMeasuredLines({ wrapperRef, measureRef, words });
 
@@ -158,7 +159,12 @@ const Work = () => {
   }, [lines]);
 
   return (
-    <div id="work" className="pt-12 md:pt-24 bg-backgroundlight px-small md:px-big flex flex-col">
+    <div
+      id={embedded ? undefined : "work"}
+      className={embedded
+        ? "flex flex-col text-white"
+        : "pt-12 md:pt-24 bg-backgroundlight px-small md:px-big flex flex-col"}
+    >
       <div ref={wrapperRef} className="relative">
         {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
         <h2
@@ -194,8 +200,8 @@ const Work = () => {
         {lines !== null && (
           <h2
             ref={linesRootRef}
-            aria-label={`[WORK] ${bodyText}`}
-            className={workHeadingClassName}
+            aria-label={`${label} ${text}`}
+            className={`${workHeadingClassName} ${embedded ? "text-white" : ""}`}
             style={workHeadingStyle}
           >
             {lines.map((line, i) => (
@@ -205,7 +211,7 @@ const Work = () => {
                     className="inline-block text-sm md:text-xl font-medium align-bottom"
                     style={{ width: labelSlotWidth }}
                   >
-                    [WORK]
+                    {label}
                   </span>
                 )}
                 {line}
