@@ -108,6 +108,10 @@ export default function MobileNav() {
     const top = Math.max(0, el.getBoundingClientRect().top + window.pageYOffset);
     window.scrollTo({ top, behavior: "auto" });
     window.history.pushState(null, "", `#${sectionId}`);
+
+    // Unlocking a fixed body can put the viewport at the target without a
+    // native scroll event. Refresh scroll-driven effects such as hero dimming.
+    window.dispatchEvent(new Event("scroll"));
     return true;
   }, []);
 
@@ -220,6 +224,10 @@ export default function MobileNav() {
 
   const handleNavClick = useCallback(
     (sectionId) => (e) => {
+      // Remove the backdrop before any scroll/navigation work. This must not
+      // depend on the GSAP timeline state, which can already be reversing.
+      setIsBackdropVisible(false);
+
       const el = document.getElementById(sectionId);
       const isLocked = document.body?.dataset.navLocked === "true";
       const menuIsOpen = Boolean(
@@ -354,12 +362,9 @@ export default function MobileNav() {
 
   return (
     <div ref={wrapperRef} className="sm:hidden fixed inset-0 z-[60] pointer-events-none">
-      <div
-        aria-hidden="true"
-        className={`fixed inset-0 z-[64] bg-black/15 transition-opacity duration-200 ${
-          isBackdropVisible ? "opacity-100" : "opacity-0"
-        }`}
-      />
+      {isBackdropVisible && (
+        <div aria-hidden="true" className="fixed inset-0 z-[64] bg-black/15" />
+      )}
       <div className="fixed top-4 right-4 z-[70] pointer-events-auto">
         <button
           ref={buttonRef}
