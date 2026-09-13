@@ -57,16 +57,14 @@ const serviceImages = Object.fromEntries(serviceImageEntries);
 
     <script>
       const progressiveBlur = document.querySelector(".progressive-blur");
-      const footer = document.querySelector("#site-footer");
 
       if (progressiveBlur) {
         let frameId;
-        let footerVisible = false;
 
         const updateBlur = () => {
           progressiveBlur.classList.toggle(
             "progressive-blur--visible",
-            window.scrollY > 24 && !footerVisible,
+            window.scrollY > 24,
           );
           frameId = undefined;
         };
@@ -78,16 +76,6 @@ const serviceImages = Object.fromEntries(serviceImageEntries);
 
         updateBlur();
         window.addEventListener("scroll", handleScroll, { passive: true });
-
-        if (footer) {
-          new IntersectionObserver(
-            ([entry]) => {
-              footerVisible = entry.isIntersecting;
-              updateBlur();
-            },
-            { threshold: 0.05 },
-          ).observe(footer);
-        }
       }
     </script>
 
