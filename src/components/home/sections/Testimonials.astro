@@ -1,0 +1,313 @@
+---
+import nadineAvatar from "../../../assets/images/testimonial-nadine.png";
+import elliotAvatar from "../../../assets/images/testimonial-elliot.png";
+import meiAvatar from "../../../assets/images/testimonial-mei.png";
+import { Image } from "astro:assets";
+
+const testimonials = [
+  {
+    role: "Brand Director · Sora Botanics, Jakarta",
+    quote: "They listened before they designed. That made all the difference.",
+    highlight: "The new identity feels distinctly Indonesian, without leaning on clichés.",
+    author: "Nadine Prasetyo",
+    avatar: nadineAvatar,
+  },
+  {
+    role: "Co-founder · Fieldnote Labs, London",
+    quote: "The process was clear, collaborative, and refreshingly free of theatre.",
+    highlight: "We launched with a brand our whole team could stand behind.",
+    author: "Elliot Mercer",
+    avatar: elliotAvatar,
+  },
+  {
+    role: "Product Lead · Northstar Health, Singapore",
+    quote: "They turned a complicated product into an experience people understood immediately.",
+    highlight: "Every choice felt thoughtful, useful, and true to us.",
+    author: "Mei Lin Tan",
+    avatar: meiAvatar,
+  },
+];
+---
+
+<section id="testimonials" class="testimonials" aria-labelledby="testimonials-title">
+  <div class="testimonials__inner">
+    <header class="testimonials__header">
+      <p class="testimonials__eyebrow">[TESTIMONIALS]</p>
+      <h2 id="testimonials-title">Good people.<br /><span>Great partnerships.</span></h2>
+    </header>
+
+    <testimonial-deck class="testimonials__deck" role="region" aria-label="Client testimonials. Scroll to explore on smaller screens." tabindex="0">
+      {testimonials.map((item, index) => (
+        <div class="testimonials__slot">
+        <figure class:list={["testimonials__card", { "testimonials__card--dark": index % 2 === 1 }]} tabindex="0" aria-label={`Testimonial ${index + 1} of ${testimonials.length}`}>
+          <blockquote>
+            <p>{item.quote} <span>{item.highlight}</span></p>
+          </blockquote>
+          <figcaption>
+            <span class="testimonials__avatar" aria-hidden="true">
+              <Image src={item.avatar} alt="" width={40} height={40} loading="lazy" />
+            </span>
+            <div>
+              <strong>{item.author}</strong>
+              <span class="testimonials__discipline">{item.role}</span>
+            </div>
+          </figcaption>
+        </figure>
+        </div>
+      ))}
+    </testimonial-deck>
+
+    <footer class="testimonials__footer">
+      <!-- <p>Kind words from close collaborations</p> -->
+      <p class="testimonials__hint">Swipe to explore <span aria-hidden="true"></span></p>
+    </footer>
+  </div>
+</section>
+
+<style>
+  .testimonials {
+    overflow: clip;
+    padding-block: 6rem 13rem;
+    background: var(--color-backgroundlight);
+    color: var(--color-black);
+    font-family: var(--font-sans);
+  }
+
+  .testimonials__inner {
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: 3rem;
+  }
+
+  .testimonials__eyebrow {
+    margin-bottom: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+
+  .testimonials__header h2 {
+    margin: 0;
+    font-size: clamp(2.5rem, 5.5vw, 5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+
+  .testimonials__deck {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 6rem 4rem;
+  }
+
+  /* Slots keep scroll parallax separate from the hover spread. */
+  .testimonials__slot {
+    --tilt: -4deg;
+    --offset: 1rem;
+    --direction: -1;
+    flex: 0 0 30%;
+    min-width: 0;
+    max-width: 22rem;
+    position: relative;
+    transform: translateY(var(--parallax-y, 0px));
+  }
+
+  .testimonials__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.5rem;
+    min-width: 0;
+    min-height: 25rem;
+    margin: 0;
+    padding: 1.5rem;
+    border: 1px solid rgb(0 0 0 / 10%);
+    border-radius: 1.25rem;
+    background: var(--color-yellow1);
+    transform: translate3d(0, var(--offset), 0) rotate(var(--tilt));
+    transform-origin: 50% 65%;
+    transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .testimonials__slot + .testimonials__slot { margin-left: -3rem; }
+  .testimonials__slot:nth-child(2) { --direction: 0; --tilt: 0deg; --offset: 0rem; }
+  .testimonials__slot:nth-child(3) { --direction: 1; --tilt: 4deg; }
+
+  .testimonials__card--dark {
+    background: var(--color-black);
+    color: var(--color-backgroundlight);
+  }
+
+  /* A stationary hover region stays open while moving between cards. */
+  @media (min-width: 992px) and (hover: hover) and (pointer: fine) {
+    .testimonials__deck:hover .testimonials__card {
+      transform: translate3d(calc(var(--direction) * 4.5rem), 0, 0) rotate(0deg);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .testimonials__deck:focus-within .testimonials__card {
+      transform: translate3d(calc(var(--direction) * 4.5rem), 0, 0) rotate(0deg);
+    }
+  }
+
+  /* Wide touch screens cannot reveal overlapped cards by hovering. */
+  @media (min-width: 992px) and (hover: none) {
+    .testimonials__deck { gap: 2rem; }
+    .testimonials__slot + .testimonials__slot { margin-left: 0; }
+  }
+
+  .testimonials__card:focus-visible,
+  .testimonials__deck:focus-visible {
+    outline: 2px solid var(--color-black);
+    outline-offset: 6px;
+  }
+
+  blockquote { margin: 0; }
+  blockquote p {
+    font-size: clamp(1.125rem, 1.55vw, 1.375rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
+  }
+
+  figcaption { display: flex; align-items: center; gap: 0.625rem; }
+  figcaption strong { display: block; font-size: 0.6875rem; font-weight: 600; }
+  .testimonials__discipline { display: block; margin-top: 0.2rem; font-size: 0.625rem; opacity: 0.65; }
+  .testimonials__avatar {
+    display: block;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--color-backgroundlight);
+    border: 1px solid rgb(0 0 0 / 12%);
+  }
+  .testimonials__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 28%;
+  }
+
+  .testimonials__footer { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.75rem; }
+  .testimonials__footer > p:first-child { opacity: 0.6; }
+  .testimonials__hint { display: none; }
+
+  @media (max-width: 991px) {
+    .testimonials { padding-block: 4rem 10rem; }
+    .testimonials__inner { padding-inline: 2.25rem; }
+    .testimonials__deck {
+      justify-content: flex-start;
+      gap: 1rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin-inline: -2.25rem;
+      padding: 3rem 2.25rem;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 2.25rem;
+    }
+    .testimonials__deck::-webkit-scrollbar { display: none; }
+    .testimonials__slot {
+      flex-basis: 19rem;
+      scroll-snap-align: center;
+    }
+    .testimonials__card {
+      min-height: 24rem;
+      transform: none;
+    }
+    .testimonials__slot + .testimonials__slot { margin-left: 0; }
+    blockquote p { font-size: 1.375rem; }
+    .testimonials__hint { display: block; }
+  }
+
+  @media (max-width: 767px) {
+    .testimonials__inner { padding-inline: 1.5rem; }
+    .testimonials__deck {
+      margin-inline: -1.5rem;
+      padding-inline: 1.5rem;
+      scroll-padding-inline: 1.5rem;
+    }
+    .testimonials__slot { flex-basis: min(19rem, 82vw); }
+    .testimonials__footer { flex-wrap: wrap; }
+  }
+
+  @media (min-width: 640px) {
+    .testimonials__eyebrow { font-size: 0.875rem; }
+  }
+
+  @media (min-width: 768px) {
+    .testimonials__eyebrow { font-size: 1.125rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .testimonials__eyebrow { font-size: 1.25rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .testimonials__slot { transform: none; }
+    .testimonials__card { transition: none; }
+  }
+</style>
+
+<script>
+  class TestimonialDeck extends HTMLElement {
+    private cleanup?: () => void;
+
+    connectedCallback() {
+      this.cleanup?.();
+      const cards = Array.from(this.querySelectorAll<HTMLElement>(".testimonials__slot"));
+      const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const controller = new AbortController();
+      const { signal } = controller;
+      const depths = [-32, 44, -22];
+      let frame = 0;
+      let visible = false;
+
+      const render = () => {
+        frame = 0;
+        if (motion.matches || !visible) return;
+        // Measure the stationary deck so card transforms never feed back into scroll progress.
+        const rect = this.getBoundingClientRect();
+        const progress = Math.max(-1, Math.min(1,
+          (window.innerHeight - rect.top * 2 - rect.height) / (window.innerHeight + rect.height),
+        ));
+        const strength = window.innerWidth < 992 ? 0.35 : 1;
+        cards.forEach((card, index) => {
+          card.style.setProperty("--parallax-y", `${progress * depths[index] * strength}px`);
+        });
+      };
+
+      const schedule = () => {
+        if (!frame && visible && !motion.matches) frame = requestAnimationFrame(render);
+      };
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        schedule();
+      }, { rootMargin: "100px" });
+      observer.observe(this);
+      window.addEventListener("scroll", schedule, { passive: true, signal });
+      window.addEventListener("resize", schedule, { passive: true, signal });
+      motion.addEventListener("change", () => {
+        cards.forEach((card) => card.style.removeProperty("--parallax-y"));
+        schedule();
+      }, { signal });
+
+      this.cleanup = () => {
+        controller.abort();
+        observer.disconnect();
+        cancelAnimationFrame(frame);
+        cards.forEach((card) => card.style.removeProperty("--parallax-y"));
+      };
+    }
+
+    disconnectedCallback() { this.cleanup?.(); }
+  }
+
+  if (!customElements.get("testimonial-deck")) {
+    customElements.define("testimonial-deck", TestimonialDeck);
+  }
+</script>

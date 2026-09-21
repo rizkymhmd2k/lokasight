@@ -6,6 +6,7 @@ import HeroSection from "../components/home/HeroSection.astro";
 import Work from "../components/home/sections/Work.jsx";
 import Services from "../components/home/sections/Services.jsx";
 import About from "../components/home/sections/About.astro";
+import Testimonials from "../components/home/sections/Testimonials.astro";
 import Contact from "../components/home/sections/Contact.jsx";
 import Footer from "../components/home/sections/Footer.astro";
 import WorkShowcase from "../components/home/sections/WorkShowcase.astro";
@@ -95,6 +96,7 @@ const serviceImages = Object.fromEntries(serviceImageEntries);
 
       <Services client:load serviceImages={serviceImages} />
       <About />
+      <Testimonials />
       <Contact client:load />
       <Footer />
     </section>
