@@ -1,7 +1,7 @@
 ---
-import nadineAvatar from "../../../assets/images/testimonial-nadine.png";
-import elliotAvatar from "../../../assets/images/testimonial-elliot.png";
-import meiAvatar from "../../../assets/images/testimonial-mei.png";
+import nadineAvatar from "../../../assets/images/testimonial-nadine-circle.png";
+import elliotAvatar from "../../../assets/images/testimonial-elliot-circle.png";
+import meiAvatar from "../../../assets/images/testimonial-mei-circle.png";
 import { Image } from "astro:assets";
 
 const testimonials = [
@@ -45,7 +45,7 @@ const testimonials = [
           </blockquote>
           <figcaption>
             <span class="testimonials__avatar" aria-hidden="true">
-              <Image src={item.avatar} alt="" width={40} height={40} loading="lazy" />
+              <Image src={item.avatar} alt="" width={160} height={160} quality={100} format="png" loading="lazy" />
             </span>
             <div>
               <strong>{item.author}</strong>
@@ -190,7 +190,8 @@ const testimonials = [
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 28%;
+    object-position: center;
+    transform: none;
   }
 
   .testimonials__footer { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.75rem; }
@@ -198,7 +199,7 @@ const testimonials = [
   .testimonials__hint { display: none; }
 
   @media (max-width: 991px) {
-    .testimonials { padding-block: 4rem 10rem; }
+    .testimonials { padding-block: 4rem 11rem; }
     .testimonials__inner { padding-inline: 2.25rem; }
     .testimonials__deck {
       justify-content: flex-start;
