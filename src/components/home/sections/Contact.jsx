@@ -215,7 +215,7 @@ export default function Contact() {
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
-        <div className="bg-black px-small md:px-big rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col pt-10 sm:pt-12 md:pt-24">
+        <div className="bg-black px-small md:px-big rounded-t-3xl h-full overflow-hidden pb-5 2xl:pb-10 flex flex-col pt-12 md:pt-24">
           <h2
             ref={contactTitleRef}
             style={{
