@@ -251,14 +251,14 @@ export default function Contact() {
               {/* Left: copy/testimonial */}
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />
-                <h3 className="font-bold leading-[0.95] tracking-[-0.03em] text-[clamp(2.5rem,10vw,4rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
+                <h3 className="font-semibold leading-[0.95] tracking-[-0.02em] text-[clamp(2.5rem,10vw,4rem)] lg:text-[clamp(2.5rem,4.6vw,4.6rem)]">
                   <br />
                   Let&apos;s build
                   <br />
                   something worth remembering.
                 </h3>
                 <blockquote className="max-w-md">
-                  <p className="text-lg font-semibold leading-snug">
+                  <p className="font-display text-lg font-semibold leading-[1.3]">
                     &ldquo;They made the whole process feel clear and fast.
                     We’re really happy with where we landed.&rdquo;
                     <br />
@@ -279,7 +279,7 @@ export default function Contact() {
                 {fields.map((field) => (
                   <label
                     key={field.label}
-                    className="flex flex-col gap-2 text-lg font-semibold"
+                    className="flex flex-col gap-2 text-base font-normal leading-[1.4]"
                   >
                     {field.label}
                     {field.type === "textarea" ? (
@@ -302,7 +302,7 @@ export default function Contact() {
                 ))}
                 <button
                   type="submit"
-                  className="mt-4 w-full rounded-full bg-black text-white text-lg font-semibold py-4"
+                  className="mt-4 w-full rounded-full bg-black text-white text-sm font-normal leading-[1.5] py-4"
                 >
                   Start the conversation
                 </button>

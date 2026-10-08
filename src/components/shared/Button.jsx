@@ -5,7 +5,7 @@ export default function Button({
   ...props
 }) {
   const content = (
-    <span className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.08em]">
+    <span className="flex items-center gap-3 text-sm font-normal leading-[1.5] tracking-[-0.02em]">
       <span>{children}</span>
       <span className="relative flex h-4 w-5 overflow-hidden">
         <span className="absolute inset-0 transition-transform duration-300 ease-out group-hover:translate-x-full">

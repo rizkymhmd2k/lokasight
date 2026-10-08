@@ -403,7 +403,7 @@ export default function MobileNav() {
             aria-hidden="true"
             className="h-8 w-11 shrink-0 object-contain"
           />
-          <span className="text-lg font-bold tracking-[-0.04em]">Lokasight</span>
+          <span className="font-display text-lg font-semibold tracking-[-0.02em]">Lokasight</span>
         </div>
 
         <nav className="mt-3 flex flex-col border-t border-black/55" aria-label="Primary navigation">
@@ -413,7 +413,7 @@ export default function MobileNav() {
                 href={`#${item.toLowerCase()}`}
                 data-nav-item
                 aria-label={item}
-                className="block py-[0.18rem] text-[clamp(2.75rem,13vw,5rem)] font-semibold leading-[0.92] tracking-[-0.055em] transition-colors duration-200 hover:text-yellow1"
+                className="block py-[0.18rem] font-display text-[clamp(2.75rem,13vw,5rem)] font-semibold leading-[0.95] tracking-[-0.02em] transition-colors duration-200 hover:text-yellow1"
                 onClick={handleNavClick(item.toLowerCase())}
               >
                 <TextScramble>{item}</TextScramble>

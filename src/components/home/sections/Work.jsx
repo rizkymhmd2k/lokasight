@@ -102,16 +102,17 @@ function useMeasuredLines({ wrapperRef, measureRef, words }) {
 const Work = ({
   embedded = false,
   label = "[WORK]",
-  text = "Attention is easy to lose. We build distinctive brands that stay with people long after the first impression.",
+  text = "Attention fades. We build distinctive brands that make a lasting impression.",
 }) => {
   const wrapperRef = useRef(null);
   const measureRef = useRef(null);
   const linesRootRef = useRef(null);
-  const labelSlotWidth = "clamp(6rem, 16vw, 12rem)";
+  const labelClassName = "inline-block typography-label align-baseline whitespace-nowrap";
+  const labelStyle = { paddingInlineEnd: "clamp(1rem, 2.5vw, 2.5rem)" };
 
   const words = useMemo(() => text.trim().split(/\s+/), [text]);
   const workHeadingClassName =
-    "text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.15] sm:leading-[1]";
+    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.1] tracking-[-0.02em]";
   const workHeadingStyle = {};
 
   const lines = useMeasuredLines({ wrapperRef, measureRef, words });
@@ -186,8 +187,11 @@ const Work = ({
         >
           <span
             aria-hidden="true"
-            style={{ display: "inline-block", width: labelSlotWidth }}
-          />
+            className={labelClassName}
+            style={labelStyle}
+          >
+            {label}
+          </span>
           {words.map((w, i) => (
             <React.Fragment key={i}>
               <span data-w="1">{w}</span>
@@ -205,11 +209,15 @@ const Work = ({
             style={workHeadingStyle}
           >
             {lines.map((line, i) => (
-              <span key={i} data-line style={{ display: "block" }}>
+              <span
+                key={i}
+                data-line
+                className="block"
+              >
                 {i === 0 && (
                   <span
-                    className="inline-block text-sm md:text-xl font-medium align-bottom"
-                    style={{ width: labelSlotWidth }}
+                    className={labelClassName}
+                    style={labelStyle}
                   >
                     {label}
                   </span>

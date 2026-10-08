@@ -84,7 +84,7 @@ function Tags({ tags, className = "" }) {
       {tags.map((tag) => (
         <span
           key={tag}
-          className="text-[11px] px-3 py-1 rounded-full bg-white/10 text-white/60 border border-white/10"
+          className="font-sans text-sm tracking-[-0.02em] leading-[1.4] px-3 py-1 rounded-full bg-white/10 text-white/60 border border-white/10"
         >
           {tag}
         </span>
@@ -109,7 +109,7 @@ function ServiceItem({ item, isFirst, isLast, image }) {
         <div className="order-1 md:col-start-1 md:row-start-1 xl:col-start-1 xl:row-start-1">
           <div className="flex items-center gap-3">
             <YellowDot />
-            <h3 data-service-copy className="text-white text-2xl lg:text-3xl font-semibold">
+            <h3 data-service-copy className="text-white text-2xl lg:text-[1.75rem] font-semibold leading-[1.2] tracking-[-0.02em]">
               {item.title}
             </h3>
           </div>
@@ -125,7 +125,7 @@ function ServiceItem({ item, isFirst, isLast, image }) {
           className="
             order-3 mt-3
             text-white/80 md:text-white/60
-            text-sm leading-relaxed
+            text-base leading-[1.4]
             md:order-2 md:mt-0 md:col-start-1 md:row-start-3
             xl:col-start-2 xl:row-start-1 2xl:max-w-90
           "
@@ -154,7 +154,7 @@ function ServiceItem({ item, isFirst, isLast, image }) {
 const Services = ({
   serviceImages,
   workLabel = "[SERVICES]",
-  workText = "Strategy, identity, and digital experiences designed to turn ambitious ideas into brands built for growth.",
+  workText = "Strategy, identity, and digital experiences that build brands for growth.",
 }) => {
   const sectionRef = useRef(null);
 
@@ -234,7 +234,7 @@ const Services = ({
         </div>
 
         {/* SERVICES */}
-        <div className="grid w-full grid-cols-1 px-6 pb-6 md:px-10 md:pb-10 lg:grid-cols-12">
+        <div className="grid w-full grid-cols-1 px-6 pb-6 md:px-10 md:pb-24 lg:grid-cols-12">
           <div className="flex w-full flex-col lg:col-span-8 lg:col-start-5">
           {/* <div className="border-t border-white/10 mb-6 md:hidden" /> */}
 

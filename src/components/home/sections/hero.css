@@ -1,0 +1,107 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  padding: 16px 16px 8px;
+  color: #0a0a0a;
+}
+
+.hero__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 32px;
+}
+
+.hero__eye {
+  display: block;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.hero__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 56px);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.hero__nav a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  transition: opacity 180ms ease;
+}
+
+.hero__nav a:hover {
+  opacity: 0.5;
+}
+
+.hero__header a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.hero__copy {
+  align-self: flex-end;
+  width: 54%;
+  margin-block: clamp(24px, 4svh, 48px) 32px;
+  font-size: clamp(16px, 1.5vw, 24px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  text-indent: 2em;
+  text-wrap: pretty;
+}
+
+.hero__brand {
+  margin-top: auto;
+  min-height: 0;
+}
+
+.hero__disciplines {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: clamp(10px, 0.8vw, 12px);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.hero__wordmark {
+  margin: 0;
+  transform: translateY(6px);
+}
+
+.hero__logo,
+.hero__logo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 639px) {
+  .hero__eye {
+    width: 64px;
+  }
+
+  .hero__nav {
+    display: none;
+  }
+
+  .hero__copy {
+    width: min(100%, 340px);
+    margin-top: 48px;
+    font-size: clamp(16px, 4.2vw, 20px);
+  }
+}
+
+@media (max-height: 600px) and (min-width: 640px) {
+  .hero__copy {
+    margin-block: 12px 20px;
+    font-size: clamp(16px, 1.5vw, 20px);
+  }
+}
