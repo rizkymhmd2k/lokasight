@@ -27,7 +27,7 @@ const items = [
                   src={item.image}
                   formats={["avif", "webp"]}
                   widths={[480, 720, 960, 1200, 1440]}
-                  sizes="(min-width: 992px) min(88.89vh, 80rem), calc(100vw - 3rem)"
+                  sizes="(min-width: 992px) min(88.89svh, 84rem, calc(100vw - 6rem)), (min-width: 768px) calc(100vw - 4.5rem), calc(100vw - 3rem)"
                   alt=""
                   loading={index === 0 ? "eager" : "lazy"}
                   decoding="async"
@@ -88,9 +88,15 @@ const items = [
     overflow: clip;
     border-radius: 3rem;
     background: #ddd;
-    transform: translate3d(0, 100vh, 0) scale(1.1) rotateX(100deg);
     transform-origin: center;
-    will-change: transform;
+  }
+
+  .work-showcase__card > :global(picture) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   .work-showcase__image {
@@ -166,8 +172,7 @@ const items = [
         .map((item) => {
           const card = item.querySelector<HTMLElement>("[data-work-card]");
           return card
-            ? { item, card, targetY: 0, targetRotate: 0, targetScale: 1,
-                currentY: 0, currentRotate: 0, currentScale: 1 }
+            ? { item, card, targetProgress: 0, currentProgress: 0 }
             : null;
         })
         .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
@@ -184,21 +189,24 @@ const items = [
 
         entries.forEach((entry) => {
           const rect = entry.item.getBoundingClientRect();
-          const startTop = viewportHeight * 0.7;
+          // Alture starts when 30% of the card enters, and ends when
+          // half the card has left. Both offsets are relative to the card.
+          const startTop = viewportHeight - Math.min(rect.height * 0.3, viewportHeight);
           const endTop = rect.height * -0.5;
-          const progress = clamp((startTop - rect.top) / (startTop - endTop), 0, 1);
-
-          if (progress <= 0.5) {
-            const phase = progress * 2;
-            entry.targetY = viewportHeight * (1 - easeOutCubic(phase));
-            entry.targetRotate = 100 * (1 - phase);
-            entry.targetScale = 1.1 - 0.1 * phase;
-          } else {
-            entry.targetY = 0;
-            entry.targetRotate = 0;
-            entry.targetScale = 1 - 0.1 * ((progress - 0.5) * 2);
-          }
+          entry.targetProgress = clamp((startTop - rect.top) / (startTop - endTop), 0, 1);
         });
+      };
+
+      const paint = (entry: (typeof entries)[number]) => {
+        const phase = Math.min(entry.currentProgress * 2, 1);
+        const y = window.innerHeight * (1 - easeOutCubic(phase));
+        const rotation = 100 * (1 - phase);
+        const scale = entry.currentProgress <= 0.5
+          ? 1.1 - 0.1 * phase
+          : 1 - 0.1 * (entry.currentProgress - 0.5) * 2;
+
+        entry.card.style.transform =
+          `translate3d(0, ${y}px, 0) scale(${scale}) rotateX(${rotation}deg)`;
       };
 
       const render = (time: number) => {
@@ -208,16 +216,15 @@ const items = [
         previousTime = time;
 
         entries.forEach((entry) => {
-          entry.currentY += (entry.targetY - entry.currentY) * smoothing;
-          entry.currentRotate += (entry.targetRotate - entry.currentRotate) * smoothing;
-          entry.currentScale += (entry.targetScale - entry.currentScale) * smoothing;
-          entry.card.style.transform =
-            `translate3d(0, ${entry.currentY}px, 0) ` +
-            `scale(${entry.currentScale}) rotateX(${entry.currentRotate}deg)`;
-
-          if (Math.abs(entry.targetY - entry.currentY) > 0.01 ||
-              Math.abs(entry.targetRotate - entry.currentRotate) > 0.01 ||
-              Math.abs(entry.targetScale - entry.currentScale) > 0.0001) unsettled = true;
+          // Smooth scroll progress before applying the keyframe easing.
+          const delta = entry.targetProgress - entry.currentProgress;
+          if (Math.abs(delta) > 0.0001) {
+            entry.currentProgress += delta * smoothing;
+            unsettled = true;
+          } else {
+            entry.currentProgress = entry.targetProgress;
+          }
+          paint(entry);
         });
 
         animationFrame = unsettled ? requestAnimationFrame(render) : 0;
@@ -226,23 +233,23 @@ const items = [
       const update = () => {
         scrollFrame = 0;
         setTargets();
-        previousTime = performance.now();
-        if (!animationFrame) animationFrame = requestAnimationFrame(render);
+        if (!animationFrame) {
+          previousTime = performance.now();
+          animationFrame = requestAnimationFrame(render);
+        }
       };
 
       const scheduleUpdate = () => {
-        if (!scrollFrame) scrollFrame = requestAnimationFrame(update);
+        if (!reducedMotion.matches && !scrollFrame) {
+          scrollFrame = requestAnimationFrame(update);
+        }
       };
 
       const syncInitialState = () => {
         setTargets();
         entries.forEach((entry) => {
-          entry.currentY = entry.targetY;
-          entry.currentRotate = entry.targetRotate;
-          entry.currentScale = entry.targetScale;
-          entry.card.style.transform =
-            `translate3d(0, ${entry.currentY}px, 0) ` +
-            `scale(${entry.currentScale}) rotateX(${entry.currentRotate}deg)`;
+          entry.currentProgress = entry.targetProgress;
+          paint(entry);
         });
       };
 
@@ -258,7 +265,7 @@ const items = [
 
       const resizeObserver = new ResizeObserver(scheduleUpdate);
       resizeObserver.observe(section);
-      syncInitialState();
+      onMotionChange();
       window.addEventListener("scroll", scheduleUpdate, { passive: true });
       window.addEventListener("resize", scheduleUpdate);
       reducedMotion.addEventListener("change", onMotionChange);

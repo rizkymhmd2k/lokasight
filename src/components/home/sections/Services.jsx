@@ -151,11 +151,7 @@ function ServiceItem({ item, isFirst, isLast, image }) {
   );
 }
 
-const Services = ({
-  serviceImages,
-  workLabel = "[SERVICES]",
-  workText = "Strategy, identity, and digital experiences that build brands for growth.",
-}) => {
+const Services = ({ serviceImages }) => {
   const sectionRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -225,16 +221,20 @@ const Services = ({
     <div
       id="services"
       ref={sectionRef}
-      className="w-full px-2 sm:px-4 pt-12 sm:pt-24 flex flex-col bg-backgroundlight"
+      className="w-full px-2 sm:px-4 pt-12 sm:pt-16 flex flex-col bg-backgroundlight"
     >
       <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black ">
         {/* HEADER */}
-        <div className="p-6  pt-12 pb-6 md:p-10 md:pt-24 md:pb-12 border">
-          <Work embedded label={workLabel} text={workText} />
+        <div className="border px-small pt-12 pb-10 md:px-big md:pt-16 md:pb-16">
+          <Work
+            embedded
+            label="[SERVICES]"
+            text="Strategy, identity, and digital experiences that build brands for growth. From clarifying your position to shaping a distinct identity and digital experiences, we help your brand earn trust and grow."
+          />
         </div>
 
         {/* SERVICES */}
-        <div className="grid w-full grid-cols-1 px-6 pb-6 md:px-10 md:pb-24 lg:grid-cols-12">
+        <div className="grid w-full grid-cols-1 px-6 pb-6 md:px-10 md:pb-16 lg:grid-cols-12">
           <div className="flex w-full flex-col lg:col-span-8 lg:col-start-5">
           {/* <div className="border-t border-white/10 mb-6 md:hidden" /> */}
 

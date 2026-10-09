@@ -3,9 +3,10 @@
 import { useMemo, useCallback } from "react";
 import TextScramble from "../../shared/TextScramble.jsx";
 import LokasightLogo from "../../shared/LokasightLogo.jsx";
+import AnimatedEye from "../../shared/AnimatedEye.jsx";
 import "./hero.css";
 
-export default function Hero({ children }) {
+export default function Hero() {
   const navItems = useMemo(
     () => ["HOME", "WORK", "SERVICES", "ABOUT", "CONTACT"],
     [],
@@ -40,7 +41,7 @@ export default function Hero({ children }) {
           className="hero__eye"
           onClick={handleNavClick("home")}
         >
-          {children}
+          <AnimatedEye />
         </a>
         <nav aria-label="Hero navigation" className="hero__nav">
           {navItems.map((item) => (

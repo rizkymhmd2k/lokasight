@@ -1,230 +1,227 @@
 "use client";
 
-import React, {
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import AnimatedEye from "../../shared/AnimatedEye.jsx";
+import "./work.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function sameArray(a, b) {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-  return true;
+function Word({ children }) {
+  return (
+    <>
+      <span className="work-heading__word-mask">
+        <span data-work-copy className="work-heading__word">
+          {children}
+        </span>
+      </span>{" "}
+    </>
+  );
 }
 
-function useMeasuredLines({ wrapperRef, measureRef, words }) {
-  const [lines, setLines] = useState(null);
-
-  const rafRef = useRef(0);
-  const lastLinesRef = useRef(null);
-
-  useLayoutEffect(() => {
-    const wrapperEl = wrapperRef.current;
-    if (!wrapperEl) return;
-
-    const measure = () => {
-      const el = measureRef.current;
-      if (!el) return;
-
-      const spans = el.querySelectorAll('span[data-w="1"]');
-      if (!spans.length) return;
-
-      const result = [];
-      let current = [];
-      let currentTop = null;
-
-      // offsetTop is typically cheaper than getBoundingClientRect()
-      for (let i = 0; i < spans.length; i++) {
-        const s = spans[i];
-        const top = s.offsetTop;
-
-        if (currentTop === null) currentTop = top;
-
-        if (top > currentTop) {
-          result.push(current.join(" "));
-          current = [];
-          currentTop = top;
-        }
-
-        current.push(s.textContent);
-      }
-
-      if (current.length) result.push(current.join(" "));
-
-      const filtered = result.filter(Boolean);
-
-      if (!sameArray(lastLinesRef.current, filtered)) {
-        lastLinesRef.current = filtered;
-        setLines(filtered);
-      }
-    };
-
-    const schedule = () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(measure);
-    };
-
-    // reset and measure
-    lastLinesRef.current = null;
-    schedule();
-
-    // Only re-measure when width changes (huge win on pages with height-only changes)
-    let lastWidth = wrapperEl.clientWidth;
-
-    const ro = new ResizeObserver(() => {
-      const w = wrapperEl.clientWidth;
-      if (w === lastWidth) return;
-      lastWidth = w;
-
-      setLines(null);
-      lastLinesRef.current = null;
-      schedule();
-    });
-
-    ro.observe(wrapperEl);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      ro.disconnect();
-    };
-  }, [wrapperRef, measureRef, words]);
-
-  return lines;
+function Graphic({ type, space = true }) {
+  return (
+    <>
+      <span className={`work-heading__graphic work-heading__graphic--${type}`} aria-hidden="true">
+        <span data-work-graphic className="work-heading__graphic-inner">
+          {type === "eye" ? <AnimatedEye /> : <svg viewBox="0 0 160 100" fill="none" focusable="false">
+            {type === "spark" && <g fill="currentColor">
+              <path d="M58 1C56 34 46 43 9 47c34 3 45 12 46 46 6-33 14-43 48-46C72 42 61 34 58 1Z" />
+              <path d="M119 39c-3 21-10 29-33 32 22 3 29 10 31 28 4-19 11-26 34-29-23-3-29-9-32-31Z" />
+            </g>}
+            {type === "orbit" && <g stroke="currentColor" strokeWidth="1.7">
+              <ellipse cx="80" cy="50" rx="75" ry="28" />
+              <ellipse cx="80" cy="50" rx="50" ry="28" />
+              <ellipse cx="80" cy="50" rx="20" ry="28" />
+              <ellipse cx="80" cy="50" rx="11" ry="28" />
+              <path d="M5 50h150" />
+            </g>}
+            {type === "type" && <g>
+              <path d="M13 15h134v70H13z" fill="#ffff04" stroke="currentColor" strokeWidth="2.5" />
+              <text x="24" y="70" fill="currentColor" fontFamily="Arial, Helvetica, sans-serif" fontSize="67" letterSpacing="-6">Aa</text>
+              <path d="M107 27v47" stroke="currentColor" strokeWidth="2" />
+            </g>}
+          </svg>}
+        </span>
+      </span>{space && " "}
+    </>
+  );
 }
 
 const Work = ({
   embedded = false,
   label = "[WORK]",
-  text = "Attention fades. We build distinctive brands that make a lasting impression.",
+  text = "Attention fades. We build distinctive brands that make a lasting impression. The kind you know from one corner of a poster, one word in a headline, one glimpse across the street.",
 }) => {
   const wrapperRef = useRef(null);
-  const measureRef = useRef(null);
-  const linesRootRef = useRef(null);
-  const labelClassName = "inline-block typography-label align-baseline whitespace-nowrap";
-  const labelStyle = { paddingInlineEnd: "clamp(1rem, 2.5vw, 2.5rem)" };
+  const words = text.trim().split(/\s+/);
 
-  const words = useMemo(() => text.trim().split(/\s+/), [text]);
-  const workHeadingClassName =
-    "text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.1] tracking-[-0.02em]";
-  const workHeadingStyle = {};
-
-  const lines = useMeasuredLines({ wrapperRef, measureRef, words });
-
-  // Animate with GSAP + ScrollTrigger (no IO, no visible state, no per-line inline transitions)
   useLayoutEffect(() => {
-    if (!lines || !wrapperRef.current || !linesRootRef.current) return;
+    const root = wrapperRef.current;
+    if (!root) return;
 
+    const media = gsap.matchMedia();
     const ctx = gsap.context(() => {
-      const targets = linesRootRef.current.querySelectorAll("[data-line]");
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        const copy = gsap.utils.toArray("[data-work-copy]", root);
+        const graphics = gsap.utils.toArray("[data-work-graphic]", root);
+        const loops = [];
+        let entered = false;
+        let visible = false;
+        const syncMotion = () => {
+          loops.forEach((animation) => animation.paused(!entered || !visible || document.hidden));
+        };
 
-      // Set initial state once (no React-driven animation)
-      gsap.set(targets, { y: 34, autoAlpha: 0 });
+        if (graphics.length) {
+          const sparks = root.querySelectorAll(".work-heading__graphic--spark path");
+          sparks.forEach((spark, index) => {
+            loops.push(gsap.timeline({ paused: true, repeat: -1, repeatDelay: 1.5 + index * 0.4 })
+              .to(spark, {
+                scale: 0.65, rotation: -18, transformOrigin: "50% 50%",
+                duration: 0.4, ease: "sine.inOut", delay: index * 0.3,
+              })
+              .to(spark, { scale: 1.08, rotation: 12, duration: 0.55, ease: "back.out(2)" })
+              .to(spark, { scale: 1, rotation: 0, duration: 0.45, ease: "sine.inOut" }));
+          });
 
-      gsap.to(targets, {
-        y: 0,
-        autoAlpha: 1,
-        duration: 0.7,
-        ease: "power3.out",
-        stagger: 0.16,
-        overwrite: true,
-        onStart: () => {
-          gsap.set(targets, { willChange: "transform,opacity" });
-        },
-        onComplete: () => {
-          // Release will-change after animation to reduce memory/compositing cost
-          gsap.set(targets, { clearProps: "willChange" });
-        },
-        onReverseComplete: () => {
-          gsap.set(targets, { clearProps: "willChange" });
-        },
-        scrollTrigger: {
-          trigger: wrapperRef.current,
-          start: "top 65%",
-          toggleActions: "play none none reverse",
-          // markers: true,
-        },
+          loops.push(gsap.fromTo(root.querySelector(".work-heading__graphic--orbit svg"),
+            { rotation: -9 },
+            { rotation: 9, transformOrigin: "50% 50%", duration: 2.4,
+              repeat: -1, yoyo: true, ease: "sine.inOut", paused: true }));
+          loops.push(gsap.fromTo(root.querySelectorAll(".work-heading__graphic--orbit ellipse:not(:first-child)"),
+            { scaleX: 0.7 },
+            { scaleX: 1.15, transformOrigin: "50% 50%", duration: 1.8, stagger: 0.2,
+              repeat: -1, yoyo: true, ease: "sine.inOut", paused: true }));
+
+          loops.push(gsap.fromTo(root.querySelector(".work-heading__graphic--type svg"),
+            { yPercent: -5 },
+            { yPercent: 5, duration: 1.8,
+              repeat: -1, yoyo: true, ease: "sine.inOut", paused: true }));
+
+          ScrollTrigger.create({
+            trigger: root, start: "top bottom", end: "bottom top",
+            onToggle: (trigger) => { visible = trigger.isActive; syncMotion(); },
+            onRefresh: (trigger) => { visible = trigger.isActive; syncMotion(); },
+          });
+          document.addEventListener("visibilitychange", syncMotion);
+        }
+
+        const timeline = gsap.timeline({
+          defaults: { ease: "power4.out" },
+          onComplete: () => { entered = true; syncMotion(); },
+          scrollTrigger: {
+            trigger: root,
+            start: "top 76%",
+            once: true,
+          },
+        });
+
+        timeline.fromTo(
+          copy,
+          { y: 12, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.45, stagger: 0.012 },
+        );
+
+        if (graphics.length) {
+          timeline.fromTo(
+            graphics,
+            {
+              autoAlpha: 0,
+              y: 8,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              stagger: 0.12,
+            },
+            0.14,
+          );
+        }
+
+        return () => document.removeEventListener("visibilitychange", syncMotion);
       });
-    }, wrapperRef);
+    }, root);
 
-    // Ensure ScrollTrigger recalculates after lines change
-    ScrollTrigger.refresh();
+    return () => {
+      media.revert();
+      ctx.revert();
+    };
+  }, [embedded, label, text]);
 
-    return () => ctx.revert();
-  }, [lines]);
+  const headingClassName = `work-heading${embedded ? " work-heading--embedded" : ""}`;
 
   return (
     <div
       id={embedded ? undefined : "work"}
-      className={embedded
-        ? "flex flex-col text-white"
-        : "pt-12 md:pt-24 bg-backgroundlight px-small md:px-big flex flex-col"}
+      className={
+        embedded
+          ? "flex flex-col text-white"
+          : "bg-backgroundlight px-small pt-12 md:px-big md:pt-24"
+      }
     >
       <div ref={wrapperRef} className="relative">
-        {/* Measurement: spans exist from first render; no DOM mutation; hidden after measured */}
-        <h2
-          ref={measureRef}
-          aria-hidden={lines !== null ? "true" : undefined}
-          className={workHeadingClassName}
-          style={
-            lines !== null
-              ? {
-                  ...workHeadingStyle,
-                  position: "absolute",
-                  visibility: "hidden",
-                  pointerEvents: "none",
-                  opacity: 0,
-                  inset: 0,
-                }
-              : { ...workHeadingStyle, opacity: 0 }
-          }
-        >
-          <span
-            aria-hidden="true"
-            className={labelClassName}
-            style={labelStyle}
-          >
-            {label}
-          </span>
-          {words.map((w, i) => (
-            <React.Fragment key={i}>
-              <span data-w="1">{w}</span>
-              {i < words.length - 1 ? " " : null}
-            </React.Fragment>
-          ))}
-        </h2>
+        {embedded ? (
+          <h2 className={headingClassName} aria-label={`${label} ${text}`}>
+            <span className="work-heading__label">{label}</span>{" "}
+            {words.map((word, index) => {
+              if (word === "distinctive" && words[index + 1] === "brands") {
+                return (
+                  <React.Fragment key={`${word}-${index}`}>
+                    <span className="work-heading__phrase" data-work-copy>
+                      <em className="work-heading__highlight">{word}</em> brands
+                    </span>{" "}
+                  </React.Fragment>
+                );
+              }
 
-        {/* Output: no inline per-line transition strings; GSAP controls animation */}
-        {lines !== null && (
-          <h2
-            ref={linesRootRef}
-            aria-label={`${label} ${text}`}
-            className={`${workHeadingClassName} ${embedded ? "text-white" : ""}`}
-            style={workHeadingStyle}
-          >
-            {lines.map((line, i) => (
-              <span
-                key={i}
-                data-line
-                className="block"
-              >
-                {i === 0 && (
-                  <span
-                    className={labelClassName}
-                    style={labelStyle}
-                  >
-                    {label}
-                  </span>
-                )}
-                {line}
-              </span>
-            ))}
+              if (word === "brands" && words[index - 1] === "distinctive") return null;
+              return <Word key={`${word}-${index}`}>{word}</Word>;
+            })}
+          </h2>
+        ) : (
+          <h2 className={headingClassName} aria-label={`${label} ${text}`}>
+            <span className="work-heading__label">{label}</span>{" "}
+            <Word>Attention</Word>
+            <Graphic type="spark" />
+            <Word>fades.</Word>
+            <Word>We</Word>
+            <Word>build</Word>
+            <Graphic type="orbit" />
+            <span className="work-heading__phrase" data-work-copy>
+              <em className="work-heading__highlight">distinctive</em> brands
+            </span>{" "}
+            <Word>that</Word>
+            <Word>make</Word>
+            <Word>a</Word>
+            <Word>lasting</Word>
+            <Word>impression.</Word>
+            <Word>The</Word>
+            <Word>kind</Word>
+            <Word>you</Word>
+            <Word>know</Word>
+            <Word>from</Word>
+            <Word>one</Word>
+            <Word>corner</Word>
+            <Word>of</Word>
+            <Word>a</Word>
+            <Word>poster,</Word>
+            <Word>one</Word>
+            <Word>word</Word>
+            <Word>in</Word>
+            <Word>a</Word>
+            <span className="work-heading__punctuated">
+              <Word>headline</Word>
+              <Graphic type="type" space={false} />,
+            </span>{" "}
+            <Word>one</Word>
+            <Word>glimpse</Word>
+            <Graphic type="eye" />
+            <Word>across</Word>
+            <Word>the</Word>
+            <Word>street.</Word>
           </h2>
         )}
       </div>
