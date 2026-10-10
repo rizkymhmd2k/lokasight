@@ -87,6 +87,7 @@ const items = [
     overflow: clip;
     border-radius: 3rem;
     background: #ddd;
+    contain: paint;
     transform-origin: center;
   }
 
@@ -116,7 +117,6 @@ const items = [
     border-radius: 9rem;
     background: #000;
     color: #fff;
-    backdrop-filter: blur(20px);
   }
 
   .work-showcase__name h3 {
@@ -167,7 +167,16 @@ const items = [
         .map((item) => {
           const card = item.querySelector<HTMLElement>("[data-work-card]");
           return card
-            ? { item, card, targetProgress: 0, currentProgress: 0 }
+            ? {
+                item,
+                card,
+                top: 0,
+                height: 0,
+                targetProgress: 0,
+                currentProgress: 0,
+                paintedProgress: -1,
+                promoted: false,
+              }
             : null;
         })
         .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
@@ -175,26 +184,44 @@ const items = [
       if (!entries.length) return;
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-      let scrollFrame = 0;
       let animationFrame = 0;
+      let geometryDirty = true;
+      let sectionNearby = false;
+      let destroyed = false;
+      let viewportHeight = window.innerHeight || 1;
       let previousTime = performance.now();
 
-      const setTargets = () => {
-        const viewportHeight = window.innerHeight || 1;
-
+      // Card geometry only changes on resize/layout changes. Cache it so normal
+      // scroll frames do not force layout before writing transforms.
+      const measure = () => {
+        const scrollY = window.scrollY;
+        viewportHeight = window.innerHeight || 1;
         entries.forEach((entry) => {
           const rect = entry.item.getBoundingClientRect();
+          entry.top = rect.top + scrollY;
+          entry.height = rect.height;
+        });
+        geometryDirty = false;
+      };
+
+      const setTargets = () => {
+        const scrollY = window.scrollY;
+
+        entries.forEach((entry) => {
           // Alture starts when 30% of the card enters, and ends when
           // half the card has left. Both offsets are relative to the card.
-          const startTop = viewportHeight - Math.min(rect.height * 0.3, viewportHeight);
-          const endTop = rect.height * -0.5;
-          entry.targetProgress = clamp((startTop - rect.top) / (startTop - endTop), 0, 1);
+          const itemTop = entry.top - scrollY;
+          const startTop = viewportHeight - Math.min(entry.height * 0.3, viewportHeight);
+          const endTop = entry.height * -0.5;
+          entry.targetProgress = clamp((startTop - itemTop) / (startTop - endTop), 0, 1);
         });
       };
 
       const paint = (entry: (typeof entries)[number]) => {
+        if (entry.paintedProgress === entry.currentProgress) return;
+
         const phase = Math.min(entry.currentProgress * 2, 1);
-        const y = window.innerHeight * (1 - easeOutCubic(phase));
+        const y = viewportHeight * (1 - easeOutCubic(phase));
         const rotation = 100 * (1 - phase);
         const scale = entry.currentProgress <= 0.5
           ? 1.1 - 0.1 * phase
@@ -202,9 +229,14 @@ const items = [
 
         entry.card.style.transform =
           `translate3d(0, ${y}px, 0) scale(${scale}) rotateX(${rotation}deg)`;
+        entry.paintedProgress = entry.currentProgress;
       };
 
       const render = (time: number) => {
+        animationFrame = 0;
+        if (geometryDirty) measure();
+        setTargets();
+
         const elapsed = Math.min(time - previousTime, 64);
         const smoothing = 1 - Math.pow(0.9, elapsed / (1000 / 60));
         let unsettled = false;
@@ -219,28 +251,40 @@ const items = [
           } else {
             entry.currentProgress = entry.targetProgress;
           }
+
+          const shouldPromote = entry.currentProgress > 0 && entry.currentProgress < 1;
+          if (entry.promoted !== shouldPromote) {
+            entry.card.style.willChange = shouldPromote ? "transform" : "auto";
+            entry.promoted = shouldPromote;
+          }
           paint(entry);
         });
 
-        animationFrame = unsettled ? requestAnimationFrame(render) : 0;
+        if (unsettled) animationFrame = requestAnimationFrame(render);
       };
 
-      const update = () => {
-        scrollFrame = 0;
-        setTargets();
-        if (!animationFrame) {
+      const scheduleRender = () => {
+        if (
+          !reducedMotion.matches &&
+          sectionNearby &&
+          !document.hidden &&
+          !animationFrame
+        ) {
           previousTime = performance.now();
           animationFrame = requestAnimationFrame(render);
         }
       };
 
-      const scheduleUpdate = () => {
-        if (!reducedMotion.matches && !scrollFrame) {
-          scrollFrame = requestAnimationFrame(update);
-        }
+      const invalidateGeometry = () => {
+        geometryDirty = true;
+        // Force a repaint even when progress itself is unchanged because the
+        // viewport-relative translation can change after a resize.
+        entries.forEach((entry) => { entry.paintedProgress = -1; });
+        scheduleRender();
       };
 
       const syncInitialState = () => {
+        measure();
         setTargets();
         entries.forEach((entry) => {
           entry.currentProgress = entry.targetProgress;
@@ -250,27 +294,64 @@ const items = [
 
       const onMotionChange = () => {
         if (reducedMotion.matches) {
-          cancelAnimationFrame(scrollFrame);
           cancelAnimationFrame(animationFrame);
-          scrollFrame = 0;
           animationFrame = 0;
-          entries.forEach(({ card }) => card.style.removeProperty("transform"));
+          entries.forEach((entry) => {
+            entry.card.style.removeProperty("transform");
+            entry.card.style.removeProperty("will-change");
+            entry.paintedProgress = -1;
+            entry.promoted = false;
+          });
         } else syncInitialState();
       };
 
-      const resizeObserver = new ResizeObserver(scheduleUpdate);
+      const onVisibilityChange = () => {
+        if (document.hidden) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = 0;
+        } else {
+          scheduleRender();
+        }
+      };
+
+      const proximityObserver = new IntersectionObserver(([entry]) => {
+        sectionNearby = entry.isIntersecting;
+        if (sectionNearby) {
+          geometryDirty = true;
+          scheduleRender();
+        } else {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = 0;
+          entries.forEach((item) => {
+            item.card.style.willChange = "auto";
+            item.promoted = false;
+          });
+        }
+      }, { rootMargin: "100% 0px" });
+
+      const resizeObserver = new ResizeObserver(invalidateGeometry);
       resizeObserver.observe(section);
+      if (section.previousElementSibling) resizeObserver.observe(section.previousElementSibling);
+      proximityObserver.observe(section);
       onMotionChange();
-      window.addEventListener("scroll", scheduleUpdate, { passive: true });
-      window.addEventListener("resize", scheduleUpdate);
+      window.addEventListener("scroll", scheduleRender, { passive: true });
+      window.addEventListener("resize", invalidateGeometry);
+      window.addEventListener("load", invalidateGeometry, { once: true });
+      document.addEventListener("visibilitychange", onVisibilityChange);
       reducedMotion.addEventListener("change", onMotionChange);
+      document.fonts?.ready.then(() => {
+        if (!destroyed) invalidateGeometry();
+      });
 
       document.addEventListener("astro:before-swap", () => {
-        cancelAnimationFrame(scrollFrame);
+        destroyed = true;
         cancelAnimationFrame(animationFrame);
         resizeObserver.disconnect();
-        window.removeEventListener("scroll", scheduleUpdate);
-        window.removeEventListener("resize", scheduleUpdate);
+        proximityObserver.disconnect();
+        window.removeEventListener("scroll", scheduleRender);
+        window.removeEventListener("resize", invalidateGeometry);
+        window.removeEventListener("load", invalidateGeometry);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
         reducedMotion.removeEventListener("change", onMotionChange);
       }, { once: true });
     });

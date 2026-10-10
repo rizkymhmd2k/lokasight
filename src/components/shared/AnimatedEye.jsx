@@ -16,20 +16,24 @@ export default function AnimatedEye() {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let visible = false;
     let frame = 0;
-    let pointer = null;
+    let pointerX = 0;
+    let pointerY = 0;
+    let hasPointer = false;
+    let bounds = null;
 
     const reset = () => {
       cancelAnimationFrame(frame);
       frame = 0;
-      pointer = null;
+      hasPointer = false;
       gaze.style.transform = "translate(0px, 0px)";
     };
+    const invalidateBounds = () => { bounds = null; };
     const updateGaze = () => {
       frame = 0;
-      if (!pointer) return;
-      const bounds = eye.getBoundingClientRect();
-      const dx = pointer.x - (bounds.left + bounds.width / 2);
-      const dy = pointer.y - (bounds.top + bounds.height / 2);
+      if (!hasPointer) return;
+      bounds ??= eye.getBoundingClientRect();
+      const dx = pointerX - (bounds.left + bounds.width / 2);
+      const dy = pointerY - (bounds.top + bounds.height / 2);
       // Bound the gaze to an ellipse, keeping the pupil inside the yellow iris.
       const distance = Math.hypot(dx, dy);
       const strength = Math.min(distance / 240, 1);
@@ -38,7 +42,9 @@ export default function AnimatedEye() {
     };
     const track = (event) => {
       if (event.pointerType === "touch") return;
-      pointer = { x: event.clientX, y: event.clientY };
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      hasPointer = true;
       if (!frame) frame = requestAnimationFrame(updateGaze);
     };
     const sync = () => {
@@ -57,6 +63,8 @@ export default function AnimatedEye() {
     document.addEventListener("visibilitychange", sync);
     document.documentElement.addEventListener("pointerleave", reset);
     window.addEventListener("blur", reset);
+    window.addEventListener("scroll", invalidateBounds, { passive: true });
+    window.addEventListener("resize", invalidateBounds);
 
     return () => {
       observer.disconnect();
@@ -65,6 +73,8 @@ export default function AnimatedEye() {
       document.removeEventListener("visibilitychange", sync);
       document.documentElement.removeEventListener("pointerleave", reset);
       window.removeEventListener("blur", reset);
+      window.removeEventListener("scroll", invalidateBounds);
+      window.removeEventListener("resize", invalidateBounds);
       window.removeEventListener("pointermove", track);
     };
   }, []);
