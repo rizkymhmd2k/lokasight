@@ -5,13 +5,15 @@ import gsap from "gsap";
 import TextScramble from "../shared/TextScramble.jsx";
 
 const ANIMATION_DURATIONS = {
-  CURTAIN: 1.4,
-  ITEMS: 0.65,
+  CURTAIN: 0.65,
+  ITEMS: 0.4,
+  ITEM_STAGGER: 0.05,
+  ITEMS_START: 0.22,
   MENU_ICON: 0.3,
 };
 const SCROLL_RETRY_DELAY_MS = 80;
 const DARK_BG_THRESHOLD = 0.42;
-const NAV_ITEMS = ["Home", "Work", "Services", "About", "Contact"];
+const NAV_ITEMS = ["Home", "Work", "Services", "Contact"];
 
 function parseRgb(color) {
   if (!color) return null;
@@ -161,6 +163,9 @@ export default function MobileNav() {
     const ctx = gsap.context(() => {
       const icon = button.querySelector("[data-menu-icon]");
       const items = menu.querySelectorAll("[data-nav-item]");
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
 
       gsap.set(items, { yPercent: 110 });
 
@@ -179,13 +184,24 @@ export default function MobileNav() {
         },
       });
 
-      tlRef.current.fromTo(menu, { yPercent: -100 }, { yPercent: 0, duration: ANIMATION_DURATIONS.CURTAIN });
-      tlRef.current.to(items, {
-        yPercent: 0,
-        stagger: 0.1,
-        duration: ANIMATION_DURATIONS.ITEMS,
-        ease: "power3.out",
-      });
+      tlRef.current.fromTo(
+        menu,
+        { yPercent: -100 },
+        {
+          yPercent: 0,
+          duration: reducedMotion ? 0.01 : ANIMATION_DURATIONS.CURTAIN,
+        },
+      );
+      tlRef.current.to(
+        items,
+        {
+          yPercent: 0,
+          stagger: reducedMotion ? 0 : ANIMATION_DURATIONS.ITEM_STAGGER,
+          duration: reducedMotion ? 0.01 : ANIMATION_DURATIONS.ITEMS,
+          ease: "power3.out",
+        },
+        reducedMotion ? 0 : ANIMATION_DURATIONS.ITEMS_START,
+      );
 
       gsap.set(icon, { rotate: 0, transformOrigin: "50% 50%" });
     }, wrapper);
@@ -365,7 +381,7 @@ export default function MobileNav() {
       {isBackdropVisible && (
         <div aria-hidden="true" className="fixed inset-0 z-[64] bg-black/15" />
       )}
-      <div className="fixed top-4 right-4 z-[70] pointer-events-auto">
+      <div className="fixed top-3.5 right-3.5 z-[70] pointer-events-auto">
         <button
           ref={buttonRef}
           type="button"
@@ -374,7 +390,7 @@ export default function MobileNav() {
           aria-expanded={isMenuActive}
           aria-controls="mobile-curtain-menu"
           className={[
-            "grid h-10 w-10 place-items-center",
+            "grid h-11 w-11 place-items-center",
             "transition-[transform,opacity] duration-200 ease-out",
             isButtonVisible || isMenuActive ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3 pointer-events-none",
           ].join(" ")}
@@ -413,7 +429,7 @@ export default function MobileNav() {
                 href={`#${item.toLowerCase()}`}
                 data-nav-item
                 aria-label={item}
-                className="block py-[0.18rem] font-display text-[clamp(2.75rem,13vw,5rem)] font-semibold leading-[0.95] tracking-[-0.02em] transition-colors duration-200 hover:text-yellow1"
+                className="block py-[0.2rem] font-display text-[clamp(2.65rem,12.5vw,4.75rem)] font-semibold leading-[0.95] tracking-[-0.025em] transition-opacity duration-200 hover:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-black active:opacity-50"
                 onClick={handleNavClick(item.toLowerCase())}
               >
                 <TextScramble>{item}</TextScramble>
@@ -426,11 +442,12 @@ export default function MobileNav() {
           <div className="border-b border-black/55 pb-2">
             <a
               href="mailto:hello@lokasight.com"
-              className="text-sm font-semibold tracking-[-0.02em] transition-colors hover:text-yellow1"
+              className="text-sm font-semibold tracking-[-0.02em] transition-opacity duration-200 hover:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
             >
               hello@lokasight.com
             </a>
           </div>
+
           <span className="block w-full whitespace-nowrap pt-4 font-oswald text-[18.5vw] leading-[0.83] tracking-[-0.055em]">
             LOKASIGHT
           </span>
