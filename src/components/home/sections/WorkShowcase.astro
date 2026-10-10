@@ -52,14 +52,13 @@ const items = [
     overflow: clip;
     background: var(--color-backgroundlight);
     color: #000;
-    padding-bottom: 8rem;
   }
 
   .work-showcase__inner {
     width: 100%;
     max-width: 90rem;
     margin-inline: auto;
-    padding: 6rem 3rem 0;
+    padding: var(--spacing-section) var(--spacing-page-gutter) 0;
   }
 
   .work-showcase__list {
@@ -135,16 +134,12 @@ const items = [
     background: #FFFF04;
   }
 
-  @media (max-width: 991px) {
-    .work-showcase { padding-bottom: 6rem; }
-    .work-showcase__inner { padding: 5rem 2.25rem 0; }
+  @media (max-width: 1023px) {
     .work-showcase__list { gap: 5rem; }
     .work-showcase__card { width: 100%; height: auto; border-radius: 1.5rem; }
   }
 
   @media (max-width: 767px) {
-    .work-showcase { padding-bottom: 4rem; }
-    .work-showcase__inner { padding: 3rem 1.5rem 0; }
     .work-showcase__list { gap: 1.5rem; }
     .work-showcase__card { border-radius: 1.25rem; }
   }

@@ -211,11 +211,11 @@ export default function Contact() {
   return (
     <div
       id="contact"
-      className="relative z-30 isolate w-full overflow-x-clip px-4 flex flex-col bg-backgroundlight"
+      className="relative z-30 isolate w-full overflow-x-clip px-frame flex flex-col bg-backgroundlight"
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
-        <div className="bg-black px-small md:px-big rounded-t-3xl h-full overflow-hidden py-12 md:py-24 flex flex-col">
+        <div className="bg-black px-card rounded-t-3xl h-full overflow-hidden py-section flex flex-col">
           <h2
             ref={contactTitleRef}
             style={{
@@ -247,7 +247,7 @@ export default function Contact() {
             ref={formCardRef}
             className="relative z-60 -mb-[5vh] w-full -translate-y-[5vh] lg:absolute lg:top-0 lg:right-7 lg:mb-0 lg:w-[70vw] lg:translate-y-0"
           >
-            <div className="rounded-t-3xl rounded-b-3xl bg-[#FFFF04] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-8 lg:p-12 pb-20 lg:pb-32">
+            <div className="rounded-t-3xl rounded-b-3xl bg-[#FFFF04] text-black grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 px-card pt-6 md:pt-8 lg:pt-12 pb-20 lg:pb-32">
               {/* Left: copy/testimonial */}
               <div className="flex flex-col gap-10">
                 <div className="h-6 w-6 rounded-full bg-black/80" />

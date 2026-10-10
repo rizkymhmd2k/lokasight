@@ -51,34 +51,10 @@ const serviceImages = Object.fromEntries(serviceImageEntries);
     <MobileNav client:load />
 
     <div class="progressive-blur" aria-hidden="true">
-      {Array.from({ length: 10 }, (_, index) => (
+      {Array.from({ length: 6 }, (_, index) => (
         <div class={`progressive-blur__layer progressive-blur__layer--${index + 1}`} />
       ))}
     </div>
-
-    <script>
-      const progressiveBlur = document.querySelector(".progressive-blur");
-
-      if (progressiveBlur) {
-        let frameId;
-
-        const updateBlur = () => {
-          progressiveBlur.classList.toggle(
-            "progressive-blur--visible",
-            window.scrollY > 24,
-          );
-          frameId = undefined;
-        };
-
-        const handleScroll = () => {
-          if (frameId !== undefined) return;
-          frameId = requestAnimationFrame(updateBlur);
-        };
-
-        updateBlur();
-        window.addEventListener("scroll", handleScroll, { passive: true });
-      }
-    </script>
 
     <HeroSection />
 
@@ -95,7 +71,7 @@ const serviceImages = Object.fromEntries(serviceImageEntries);
       <WorkShowcase />
 
       <Services client:load serviceImages={serviceImages} />
-      <About />
+      <!-- <About /> -->
       <Testimonials />
       <Contact client:load />
       <Footer />

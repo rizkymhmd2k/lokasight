@@ -33,7 +33,27 @@ const testimonials = [
   <div class="testimonials__inner">
     <header class="testimonials__header">
       <p class="typography-label">[TESTIMONIALS]</p>
-      <h2 id="testimonials-title">Good people.<br />Great <br />partnerships.</h2>
+      <h2 id="testimonials-title" aria-label="Good people. Great partnerships.">
+        <span class="testimonials__headline-line">
+          <span>Good people.</span>
+          <span class="testimonials__headline-graphic testimonials__headline-graphic--smiley" aria-hidden="true">
+            <svg viewBox="0 0 88 88" fill="none" focusable="false">
+              <path d="M44.7 5.8C66.5 4.7 80 20.6 80.4 42.7c.4 22.8-13.5 39-35.9 39.5C22.8 82.7 7.8 67.7 7.4 45 7 22.9 22.1 6.9 44.7 5.8Z" />
+              <path d="M31.4 29.3c2.7-.2 4.4 2 4.4 5.5 0 3.7-1.7 6-4.4 6.1-2.6 0-4.3-2.2-4.3-5.7 0-3.6 1.6-5.7 4.3-5.9Zm25.4-.2c2.7 0 4.3 2.2 4.2 5.7-.1 3.7-1.9 5.9-4.6 5.8-2.6-.1-4.2-2.4-4-5.9.1-3.6 1.7-5.7 4.4-5.6Z" />
+              <path d="M24.7 50.7c2.9 10.8 10 16.4 20.8 16.2 10.6-.2 17.3-5.8 19.8-16.7" />
+            </svg>
+          </span>
+        </span>
+        <span class="testimonials__headline-line">
+          <span>Great</span>
+          <span class="testimonials__headline-graphic testimonials__headline-graphic--spark" aria-hidden="true">
+            <svg viewBox="0 0 106 104" fill="none" focusable="false">
+              <path d="m53 2 9 30 28-17-13 29 28 6-29 9 19 24-31-12-8 31-10-30-29 18 14-30-30-7 31-10L12 20l32 12L53 2Z" />
+            </svg>
+          </span>
+        </span>
+        <span class="testimonials__headline-line">partnerships.</span>
+      </h2>
       <p class="testimonials__intro">A few kind words.<br />A lot of shared ambition.</p>
     </header>
 
@@ -61,11 +81,16 @@ const testimonials = [
       <div class="testimonials__controls" hidden>
         <div class="testimonials__navigation">
           <button type="button" data-step="-1" aria-label="Previous testimonial">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6" /></svg>
+            <svg viewBox="0 0 64 32" fill="none" aria-hidden="true">
+              <path d="M57.5 15.7c-12.8-.4-26.2-.1-49.7.7" />
+              <path d="M18.2 6.7c-3.4 3.4-6.8 6.5-10.4 9.7 3.7 2.8 7 5.8 10 9" />
+            </svg>
           </button>
-          <span class="testimonials__count" aria-hidden="true">01 / 03</span>
           <button type="button" data-step="1" aria-label="Next testimonial">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+            <svg viewBox="0 0 64 32" fill="none" aria-hidden="true">
+              <path d="M6.5 16.3c12.8.4 26.2.1 49.7-.7" />
+              <path d="M45.8 25.3c3.4-3.4 6.8-6.5 10.4-9.7-3.7-2.8-7-5.8-10-9" />
+            </svg>
           </button>
         </div>
       </div>
@@ -77,7 +102,7 @@ const testimonials = [
 <style>
   .testimonials {
     overflow: clip;
-    padding-block: 7rem 224px;
+    padding-block: var(--spacing-section);
     background: var(--color-backgroundlight);
     color: var(--color-black);
     font-family: var(--font-sans);
@@ -85,7 +110,7 @@ const testimonials = [
   .testimonials__inner {
     max-width: 90rem;
     margin-inline: auto;
-    padding-inline: 3rem;
+    padding-inline: var(--spacing-page-gutter);
     display: grid;
     grid-template-columns: 0.85fr 1.15fr;
     align-items: center;
@@ -97,6 +122,55 @@ const testimonials = [
     font-weight: 600;
     line-height: 1.02;
     letter-spacing: -0.055em;
+  }
+  .testimonials__headline-line {
+    display: flex;
+    width: max-content;
+    max-width: 100%;
+    align-items: center;
+    gap: 0.2em;
+  }
+  .testimonials__headline-graphic {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center;
+  }
+  .testimonials__headline-graphic svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .testimonials__headline-graphic--smiley {
+    width: 0.82em;
+    height: 0.82em;
+    color: #55544f;
+    animation: testimonials-smiley-wobble 4.8s ease-in-out infinite;
+  }
+  .testimonials__headline-graphic--smiley path:first-child,
+  .testimonials__headline-graphic--smiley path:last-child {
+    stroke: currentColor;
+    stroke-width: 6.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .testimonials__headline-graphic--smiley path:nth-child(2) { fill: currentColor; }
+  .testimonials__headline-graphic--spark {
+    width: 0.9em;
+    height: 0.9em;
+    color: #f3bd56;
+    animation: testimonials-spark-pulse 3.4s ease-in-out infinite;
+  }
+  .testimonials__headline-graphic--spark path { fill: currentColor; }
+  @keyframes testimonials-smiley-wobble {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-0.035em) rotate(3deg); }
+  }
+  @keyframes testimonials-spark-pulse {
+    0%, 100% { transform: rotate(-5deg) scale(0.96); }
+    50% { transform: rotate(4deg) scale(1.06); }
   }
   .testimonials__intro { font-size: 1rem; line-height: 1.6; opacity: 0.6; }
   .testimonials__deck { display: block; min-width: 0; width: 100%; max-width: 38rem; margin-inline: auto; }
@@ -153,37 +227,42 @@ const testimonials = [
   .testimonials__pick { position: absolute; inset: 0; width: 100%; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
   .testimonials__controls { display: flex; align-items: center; justify-content: center; gap: 1rem; padding-top: 1rem; }
   [hidden] { display: none !important; }
-  .testimonials__navigation { display: flex; align-items: center; justify-content: center; gap: 0.875rem; }
+  .testimonials__navigation { display: flex; align-items: center; justify-content: center; gap: 3rem; }
   .testimonials__navigation button {
     display: grid;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    border: 1px solid rgb(0 0 0 / 25%);
-    border-radius: 50%;
+    width: 4rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
     color: var(--color-black);
     background: transparent;
     cursor: pointer;
-    transition: background 180ms, color 180ms;
+    transition: transform 180ms ease;
   }
   @media (hover: hover) {
-    .testimonials__navigation button:hover { background: var(--color-black); color: var(--color-yellow1); }
+    .testimonials__navigation button:hover { transform: scale(1.08) rotate(-2deg); }
+    .testimonials__navigation button:last-child:hover { transform: scale(1.08) rotate(2deg); }
   }
   button:focus-visible { outline: 3px solid #6863ef; outline-offset: 5px; }
-  .testimonials__navigation svg { width: 1.25rem; stroke: currentColor; stroke-width: 1.5; }
-  .testimonials__count { white-space: nowrap; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+  .testimonials__navigation svg {
+    width: 100%;
+    overflow: visible;
+    stroke: currentColor;
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
   .testimonials__status { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  @media (max-width: 991px) {
-    .testimonials { padding-top: 4rem; }
-    .testimonials__inner { grid-template-columns: 1fr; gap: 2.5rem; padding-inline: 2rem; }
+  @media (max-width: 1023px) {
+    .testimonials__inner { grid-template-columns: 1fr; gap: 2.5rem; }
     .testimonials__header h2 { font-size: clamp(2.75rem, 7vw, 4rem); }
-    .testimonials__header h2 br:last-child { display: none; }
     .testimonials__intro { margin-bottom: 0; }
     .testimonials__deck { width: 100%; max-width: 38rem; margin-inline: auto; }
     blockquote p { font-size: clamp(1.375rem, 4vw, 1.875rem); }
   }
   @media (max-width: 479px) {
-    .testimonials__inner { padding-inline: 1.25rem; gap: 1.5rem; }
+    .testimonials__inner { gap: 1.5rem; }
     .testimonials__header h2 { font-size: 2.5rem; letter-spacing: -0.045em; }
     .testimonials__deck[data-ready] .testimonials__stack { margin-inline: 1.5rem; margin-bottom: 1.5rem; }
     [data-position="1"] { transform: translate(4%, -1%) rotate(5deg); }
@@ -193,6 +272,7 @@ const testimonials = [
   }
   @media (prefers-reduced-motion: reduce) {
     .testimonials__navigation button { transition: none; }
+    .testimonials__headline-graphic { animation: none; }
   }
 </style>
 
@@ -205,7 +285,6 @@ const testimonials = [
       const cards = Array.from(this.querySelectorAll<HTMLElement>("[data-card]"));
       const stack = this.querySelector<HTMLElement>(".testimonials__stack")!;
       const controls = this.querySelector<HTMLElement>(".testimonials__controls")!;
-      const count = this.querySelector<HTMLElement>(".testimonials__count")!;
       const status = this.querySelector<HTMLElement>(".testimonials__status")!;
       const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const controller = new AbortController();
@@ -214,8 +293,6 @@ const testimonials = [
       let busy = false;
       let animations: Animation[] = [];
       let touchStart: { x: number; y: number } | undefined;
-      const number = (value: number) => String(value).padStart(2, "0");
-
       const render = () => {
         cards.forEach((card, index) => {
           const position = (index - active + cards.length) % cards.length;
@@ -223,7 +300,6 @@ const testimonials = [
           card.setAttribute("aria-hidden", String(position !== 0));
           card.querySelector<HTMLButtonElement>("[data-pick]")!.hidden = position === 0;
         });
-        count.textContent = `${number(active + 1)} / ${number(cards.length)}`;
       };
 
       const select = async (next: number, direction = 1) => {

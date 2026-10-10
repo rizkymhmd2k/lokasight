@@ -221,11 +221,11 @@ const Services = ({ serviceImages }) => {
     <div
       id="services"
       ref={sectionRef}
-      className="w-full px-2 sm:px-4 pt-12 sm:pt-16 flex flex-col bg-backgroundlight"
+      className="w-full px-frame pt-section flex flex-col bg-backgroundlight"
     >
       <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black ">
         {/* HEADER */}
-        <div className="border px-small pt-12 pb-10 md:px-big md:pt-16 md:pb-16">
+        <div className="border px-card pt-12 pb-10 md:py-12 lg:py-16">
           <Work
             embedded
             label="[SERVICES]"
@@ -234,7 +234,7 @@ const Services = ({ serviceImages }) => {
         </div>
 
         {/* SERVICES */}
-        <div className="grid w-full grid-cols-1 px-6 pb-6 md:px-10 md:pb-16 lg:grid-cols-12">
+        <div className="grid w-full grid-cols-1 px-card pb-6 md:pb-8 lg:pb-12 lg:grid-cols-12">
           <div className="flex w-full flex-col lg:col-span-8 lg:col-start-5">
           {/* <div className="border-t border-white/10 mb-6 md:hidden" /> */}
 

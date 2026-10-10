@@ -25,7 +25,7 @@ function Graphic({ type, space = true }) {
     <>
       <span className={`work-heading__graphic work-heading__graphic--${type}`} aria-hidden="true">
         <span data-work-graphic className="work-heading__graphic-inner">
-          {type === "eye" ? <AnimatedEye /> : <svg viewBox="0 0 160 100" fill="none" focusable="false">
+          {type === "eye" ? <AnimatedEye /> : <svg viewBox={type === "type" ? "0 0 128 96" : "0 0 160 100"} fill="none" focusable="false">
             {type === "spark" && <g fill="currentColor">
               <path d="M58 1C56 34 46 43 9 47c34 3 45 12 46 46 6-33 14-43 48-46C72 42 61 34 58 1Z" />
               <path d="M119 39c-3 21-10 29-33 32 22 3 29 10 31 28 4-19 11-26 34-29-23-3-29-9-32-31Z" />
@@ -38,9 +38,9 @@ function Graphic({ type, space = true }) {
               <path d="M5 50h150" />
             </g>}
             {type === "type" && <g>
-              <path d="M13 15h134v70H13z" fill="#ffff04" stroke="currentColor" strokeWidth="2.5" />
-              <text x="24" y="70" fill="currentColor" fontFamily="Arial, Helvetica, sans-serif" fontSize="67" letterSpacing="-6">Aa</text>
-              <path d="M107 27v47" stroke="currentColor" strokeWidth="2" />
+              <path d="M2 2h124v92H2z" fill="#ffff04" stroke="currentColor" strokeWidth="2.5" />
+              <text x="10" y="76" fill="currentColor" fontFamily="Arial, Helvetica, sans-serif" fontSize="78" letterSpacing="-7">Aa</text>
+              <path d="M115 14v68" stroke="currentColor" strokeWidth="3" />
             </g>}
           </svg>}
         </span>
@@ -159,7 +159,7 @@ const Work = ({
       className={
         embedded
           ? "flex flex-col text-white"
-          : "bg-backgroundlight px-small pt-12 md:px-big md:pt-24"
+          : "bg-backgroundlight px-page pt-section"
       }
     >
       <div ref={wrapperRef} className="relative">

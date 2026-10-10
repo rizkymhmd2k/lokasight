@@ -1,6 +1,7 @@
 ---
 import LokasightLogo from "../../shared/LokasightLogo.jsx";
 import TextScramble from "../../shared/TextScramble.jsx";
+import AnimatedEye from "../../shared/AnimatedEye.jsx";
 
 const NAV_ITEMS = [
   { label: "HOME", href: "#home" },
@@ -21,7 +22,7 @@ const LINK_CLASS =
 ---
 
 <footer id="site-footer" class="w-full bg-backgroundlight font-sans text-black">
-  <div class="px-4 pb-3 sm:px-6 md:px-8 md:pt-12 lg:px-12 lg:pt-24">
+  <div class="px-page pb-3 pt-section">
     <div class="grid grid-cols-1 gap-8 pb-8 md:grid-cols-12 md:gap-x-8 md:pb-10">
       <div class="md:col-span-8">
         <p class="mb-6 max-w-[18rem] text-base font-normal leading-[1.4] md:mb-8">
@@ -40,12 +41,7 @@ const LINK_CLASS =
 
       <div class="flex items-start md:col-span-4 md:justify-end">
         <div class="w-full max-w-[18rem]">
-          <img
-            src="/eyesvg.svg"
-            alt=""
-            class="h-auto w-full"
-            loading="lazy"
-          />
+          <AnimatedEye client:visible />
         </div>
       </div>
     </div>
@@ -83,7 +79,7 @@ const LINK_CLASS =
     </div>
   </div>
 
-  <div class="flex items-start justify-between gap-4 min-h-8 whitespace-nowrap bg-yellow1 px-4 pb-[0rem] pt-4 text-[clamp(0.5rem,2.2vw,0.75rem)] font-bold sm:px-6 md:px-8 lg:px-12">
+  <div class="flex items-start justify-between gap-4 min-h-8 whitespace-nowrap bg-yellow1 px-page pb-[0rem] pt-4 text-[clamp(0.5rem,2.2vw,0.75rem)] font-bold">
     <!-- <p>©2026 LOKASIGHT STUDIO</p>
     <p class="text-right">WEBSITE BY NEWRIZK</p> -->
   </div>

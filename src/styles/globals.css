@@ -57,6 +57,29 @@
    Base
 ---------------------------------------------- */
 @layer base {
+  :root {
+    --spacing-page-gutter: 1rem;
+    --spacing-frame-inset: 0.5rem;
+    --spacing-section: clamp(4rem, calc(2rem + 5vw), 8rem);
+    --spacing-card: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --spacing-page-gutter: 2rem;
+      --spacing-frame-inset: 0.75rem;
+      --spacing-card: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :root {
+      --spacing-page-gutter: 3rem;
+      --spacing-frame-inset: 1rem;
+      --spacing-card: 3rem;
+    }
+  }
+
   html {
     background: var(--color-backgroundlight);
   }
@@ -104,6 +127,26 @@
 
 @utility px-big {
   padding-inline: 2rem;
+}
+
+@utility px-page {
+  padding-inline: var(--spacing-page-gutter);
+}
+
+@utility px-frame {
+  padding-inline: var(--spacing-frame-inset);
+}
+
+@utility px-card {
+  padding-inline: var(--spacing-card);
+}
+
+@utility pt-section {
+  padding-top: var(--spacing-section);
+}
+
+@utility py-section {
+  padding-block: var(--spacing-section);
 }
 
 @utility typography-label {
@@ -165,11 +208,6 @@
   pointer-events: none;
   overflow: clip;
   transform: rotate(180deg);
-  opacity: 0;
-  transition: opacity 250ms ease;
-}
-
-.progressive-blur--visible {
   opacity: 1;
 }
 
@@ -218,34 +256,12 @@
 .progressive-blur__layer--6 {
   -webkit-backdrop-filter: blur(calc(var(--progressive-blur) / 32));
   backdrop-filter: blur(calc(var(--progressive-blur) / 32));
-  -webkit-mask: linear-gradient(transparent 30%, #000 50% 60%, transparent 80%);
-  mask: linear-gradient(transparent 30%, #000 50% 60%, transparent 80%);
+  -webkit-mask: linear-gradient(transparent 30%, #000 50%, transparent 100%);
+  mask: linear-gradient(transparent 30%, #000 50%, transparent 100%);
 }
 
-.progressive-blur__layer--7 {
-  -webkit-backdrop-filter: blur(calc(var(--progressive-blur) / 64));
-  backdrop-filter: blur(calc(var(--progressive-blur) / 64));
-  -webkit-mask: linear-gradient(transparent 40%, #000 60% 70%, transparent 90%);
-  mask: linear-gradient(transparent 40%, #000 60% 70%, transparent 90%);
-}
-
-.progressive-blur__layer--8 {
-  -webkit-backdrop-filter: blur(calc(var(--progressive-blur) / 128));
-  backdrop-filter: blur(calc(var(--progressive-blur) / 128));
-  -webkit-mask: linear-gradient(transparent 50%, #000 70% 80%, transparent 100%);
-  mask: linear-gradient(transparent 50%, #000 70% 80%, transparent 100%);
-}
-
-.progressive-blur__layer--9 {
-  -webkit-backdrop-filter: blur(calc(var(--progressive-blur) / 256));
-  backdrop-filter: blur(calc(var(--progressive-blur) / 256));
-  -webkit-mask: linear-gradient(transparent 60%, #000 80% 90%, transparent 100%);
-  mask: linear-gradient(transparent 60%, #000 80% 90%, transparent 100%);
-}
-
-.progressive-blur__layer--10 {
-  -webkit-backdrop-filter: blur(calc(var(--progressive-blur) / 512));
-  backdrop-filter: blur(calc(var(--progressive-blur) / 512));
-  -webkit-mask: linear-gradient(transparent 70%, #000 90%, transparent 100%);
-  mask: linear-gradient(transparent 70%, #000 90%, transparent 100%);
+@media (max-width: 767px) {
+  .progressive-blur {
+    display: none;
+  }
 }

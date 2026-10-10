@@ -83,9 +83,9 @@
 }
 
 .work-heading__graphic--type {
-  width: 1.02em;
-  height: 0.7em;
-  vertical-align: -0.04em;
+  width: 1.24em;
+  height: 0.88em;
+  vertical-align: -0.12em;
 }
 
 @media (min-width: 768px) {
@@ -105,9 +105,7 @@
     width: 1.1em;
   }
 
-  .work-heading__graphic--type {
-    width: 0.88em;
-  }
+  .work-heading__graphic--type { width: 1.24em; }
 }
 
 @media (prefers-reduced-motion: reduce) {
