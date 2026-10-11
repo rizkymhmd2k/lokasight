@@ -20,12 +20,12 @@ function Word({ children }) {
   );
 }
 
-function Graphic({ type, space = true }) {
+function Graphic({ type }) {
   return (
     <>
       <span className={`work-heading__graphic work-heading__graphic--${type}`} aria-hidden="true">
         <span data-work-graphic className="work-heading__graphic-inner">
-          {type === "eye" ? <AnimatedEye /> : <svg viewBox={type === "type" ? "0 0 128 96" : "0 0 160 100"} fill="none" focusable="false">
+          {type === "eye" ? <AnimatedEye /> : <svg viewBox="0 0 160 100" fill="none" focusable="false">
             {type === "spark" && <g fill="currentColor">
               <path d="M58 1C56 34 46 43 9 47c34 3 45 12 46 46 6-33 14-43 48-46C72 42 61 34 58 1Z" />
               <path d="M119 39c-3 21-10 29-33 32 22 3 29 10 31 28 4-19 11-26 34-29-23-3-29-9-32-31Z" />
@@ -37,14 +37,9 @@ function Graphic({ type, space = true }) {
               <ellipse cx="80" cy="50" rx="11" ry="28" />
               <path d="M5 50h150" />
             </g>}
-            {type === "type" && <g>
-              <path d="M2 2h124v92H2z" fill="#ffff04" stroke="currentColor" strokeWidth="2.5" />
-              <text x="10" y="76" fill="currentColor" fontFamily="Arial, Helvetica, sans-serif" fontSize="78" letterSpacing="-7">Aa</text>
-              <path d="M115 14v68" stroke="currentColor" strokeWidth="3" />
-            </g>}
           </svg>}
         </span>
-      </span>{space && " "}
+      </span>{" "}
     </>
   );
 }
@@ -92,11 +87,6 @@ const Work = ({
           loops.push(gsap.fromTo(root.querySelectorAll(".work-heading__graphic--orbit ellipse:not(:first-child)"),
             { scaleX: 0.7 },
             { scaleX: 1.15, transformOrigin: "50% 50%", duration: 1.8, stagger: 0.2,
-              repeat: -1, yoyo: true, ease: "sine.inOut", paused: true }));
-
-          loops.push(gsap.fromTo(root.querySelector(".work-heading__graphic--type svg"),
-            { yPercent: -5 },
-            { yPercent: 5, duration: 1.8,
               repeat: -1, yoyo: true, ease: "sine.inOut", paused: true }));
 
           ScrollTrigger.create({
@@ -189,7 +179,6 @@ const Work = ({
             <Word>fades.</Word>
             <Word>We</Word>
             <Word>build</Word>
-            <Graphic type="orbit" />
             <span className="work-heading__phrase" data-work-copy>
               <em className="work-heading__highlight">distinctive</em> brands
             </span>{" "}
@@ -208,13 +197,13 @@ const Work = ({
             <Word>of</Word>
             <Word>a</Word>
             <Word>poster,</Word>
+            <Graphic type="orbit" />
             <Word>one</Word>
             <Word>word</Word>
             <Word>in</Word>
             <Word>a</Word>
             <span className="work-heading__punctuated">
-              <Word>headline</Word>
-              <Graphic type="type" space={false} />,
+              <Word>headline,</Word>
             </span>{" "}
             <Word>one</Word>
             <Word>glimpse</Word>
