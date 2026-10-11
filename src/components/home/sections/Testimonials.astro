@@ -261,13 +261,18 @@ const testimonials = [
     .testimonials__deck { width: 100%; max-width: 38rem; margin-inline: auto; }
     blockquote p { font-size: clamp(1.375rem, 4vw, 1.875rem); }
   }
-  @media (max-width: 479px) {
+  @media (max-width: 767px) {
     .testimonials__inner { gap: 1.5rem; }
     .testimonials__header h2 { font-size: 2.5rem; letter-spacing: -0.045em; }
-    .testimonials__deck[data-ready] .testimonials__stack { margin-inline: 1.5rem; margin-bottom: 1.5rem; }
-    [data-position="1"] { transform: translate(4%, -1%) rotate(5deg); }
-    [data-position="2"] { transform: translate(-4%, 1%) rotate(-5deg); }
-    .testimonials__deck[data-ready] .testimonials__card { min-height: 29rem; padding: 1.25rem; }
+    .testimonials__deck { max-width: 30rem; }
+    .testimonials__deck[data-ready] .testimonials__stack { margin: 2rem 1.75rem 1.5rem; }
+    .testimonials__deck[data-ready] .testimonials__card { min-height: 26rem; padding: 1.25rem; }
+    .testimonials__quote-mark { height: 4rem; font-size: 5rem; }
+    blockquote { margin-bottom: 1.75rem; }
+    blockquote p { font-size: clamp(1.25rem, 4.5vw, 1.5rem); }
+    [data-position="0"] { transform: rotate(-2deg); }
+    [data-position="1"] { transform: translate(2%, -1%) rotate(3deg); }
+    [data-position="2"] { transform: translate(-2%, 1%) rotate(-3deg); }
     .testimonials__controls { flex-direction: column-reverse; gap: 1rem; text-align: center; }
   }
   @media (prefers-reduced-motion: reduce) {
