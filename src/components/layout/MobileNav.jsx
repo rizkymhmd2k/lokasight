@@ -407,7 +407,10 @@ export default function MobileNav() {
         ref={menuRef}
         data-lenis-prevent
         className="fixed inset-0 z-[65] flex flex-col overflow-y-auto overscroll-contain bg-backgroundlight px-4 pb-3 pt-4 text-black"
-        style={{ pointerEvents: isMenuActive ? "auto" : "none" }}
+        style={{
+          pointerEvents: isMenuActive ? "auto" : "none",
+          transform: "translateY(-100%)",
+        }}
         onClick={(e) => {
           if (e.target === e.currentTarget && isMenuActive) toggleMenu();
         }}

@@ -60,7 +60,7 @@
   :root {
     --spacing-page-gutter: 1rem;
     --spacing-frame-inset: 0.5rem;
-    --spacing-section: clamp(4rem, calc(2rem + 5vw), 8rem);
+    --spacing-section: clamp(6rem, calc(4rem + 4vw), 8rem);
     --spacing-card: 1.5rem;
   }
 
