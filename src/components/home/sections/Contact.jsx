@@ -211,7 +211,7 @@ export default function Contact() {
   return (
     <div
       id="contact"
-      className="relative z-30 isolate w-full overflow-x-clip px-frame flex flex-col bg-backgroundlight"
+      className="relative z-30 isolate w-full overflow-x-clip px-frame md:pb-24 flex flex-col bg-backgroundlight"
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
