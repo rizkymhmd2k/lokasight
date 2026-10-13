@@ -20,6 +20,11 @@ export default function AnimatedEye() {
     let pointerY = 0;
     let hasPointer = false;
     let bounds = null;
+    let clickTimer = 0;
+    const clickTarget = eye.closest("a, button") ?? eye;
+    const animatedParts = eye.querySelectorAll(
+      ".animated-eye__blink, .animated-eye__lash",
+    );
 
     const reset = () => {
       cancelAnimationFrame(frame);
@@ -47,6 +52,22 @@ export default function AnimatedEye() {
       hasPointer = true;
       if (!frame) frame = requestAnimationFrame(updateGaze);
     };
+    const animateClick = () => {
+      clearTimeout(clickTimer);
+      eye.classList.remove("animated-eye--clicked");
+      // Cancel the ambient timelines so the same blink keyframes restart now.
+      animatedParts.forEach((part) => {
+        part.style.animationName = "none";
+      });
+      void eye.getBoundingClientRect();
+      animatedParts.forEach((part) => {
+        part.style.removeProperty("animation-name");
+      });
+      eye.classList.add("animated-eye--clicked");
+      clickTimer = window.setTimeout(() => {
+        eye.classList.remove("animated-eye--clicked");
+      }, 800);
+    };
     const sync = () => {
       const active = visible && !document.hidden && !motion.matches;
       eye.dataset.active = String(active);
@@ -65,10 +86,12 @@ export default function AnimatedEye() {
     window.addEventListener("blur", reset);
     window.addEventListener("scroll", invalidateBounds, { passive: true });
     window.addEventListener("resize", invalidateBounds);
+    clickTarget.addEventListener("click", animateClick);
 
     return () => {
       observer.disconnect();
       reset();
+      clearTimeout(clickTimer);
       motion.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
       document.documentElement.removeEventListener("pointerleave", reset);
@@ -76,6 +99,7 @@ export default function AnimatedEye() {
       window.removeEventListener("scroll", invalidateBounds);
       window.removeEventListener("resize", invalidateBounds);
       window.removeEventListener("pointermove", track);
+      clickTarget.removeEventListener("click", animateClick);
     };
   }, []);
 

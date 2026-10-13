@@ -23,23 +23,25 @@ function Word({ children }) {
 function Graphic({ type }) {
   return (
     <>
-      <span className={`work-heading__graphic work-heading__graphic--${type}`} aria-hidden="true">
-        <span data-work-graphic className="work-heading__graphic-inner">
-          {type === "eye" ? <AnimatedEye /> : <svg viewBox="0 0 160 100" fill="none" focusable="false">
-            {type === "spark" && <g fill="currentColor">
-              <path d="M58 1C56 34 46 43 9 47c34 3 45 12 46 46 6-33 14-43 48-46C72 42 61 34 58 1Z" />
-              <path d="M119 39c-3 21-10 29-33 32 22 3 29 10 31 28 4-19 11-26 34-29-23-3-29-9-32-31Z" />
-            </g>}
-            {type === "orbit" && <g stroke="currentColor" strokeWidth="1.7">
-              <ellipse cx="80" cy="50" rx="75" ry="28" />
-              <ellipse cx="80" cy="50" rx="50" ry="28" />
-              <ellipse cx="80" cy="50" rx="20" ry="28" />
-              <ellipse cx="80" cy="50" rx="11" ry="28" />
-              <path d="M5 50h150" />
-            </g>}
-          </svg>}
+      <span className="work-heading__graphic-group" aria-hidden="true">
+        (<span className={`work-heading__graphic work-heading__graphic--${type}`}>
+          <span data-work-graphic className="work-heading__graphic-inner">
+            {type === "eye" ? <AnimatedEye /> : <svg viewBox={type === "spark" ? "0 0 106 104" : "0 0 160 100"} fill="none" focusable="false">
+              {type === "spark" && <g fill="currentColor">
+                <path d="m53 2 9 30 28-17-13 29 28 6-29 9 19 24-31-12-8 31-10-30-29 18 14-30-30-7 31-10L12 20l32 12L53 2Z" />
+              </g>}
+              {type === "orbit" && <g stroke="currentColor" strokeWidth="1.7">
+                <ellipse cx="80" cy="50" rx="75" ry="28" />
+                <ellipse cx="80" cy="50" rx="50" ry="28" />
+                <ellipse cx="80" cy="50" rx="20" ry="28" />
+                <ellipse cx="80" cy="50" rx="11" ry="28" />
+                <path d="M5 50h150" />
+              </g>}
+            </svg>}
+          </span>
+        </span>)
         </span>
-      </span>{" "}
+      {" "}
     </>
   );
 }

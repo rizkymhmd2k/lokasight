@@ -3,6 +3,7 @@
   width: 100%;
   height: auto;
   overflow: visible;
+  transform-origin: center;
 }
 
 .animated-eye__blink {
@@ -28,6 +29,28 @@
   scale: 1 1.045;
 }
 
+.animated-eye--clicked {
+  animation: eye-click-scale 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.animated-eye--clicked .animated-eye__blink {
+  animation-name: eye-blink;
+  animation-duration: 6.8s;
+  animation-delay: -2.856s;
+  animation-iteration-count: 1;
+}
+
+.animated-eye--clicked .animated-eye__lash {
+  animation-name: eye-lash;
+  animation-duration: 6.8s;
+  animation-delay: -2.652s;
+  animation-iteration-count: 1;
+}
+
+.animated-eye--clicked .animated-eye__lash--lower {
+  animation-delay: -2.562s;
+}
+
 .animated-eye:not([data-active="true"]) :is(.animated-eye__blink, .animated-eye__lash) {
   animation-play-state: paused;
 }
@@ -42,9 +65,15 @@
   44%, 75% { transform: scaleY(1.04); }
 }
 
+@keyframes eye-click-scale {
+  0%, 100% { scale: 1; }
+  35% { scale: 1.06; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animated-eye .animated-eye__blink,
-  .animated-eye .animated-eye__lash {
+  .animated-eye .animated-eye__lash,
+  .animated-eye--clicked {
     animation: none;
     transition: none;
     scale: none;

@@ -41,7 +41,13 @@ const LINK_CLASS =
 
       <div class="flex items-start md:col-span-4 md:justify-end">
         <div class="w-full max-w-[18rem]">
-          <AnimatedEye client:visible />
+          <a
+            href="#home"
+            aria-label="Back to top"
+            class="block rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+          >
+            <AnimatedEye client:visible />
+          </a>
         </div>
       </div>
     </div>
@@ -75,7 +81,7 @@ const LINK_CLASS =
     </div>
 
     <div class="overflow-hidden">
-      <LokasightLogo client:visible className="w-full text-black" />
+      <LokasightLogo client:visible animation="slide" className="w-full text-black" />
     </div>
   </div>
 

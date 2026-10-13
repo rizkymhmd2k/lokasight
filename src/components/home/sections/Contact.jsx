@@ -215,7 +215,7 @@ export default function Contact() {
     >
       <div className="relative w-full rounded-t-3xl overflow-visible">
         {/* Top black title block */}
-        <div className="bg-black px-card rounded-t-3xl h-full overflow-hidden py-section flex flex-col">
+        <div className="bg-black px-card rounded-t-3xl h-full overflow-hidden py-10 sm:py-14 md:py-section flex flex-col">
           <h2
             ref={contactTitleRef}
             style={{
