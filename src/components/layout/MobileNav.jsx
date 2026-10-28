@@ -13,7 +13,7 @@ const ANIMATION_DURATIONS = {
 };
 const SCROLL_RETRY_DELAY_MS = 80;
 const DARK_BG_THRESHOLD = 0.42;
-const NAV_ITEMS = ["Home", "Work", "Services", "Contact"];
+const NAV_ITEMS = ["Home", "Work", "Services", "About", "Contact"];
 
 function parseRgb(color) {
   if (!color) return null;
@@ -186,7 +186,8 @@ export default function MobileNav() {
 
       tlRef.current.fromTo(
         menu,
-        { yPercent: -100 },
+        // Clear the pixel translation parsed from the initial inline transform.
+        { y: 0, yPercent: -100 },
         {
           yPercent: 0,
           duration: reducedMotion ? 0.01 : ANIMATION_DURATIONS.CURTAIN,
@@ -404,6 +405,8 @@ export default function MobileNav() {
 
       <div
         id="mobile-curtain-menu"
+        inert={!isMenuActive}
+        aria-hidden={!isMenuActive}
         ref={menuRef}
         data-lenis-prevent
         className="fixed inset-0 z-[65] flex flex-col overflow-y-auto overscroll-contain bg-backgroundlight px-4 pb-3 pt-4 text-black"

@@ -1,0 +1,27 @@
+.services-arrows__track {
+  display: flex;
+  width: 200%;
+}
+
+.services-arrows__group {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 0 0 50%;
+  gap: clamp(0.5rem, 1vw, 1rem);
+  padding-right: clamp(0.5rem, 1vw, 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .services-arrows__track {
+    animation: services-arrows-scroll 10s linear infinite reverse;
+  }
+
+  .services-arrows:hover .services-arrows__track,
+  .services-arrows:focus-visible .services-arrows__track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes services-arrows-scroll {
+  to { transform: translateX(-50%); }
+}

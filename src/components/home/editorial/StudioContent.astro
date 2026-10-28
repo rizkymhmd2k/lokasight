@@ -1,0 +1,72 @@
+---
+import { Picture } from "astro:assets";
+import vellum from "../../../assets/images/work-vellum.webp";
+import forma86 from "../../../assets/images/work-forma-86.webp";
+import oriel from "../../../assets/images/work-oriel.webp";
+import ProjectInquiry from "./ProjectInquiry.jsx";
+import AnimatedEye from "../../shared/AnimatedEye.jsx";
+import Voices from "./Voices.jsx";
+import "./editorial.css";
+const projects = [
+  { name: "Vellum", image: vellum, caption: "Body care. Identity & packaging.", alt: "An ivory Vellum body care cylinder with subtle serif typography against a grey-to-dark gradient" },
+  { name: "Forma 86", image: forma86, caption: "Architecture. Art direction & visualisation.", alt: "A sculptural pale concrete pavilion model with carved openings on a light grey background" },
+  { name: "Oriel", image: oriel, caption: "Jewellery. Identity & packaging.", alt: "A sculptural silver ring on a hand against black fabric with Oriel presentation packaging" },
+];
+const services = [
+  { title: "Strategy", description: "Understanding where your business stands today, where it belongs tomorrow, and how to close the gap with clarity.", tags: "Research, positioning, audience, messaging." },
+  { title: "Identity", description: "Creating identities that feel distinct, consistent, and built to last across every touchpoint.", tags: "Visual and verbal identity, art direction, design systems, guidelines." },
+  { title: "Digital", description: "Turning strategy into digital experiences that build trust and support long-term growth.", tags: "Websites, content, performance, SEO, analytics, growth." },
+];
+---
+<div id="main-content" class="editorial" tabindex="-1">
+  <section id="work" class="ed-work" aria-labelledby="work-title">
+    <header class="ed-work-intro"><h2 id="work-title" data-ed-reveal>Independent minds. Unmistakable identities.</h2><span class="ed-label">( selected work )</span></header>
+    <div class="ed-projects" tabindex="0" role="region" aria-label="Selected projects. Scroll horizontally to explore.">
+      {projects.map((project, index) => <article class="ed-project">
+        <a class="ed-project-image" href={project.image.src} target="_blank" rel="noreferrer" aria-label={`View ${project.name} artwork at full size (opens in a new tab)`}>
+          <Picture src={project.image} formats={["webp"]} fallbackFormat="webp" widths={[480, 800, 1200]} sizes={["(max-width: 599px) 72vw, 32vw", "(max-width: 599px) 55vw, 24vw", "(max-width: 599px) 64vw, 28vw"][index]} alt={project.alt} loading="lazy" />
+          <span class="ed-project-view">View artwork ↗</span>
+        </a>
+        <h3>{project.name}</h3><p>{project.caption}</p>
+      </article>)}
+    </div>
+    <p class="ed-gallery-note">A few different worlds. One considered point of view.</p>
+  </section>
+
+  <section class="ed-statement" aria-labelledby="studio-title">
+    <div data-ed-reveal><h2 id="studio-title">We’re an independent brand studio. We help ambitious businesses become clearer, more distinctive, and easier to remember.</h2><a class="ed-dot-link" href="#about">A little about us</a></div>
+  </section>
+
+  <section id="testimonials" class="ed-testimonials" aria-labelledby="voices-title">
+    <h2 id="voices-title" class="ed-label">( in good company )</h2>
+    <Voices client:visible />
+  </section>
+
+  <section id="services" class="ed-services" aria-labelledby="services-title">
+    <div class="ed-service-intro"><p class="ed-label">( what we do )</p><h2 id="services-title" data-ed-reveal>Clear thinking, a distinctive identity, and digital experiences that connect. Senior attention, from first conversation to final delivery.</h2><a class="ed-dot-link ed-dot-link--button" href="#contact">Let’s get started</a></div>
+    <div class="ed-service-list">{services.map((service,index) => <details class="ed-service" open={index === 0}><summary><h3>{service.title}</h3><span aria-hidden="true">+</span></summary><div class="ed-service-body"><p>{service.description}</p><p class="ed-muted">{service.tags}</p></div></details>)}</div>
+  </section>
+
+  <section id="about" class="ed-about" aria-labelledby="about-title">
+    <div class="ed-art" aria-hidden="true"><AnimatedEye client:visible /></div>
+    <div class="ed-about-copy"><p class="ed-label">( our point of view )</p><h2 id="about-title" data-ed-reveal>Strong brands begin with clear thinking. Research uncovers what matters. Strategy defines the direction. Identity brings it to life.</h2><p>We stay intentionally small. That means closer collaboration, sharper decisions, and no unnecessary layers. Independent in spirit. Collaborative at heart.</p><a class="ed-dot-link" href="#contact">Meet your next creative partners</a></div>
+  </section>
+
+  <section id="contact" class="ed-contact" aria-labelledby="contact-title">
+    <h2 id="contact-title" data-ed-reveal>Have something in mind? Let’s build something worth <span class="ed-contact-ending">remembering. <svg class="ed-contact-spark" viewBox="0 0 106 104" aria-hidden="true" focusable="false"><path d="m53 2 9 30 28-17-13 29 28 6-29 9 19 24-31-12-8 31-10-30-29 18 14-30-30-7 31-10L12 20l32 12L53 2Z" /></svg></span></h2>
+    <div class="ed-contact-links"><a class="ed-dot-link" href="mailto:hello@lokasight.com">Say hello</a><a class="ed-dot-link ed-dot-link--button" href="#project-inquiry">Tell us about your project</a></div>
+    <details id="project-inquiry" class="ed-contact-details"><summary>Start a conversation <span aria-hidden="true">+</span></summary><ProjectInquiry client:visible /></details>
+  </section>
+
+  <footer class="ed-footer">
+    <div><span class="ed-label">( contact )</span><p>Bali, Indonesia · GMT+8<br /><a href="mailto:hello@lokasight.com">hello@lokasight.com</a></p></div>
+    <div><span class="ed-label">( explore )</span><nav aria-label="Footer navigation"><a href="#work">Work,</a> <a href="#services">Services,</a> <a href="#about">About</a></nav></div>
+    <div><span class="ed-label">( lokasight )</span><p>Independent brand studio.<br />Open to the world.</p></div>
+    <div class="ed-footer-bottom"><span>© {new Date().getFullYear()} Lokasight Studio</span><a href="#home">Back to top ↑</a></div>
+  </footer>
+</div>
+<script>
+  import { initializeEditorial } from "./motion";
+  initializeEditorial();
+  document.addEventListener("astro:page-load", initializeEditorial);
+</script>

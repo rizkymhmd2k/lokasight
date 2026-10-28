@@ -8,11 +8,11 @@ import "./work.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-function Word({ children, muted = false }) {
+function Word({ children }) {
   return (
     <>
       <span className="work-heading__word-mask">
-        <span data-work-copy className={`work-heading__word${muted ? " work-heading__word--muted" : ""}`}>
+        <span data-work-copy className="work-heading__word">
           {children}
         </span>
       </span>{" "}
@@ -20,15 +20,35 @@ function Word({ children, muted = false }) {
   );
 }
 
+function ServiceGraphic({ growth = false }) {
+  return (
+    <span data-work-copy className="work-heading__graphic" aria-hidden="true">
+      <svg viewBox="0 0 106 104" fill="none" focusable="false">
+        {growth ? (
+          <>
+            <circle cx="53" cy="52" r="49" fill="currentColor" />
+            <path className="work-heading__growth-arrow" d="M32 73 74 31M34 31h40v40" stroke="#080808" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+          </>
+        ) : (
+          <g className="work-heading__rings" stroke="currentColor" strokeWidth="7">
+            <ellipse cx="53" cy="52" rx="43" ry="22" transform="rotate(-45 53 52)" />
+            <ellipse cx="53" cy="52" rx="43" ry="22" transform="rotate(45 53 52)" />
+          </g>
+        )}
+      </svg>
+    </span>
+  );
+}
+
 const Work = ({
   embedded = false,
-  label = "[WORK]",
-  text = "Attention fades. We build distinctive brands that make a lasting impression. The kind you know from one corner of a poster, one word in a headline, one glimpse across the street.",
+  text = "We help ambitious businesses become distinctive brands that leave a lasting impression.",
 }) => {
   const wrapperRef = useRef(null);
   const words = text.trim().split(/\s+/);
-  const openingSentenceEnd = words.findIndex((word) => /[.!?]$/.test(word));
   const eyeWordIndex = words.indexOf("glimpse");
+  const ringsWordIndex = words.indexOf("growth.");
+  const growthWordIndex = words.indexOf("trust");
 
   useLayoutEffect(() => {
     const root = wrapperRef.current;
@@ -59,9 +79,11 @@ const Work = ({
       media.revert();
       ctx.revert();
     };
-  }, [embedded, label, text]);
+  }, [embedded, text]);
 
-  const headingClassName = `work-heading work-heading--compact${embedded ? " work-heading--embedded" : ""}`;
+  const headingClassName = embedded
+    ? "work-heading work-heading--intro work-heading--embedded"
+    : "work-heading work-heading--intro";
 
   return (
     <div
@@ -69,17 +91,34 @@ const Work = ({
       className={
         embedded
           ? "flex flex-col text-white"
-          : "work-intro bg-backgroundlight px-page"
+          : "work-intro px-page"
       }
     >
       <div ref={wrapperRef} className="relative">
-        <h2 className={headingClassName} aria-label={`${label} ${text}`}>
-          <span className="work-heading__label">{label}</span>{" "}
+        {!embedded && (
+          <div className="work-welcome">
+            <p data-work-copy className="work-welcome__label">Hi There</p>
+            <h2 data-work-copy className="work-welcome__title">
+              Welcome to<br />our studio!
+            </h2>
+            <p data-work-copy className="work-welcome__copy">{text}</p>
+          </div>
+        )}
+        {embedded && <h2 className={headingClassName} aria-label={text}>
           {words.map((word, index) => (
             <React.Fragment key={`${word}-${index}`}>
-              <Word muted={openingSentenceEnd >= 0 && index > openingSentenceEnd}>
-                {word}
+              <Word>
+                {embedded && index === ringsWordIndex ? (
+                  <>
+                    {word.slice(0, -1)}<ServiceGraphic />.
+                  </>
+                ) : word}
               </Word>
+              {embedded && index === growthWordIndex && (
+                <>
+                  <ServiceGraphic growth />{" "}
+                </>
+              )}
               {!embedded && index === eyeWordIndex && (
                 <>
                   <span data-work-copy className="work-heading__eye" aria-hidden="true">
@@ -89,7 +128,7 @@ const Work = ({
               )}
             </React.Fragment>
           ))}
-        </h2>
+        </h2>}
       </div>
     </div>
   );

@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "lint": "eslint . --ext .js,.jsx,.mjs"
+    "lint": "eslint . --ext .js,.jsx,.mjs",
+    "typecheck": "astro check"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.7",
@@ -23,8 +24,10 @@
     "three": "^0.182.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@tailwindcss/postcss": "^4.1.18",
     "eslint": "^9",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "typescript": "^6.0.3"
   }
 }

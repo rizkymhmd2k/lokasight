@@ -1,7 +1,18 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
-  }
+  },
+  "extends": "astro/tsconfigs/base",
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

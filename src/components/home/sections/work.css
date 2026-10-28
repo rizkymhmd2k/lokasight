@@ -1,5 +1,8 @@
 .work-intro {
-  padding-top: clamp(3rem, 5vw, 4.5rem);
+  padding-block: clamp(4rem, 8vw, 8rem);
+  background: var(--color-backgroundlight);
+  color: var(--color-yellow1);
+  border-radius: inherit;
 }
 
 .work-heading {
@@ -9,6 +12,20 @@
   font-weight: 300;
   line-height: 1.14;
   letter-spacing: normal;
+}
+
+.work-heading--intro {
+  font-size: clamp(1.5rem, 2.8vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  text-indent: 2em;
+  text-wrap: pretty;
+}
+
+.work-heading--intro .work-heading__word-mask,
+.work-heading--intro .work-heading__eye {
+  text-indent: 0;
 }
 
 .work-heading--embedded {
@@ -63,6 +80,23 @@
   height: 100%;
 }
 
+.work-heading__graphic {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline: 0.08em;
+  color: var(--color-yellow1);
+  vertical-align: -0.12em;
+  line-height: 0;
+  text-indent: 0;
+}
+
+.work-heading__graphic svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 @media (min-width: 768px) {
   .work-heading__label {
     font-size: 1rem;
@@ -72,9 +106,56 @@
 
 @media (prefers-reduced-motion: reduce) {
   .work-heading__word,
+  .work-heading__graphic,
   .work-heading__eye {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
   }
+}
+
+.work-heading__rings {
+  transform-origin: 53px 52px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .work-heading__rings {
+    animation: work-rings-turn 8s linear infinite;
+  }
+}
+
+@keyframes work-rings-turn {
+  to { transform: rotate(360deg); }
+}
+
+.work-welcome {
+  max-width: 72rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.work-welcome__label {
+  margin: 0 0 1rem;
+  color: #080808;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.work-welcome__title {
+  margin: 0;
+  -webkit-text-stroke: clamp(2px, 0.25vw, 4px) #080808;
+  paint-order: stroke fill;
+  font-size: clamp(3rem, 10vw, 9rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.065em;
+}
+
+.work-welcome__copy {
+  color: #080808;
+  max-width: 30ch;
+  margin: 1.5rem auto 0;
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.2;
 }

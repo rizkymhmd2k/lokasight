@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
+/** @param {{ children?: import("react").ReactNode, text?: string, className?: string }} props */
 export default function TextScramble({ children, text: textProp, className = "" }) {
   const text = textProp ?? String(children);
   const frameRef = useRef();

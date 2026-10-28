@@ -6,7 +6,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 import SplitText from "gsap/SplitText";
 import CustomEase from "gsap/CustomEase";
-import Work from "./Work.jsx";
+import "./services.css";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, CustomEase);
 
@@ -225,12 +225,24 @@ const Services = ({ serviceImages }) => {
     >
       <div className="flex w-full flex-col overflow-hidden rounded-3xl bg-black ">
         {/* HEADER */}
-        <div className="border px-card pt-12 pb-10 md:py-12 lg:py-16">
-          <Work
-            embedded
-            label="[SERVICES]"
-            text="Strategy, identity, and digital experiences that build brands for growth. From clarifying your position to shaping a distinct identity and digital experiences, we help your brand earn trust and grow."
-          />
+        <div className="flex flex-col gap-6 px-card pt-12 pb-10 md:flex-row md:items-center md:justify-between md:gap-10 md:py-12 lg:py-16">
+          <h2 data-service-copy className="shrink-0 font-display text-[clamp(2rem,3.8vw,4rem)] font-semibold leading-[1.05] tracking-[-0.045em] text-white">
+            Our most demandable<br />
+            &amp; experienced services
+          </h2>
+          <a href="#contact" aria-label="Contact us" className="services-arrows block w-full max-w-sm overflow-hidden text-yellow1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow1 md:min-w-0 md:max-w-none md:flex-1">
+            <span className="services-arrows__track" aria-hidden="true">
+              {[0, 1].map((group) => (
+                <span key={group} className="services-arrows__group">
+                  {[0, 1, 2, 3].map((arrow) => (
+                    <svg key={arrow} viewBox="0 0 100 100" className="block h-auto w-full" fill="none" focusable="false">
+                      <path d="M14 86 84 16M14 16h70v70" stroke="currentColor" strokeWidth="18" />
+                    </svg>
+                  ))}
+                </span>
+              ))}
+            </span>
+          </a>
         </div>
 
         {/* SERVICES */}

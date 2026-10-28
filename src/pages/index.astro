@@ -1,80 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getImage } from "astro:assets";
 import MobileNav from "../components/layout/MobileNav.jsx";
 import HeroSection from "../components/home/HeroSection.astro";
-import Work from "../components/home/sections/Work.jsx";
-import Services from "../components/home/sections/Services.jsx";
-import About from "../components/home/sections/About.astro";
-import Testimonials from "../components/home/sections/Testimonials.astro";
-import Contact from "../components/home/sections/Contact.jsx";
-import Footer from "../components/home/sections/Footer.astro";
-import WorkShowcase from "../components/home/sections/WorkShowcase.astro";
-import strategyImage from "../assets/images/strategy-ai.png";
-import identityImage from "../assets/images/identity-ai.png";
-import digitalImage from "../assets/images/digital-ai.png";
-
-const serviceImageEntries = await Promise.all(
-  [
-    ["strategy", strategyImage],
-    ["identity", identityImage],
-    ["digital", digitalImage],
-  ].map(async ([key, src]) => {
-    const image = await getImage({
-      src,
-      width: 360,
-      densities: [1, 2],
-      format: "webp",
-      quality: 75,
-    });
-
-    return [
-      key,
-      {
-        src: image.src,
-        srcSet: image.srcSet.attribute,
-        width: image.attributes.width,
-        height: image.attributes.height,
-      },
-    ];
-  }),
-);
-
-const serviceImages = Object.fromEntries(serviceImageEntries);
+import StudioContent from "../components/home/editorial/StudioContent.astro";
 ---
-
-<Layout
-  title="Lokasight — Strategy, Identity & Digital"
-  description="An independent strategy, identity, and digital studio helping ambitious businesses build lasting perception."
->
+<Layout title="Lokasight — Strategy, Identity & Digital" description="An independent strategy, identity, and digital studio helping ambitious businesses build lasting perception.">
   <main class="w-full">
     <MobileNav client:load />
-
-    <div class="progressive-blur" aria-hidden="true">
-      {Array.from({ length: 6 }, (_, index) => (
-        <div class={`progressive-blur__layer progressive-blur__layer--${index + 1}`} />
-      ))}
-    </div>
-
     <HeroSection />
-
-    <section
-      id="main-content"
-      aria-label="Lokasight studio content"
-      class="relative z-10
-        min-h-screen
-        -mt-[100vh]
-        bg-neutral-950
-        rounded-t-4xl"
-    >
-      <Work client:load />
-      <WorkShowcase />
-
-      <Services client:load serviceImages={serviceImages} />
-      <!-- <About /> -->
-      <Testimonials />
-      <Contact client:load />
-      <Footer />
-    </section>
+    <StudioContent />
   </main>
 </Layout>
