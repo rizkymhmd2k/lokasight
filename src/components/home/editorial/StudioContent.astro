@@ -21,10 +21,10 @@ const services = [
 <div id="main-content" class="editorial" tabindex="-1">
   <section id="work" class="ed-work" aria-labelledby="work-title">
     <header class="ed-work-intro"><h2 id="work-title" data-ed-reveal>Independent minds. Unmistakable identities.</h2><span class="ed-label">( selected work )</span></header>
-    <div class="ed-projects" tabindex="0" role="region" aria-label="Selected projects. Scroll horizontally to explore.">
+    <div class="ed-projects" tabindex="0" role="region" aria-label="Selected projects">
       {projects.map((project, index) => <article class="ed-project">
         <a class="ed-project-image" href={project.image.src} target="_blank" rel="noreferrer" aria-label={`View ${project.name} artwork at full size (opens in a new tab)`}>
-          <Picture src={project.image} formats={["webp"]} fallbackFormat="webp" widths={[480, 800, 1200]} sizes={["(max-width: 599px) 72vw, 32vw", "(max-width: 599px) 55vw, 24vw", "(max-width: 599px) 64vw, 28vw"][index]} alt={project.alt} loading="lazy" />
+          <Picture src={project.image} formats={["webp"]} fallbackFormat="webp" widths={[480, 800, 1200]} sizes={`(max-width: 599px) calc(100vw - 44px), ${["32vw", "24vw", "28vw"][index]}`} alt={project.alt} loading="lazy" />
           <span class="ed-project-view">View artwork ↗</span>
         </a>
         <h3>{project.name}</h3><p>{project.caption}</p>
