@@ -1,31 +1,30 @@
 import { useState, useRef } from "react";
+import female1 from "../../../assets/images/female1.webp";
+import female2 from "../../../assets/images/female2.webp";
+import wendy from "../../../assets/images/wendy.webp";
 const voices = [
   {
     quote: "They listened before they designed. That made all the difference.",
     detail:
       "The new identity feels distinctly Indonesian, without leaning on clichés.",
     name: "Nadine Prasetyo",
-    role: "Brand Director · Sora Botanics, Jakarta",
-  },
-  {
-    quote:
-      "The process was clear, collaborative, and refreshingly free of theatre.",
-    detail: "We launched with a brand our whole team could stand behind.",
-    name: "Elliot Mercer",
-    role: "Co-founder · Fieldnote Labs, London",
+    image: female1,
+    role: "Founder of Vellum",
   },
   {
     quote:
       "They turned a complicated product into an experience people understood immediately.",
     detail: "Every choice felt thoughtful, useful, and true to us.",
     name: "Mei Lin Tan",
-    role: "Product Lead · Northstar Health, Singapore",
+    image: female2,
+    role: "CEO of Forma 86",
   },
   {
     quote: "They made the whole process feel clear and fast.",
     detail: "We’re really happy with where we landed.",
     name: "Wendy",
-    role: "Jakarta",
+    image: wendy,
+    role: "Founder of Oriel",
   },
 ];
 export default function Voices() {
@@ -63,6 +62,15 @@ export default function Voices() {
     >
       <div className="ed-voice-content" aria-live="polite" aria-atomic="true">
         <figure key={active}>
+          <img
+            className="ed-voice-portrait"
+            src={voice.image.src}
+            width={voice.image.width}
+            height={voice.image.height}
+            alt={`Portrait of ${voice.name}`}
+            loading="lazy"
+            decoding="async"
+          />
           <blockquote>
             <p>“{voice.quote}”</p>
             <p className="ed-quote-detail">{voice.detail}</p>
