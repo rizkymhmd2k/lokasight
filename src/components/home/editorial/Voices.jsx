@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import female1 from "../../../assets/images/female1.webp";
 import female2 from "../../../assets/images/female2.webp";
 import wendy from "../../../assets/images/wendy.webp";
+import { observeFrost } from "./frostReveal";
 const voices = [
   {
     quote: "They listened before they designed. That made all the difference.",
@@ -30,6 +31,8 @@ const voices = [
 export default function Voices() {
   const [active, setActive] = useState(0);
   const touch = useRef(null);
+  const portrait = useRef(null);
+  useEffect(() => observeFrost(portrait.current), [active]);
   const step = (direction) =>
     setActive((index) => (index + direction + voices.length) % voices.length);
   const voice = voices[active];
@@ -62,7 +65,9 @@ export default function Voices() {
     >
       <div className="ed-voice-content" aria-live="polite" aria-atomic="true">
         <figure key={active}>
+          <span className="ed-voice-portrait-frame">
           <img
+            ref={portrait}
             className="ed-voice-portrait"
             src={voice.image.src}
             width={voice.image.width}
@@ -71,6 +76,7 @@ export default function Voices() {
             loading="lazy"
             decoding="async"
           />
+          </span>
           <blockquote>
             <p>“{voice.quote}”</p>
             <p className="ed-quote-detail">{voice.detail}</p>
